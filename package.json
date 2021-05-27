@@ -32,6 +32,10 @@
     "plyr": "^3.6.4",
     "vue": "^3.0.9"
   },
+  "peerDependencies": {
+    "plyr": "^3.6.4",
+    "vue": "^3.0.9"
+  },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.13.10",
     "@rollup/plugin-babel": "^5.3.0",
