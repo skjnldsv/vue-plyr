@@ -14,14 +14,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [15]
-        examples: ["html", "nuxt", "shared", "vite", "vue-cli"]
+        node-version: [14]
+        examples: ["html", "nuxt", "vite", "vue-cli"]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up node ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
