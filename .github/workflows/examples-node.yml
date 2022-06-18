@@ -25,10 +25,19 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install dependencies
-        working-directory: "examples/${{ matrix.examples }}"
-        run: npm ci
+      - name: Install dependencies and build library
+        run: |
+          npm ci
+          npm run build --if-present
+          npm pack
 
-      - name: Build
+      - name: Install example dependencies
+        working-directory: "examples/${{ matrix.examples }}"
+        run: |
+          npm ci
+          version=$(cat ../../package.json | jq --raw-output .version)
+          npm install -D ../../skjnldsv-vue-plyr-$version.tgz
+
+      - name: Build ${{ matrix.examples }} example
         working-directory: "examples/${{ matrix.examples }}"
         run: npm run build --if-present
