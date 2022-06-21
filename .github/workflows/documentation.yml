@@ -40,6 +40,9 @@ jobs:
           npm ci --no-dev
           npm i --save @skjnldsv/vue-plyr@latest
 
+      - name: Allow node_modules
+        run: echo '!examples/html/node_modules' >> .gitignore
+
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
