@@ -13,8 +13,8 @@
     "build": "rm  -rf dist/ && rollup --config rollup.config.js",
     "dev": "echo 'No dev build available, production only' && npm run build",
     "watch": "rollup --config rollup.config.js --watch",
-    "lint": "eslint --ext .js,.vue lib examples",
-    "lint:fix": "eslint --ext .js,.vue --fix lib examples"
+    "lint": "eslint --ext .js,.vue lib",
+    "lint:fix": "eslint --ext .js,.vue --fix lib"
   },
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -29,6 +29,10 @@
   "files": [
     "dist/"
   ],
+  "engines": {
+    "node": "^14.0.0",
+    "npm": "^7.0.0"
+  },
   "dependencies": {
     "plyr": "^3.6.8",
     "vue": "^3.2.37"
