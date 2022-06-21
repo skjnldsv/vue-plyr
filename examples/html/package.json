@@ -8,5 +8,8 @@
   },
   "devDependencies": {
     "serve": "^13.0.2"
+  },
+  "dependencies": {
+    "@skjnldsv/vue-plyr": "file:../.."
   }
 }
