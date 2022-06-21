@@ -10,7 +10,7 @@
   },
   "repository": "github:skjnldsv/vue-plyr",
   "scripts": {
-    "build": "rollup --config rollup.config.js",
+    "build": "rm  -rf dist/ && rollup --config rollup.config.js",
     "dev": "echo 'No dev build available, production only' && npm run build",
     "watch": "rollup --config rollup.config.js --watch",
     "lint": "eslint --ext .js,.vue lib examples",
@@ -37,7 +37,6 @@
     "@nextcloud/babel-config": "^1.0.0",
     "@nextcloud/eslint-config": "^8.0.0",
     "@nextcloud/stylelint-config": "^2.1.2",
-    "@rollup-extras/plugin-clean": "^1.2.3",
     "@rollup/plugin-commonjs": "^22.0.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@vue/tsconfig": "^0.1.3",

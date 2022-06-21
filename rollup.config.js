@@ -1,5 +1,4 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve'
-import clean from '@rollup-extras/plugin-clean'
 import commonjs from '@rollup/plugin-commonjs'
 import styles from 'rollup-plugin-styles'
 import vue from 'rollup-plugin-vue'
@@ -19,7 +18,6 @@ export default {
 		styles({
 			mode: 'extract',
 		}),
-		clean(),
 	],
 	output: [
 		{
@@ -27,6 +25,7 @@ export default {
 			format: 'cjs',
 			sourcemap: true,
 			assetFileNames: 'vue-plyr[extname]',
+			exports: 'default',
 		},
 		{
 			file: 'dist/index.esm.js',
