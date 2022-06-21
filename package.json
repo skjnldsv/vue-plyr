@@ -23,10 +23,11 @@
     ".": {
       "import": "./dist/index.esm.js",
       "require": "./dist/index.js"
-    }
+    },
+    "./dist/": "./dist/"
   },
   "files": [
-    "dist"
+    "dist/"
   ],
   "dependencies": {
     "plyr": "^3.6.8",
