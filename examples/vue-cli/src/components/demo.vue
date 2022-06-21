@@ -4,16 +4,15 @@
 		<h3>
 			sources can be found at
 			<a href="https://github.com/skjnldsv/vue-plyr/tree/master/examples">
-				github.com/skjnldsv/vue-plyr</a
-			>.
+				github.com/skjnldsv/vue-plyr</a>.
 		</h3>
 		<div class="components">
-			<vue-plyr-video />
-			<vue-plyr-audio />
-			<youtube />
-			<youtube-np />
-			<vimeo />
-			<vimeo-np />
+			<VuePlyrVideo />
+			<VuePlyrAudio />
+			<Youtube />
+			<YoutubeNp />
+			<Vimeo />
+			<VimeoNp />
 		</div>
 	</div>
 </template>
@@ -27,8 +26,6 @@ import Vimeo from './vimeo.vue'
 import VimeoNp from './vimeo-np.vue'
 
 export default {
-	name: 'Demo',
-
 	components: {
 		VuePlyrVideo,
 		VuePlyrAudio,
