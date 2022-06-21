@@ -7,17 +7,11 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "core-js": "^3.21.1",
     "vue": "^3.2.31"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^5.0.1",
     "@vue/cli-service": "^5.0.1",
     "@vue/compiler-sfc": "^3.2.31"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+  }
 }
