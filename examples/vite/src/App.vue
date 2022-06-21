@@ -1,14 +1,14 @@
 <template>
-	<demo />
+	<Demo />
 </template>
 
 <script>
-	import Demo from './components/demo.vue'
+import Demo from './components/demo.vue'
 
-	export default {
-		name: 'App',
-		components: {
-			Demo
-		}
-	}
+export default {
+	name: 'App',
+	components: {
+		Demo,
+	},
+}
 </script>

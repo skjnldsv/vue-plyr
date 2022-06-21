@@ -2,7 +2,7 @@
 	<div>
 		<h2>vimeo (not progressive-enhancement)</h2>
 		<vue-plyr>
-			<div data-plyr-provider="vimeo" data-plyr-embed-id="143418951"></div>
+			<div data-plyr-provider="vimeo" data-plyr-embed-id="147865858" />
 		</vue-plyr>
 	</div>
 </template>
