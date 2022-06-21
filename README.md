@@ -1,17 +1,12 @@
-# vue-plyr
+# vue-plyr - A vue component for the plyr video & audio player
+
 ![github_actions](https://img.shields.io/github/checks-status/skjnldsv/vue-plyr/master?style=flat-square)
 [![npm last version](https://img.shields.io/npm/v/@skjnldsv/vue-plyr.svg?style=flat-square)](https://www.npmjs.com/package/@skjnldsv/vue-plyr)
 ![Dependabot status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg?longCache=true&style=flat-square&logo=dependabot)
 
-[Changelog](https://github.com/skjnldsv/vue-plyr/releases)
-
-A vue component for the plyr video & audio player.
-
 This is useful for when you want a nice video player in your Vue app.
-
-It uses [plyr](https://plyr.io) by [sampotts](https://github.com/sampotts) for the players.
-
-Supported player types: HTML5 video, HTML5 audio, YouTube, and Vimeo.
+- It uses [plyr](https://plyr.io) by [sampotts](https://github.com/sampotts) for the players.
+- Supported player types: HTML5 video, HTML5 audio, YouTube, and Vimeo.
 
 ### Demo
 A demo of the components (equivalent to the html example include here) can be found at
