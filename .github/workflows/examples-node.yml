@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [14]
+        node-version: [14, 16, 18]
         examples: ["html", "vite", "vue-cli"]
 
     name: examples-build
@@ -34,10 +34,7 @@ jobs:
 
       - name: Install example dependencies
         working-directory: "examples/${{ matrix.examples }}"
-        run: |
-          npm ci
-          version=$(cat ../../package.json | jq --raw-output .version)
-          npm install -D ../../skjnldsv-vue-plyr-$version.tgz
+        run: npm i
 
       - name: Build ${{ matrix.examples }} example
         working-directory: "examples/${{ matrix.examples }}"
