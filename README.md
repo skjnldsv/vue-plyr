@@ -19,48 +19,11 @@ A demo of the components (equivalent to the html example include here) can be fo
 
 ## Installation
 ```bash
-npm i vue-plyr # or yarn add vue-plyr
+npm install vue-plyr
 ```
 
-### Module
-```js
-// In your main vue file - the one where you create the initial vue instance.
-import Vue from 'vue'
-import VuePlyr from '@skjnldsv/vue-plyr'
-import '@skjnldsv/vue-plyr/dist/vue-plyr.css'
-
-// Vue 3.x
-// The second argument is optional and sets the default config values for every player.
-createApp(App)
-  .use(VuePlyr, {
-    plyr: {}
-  })
-  .mount('#app')
-
-// Vue 2.x
-// The second argument is optional and sets the default config values for every player.
-Vue.use(VuePlyr, {
-  plyr: {}
-})
-```
-
-### SSR [(more below)](#ssr)
-For SSR, you can import the SSR optimized module, found at `dist/vue-plyr.ssr.js`. There is a more in depth description
-on how to use it with [nuxt](#nuxt) below.
-
-### Browser
-In the browser you can include it as you would any other package with unpkg, along with the stylesheet:
-
-```html
-<script type="text/javascript" src="https://unpkg.com/vue"></script>
-<script type="text/javascript" src="https://unpkg.com/@skjnldsv/vue-plyr"></script>
-<link rel="stylesheet" href="https://unpkg.com/@skjnldsv/vue-plyr/dist/vue-plyr.css" />
-
-<!-- You will also need to install the component during app creation -->
-<script>
-  window.Vue.createApp(VuePlyr).mount('#app')
-</script>
-```
+## Examples
+Examples of how to use this app can be found [here](https://github.com/skjnldsv/vue-plyr/tree/master/examples).
 
 ## Usage
 Once installed, it can be used in a template as simply as:
@@ -161,9 +124,6 @@ To access the player instance, you can use the `player` property from the `refs`
 </script>
 ```
 
-## Examples
-Examples of how to use this app can be found [here](https://github.com/skjnldsv/vue-plyr/tree/master/examples).
-
 ## Events
 If you want to capture events from the plyr instance, you can do so by accessing the player instance through the `ref`
 attribute and using that object for events, as you would with a vanilla plyr instance.
@@ -199,33 +159,7 @@ createApp(App).use(VuePlyr, {
 })
 ```
 
-## SSR
-### Nuxt (Vue 2.x)
-This should support SSR out of the box. For [nuxt](https://nuxtjs.org/), create a file called `vue-plyr.js` in your
-plugins folder containing only these three statements:
+## Author & Contributors
 
-```js
-import Vue from 'vue'
-import VuePlyr from '@skjnldsv/vue-plyr/dist/vue-plyr.ssr.js'
-import '@skjnldsv/vue-plyr/dist/vue-plyr.css'
-
-// The second argument is optional and sets the default config values for every player.
-Vue.use(VuePlyr, {
-  plyr: {}
-})
-```
-
-Then, in your `nuxt.config.js` file add `{ src: '~/plugins/vue-plyr', mode: 'client' }` to the plugins array. The
-`vue-plyr` element should be globally registered now.
-
-The `nuxt.config.js` file should at minimum include this:
-
-```js
-export default {
-  plugins: [{ src: '~/plugins/vue-plyr', mode: 'client' }]
-}
-```
-
-## Author
-
-**vue-plyr** © [RedXTech](https://github.com/redxtech), Released under the [MIT](./LICENSE.md) License.
+  - [RedXTech](https://github.com/redxtech), released under the [MIT](./LICENSE.md) License.
+  - [Skjnldsv](https://github.com/skjnldsv)
