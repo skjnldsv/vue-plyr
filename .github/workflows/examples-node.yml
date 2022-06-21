@@ -26,6 +26,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      # TODO: Remove when min LTS is 16
+      - name: Set up npm 7 for node 14
+        if: matrix.node-version == '14'
+        run: npm i -g npm@^7
+
       - name: Install dependencies and build library
         run: |
           npm ci
@@ -34,7 +39,10 @@ jobs:
 
       - name: Install example dependencies
         working-directory: "examples/${{ matrix.examples }}"
-        run: npm i
+        run: |
+          npm ci
+          version=$(cat ../../package.json | jq --raw-output .version)
+          npm install -D ../../skjnldsv-vue-plyr-$version.tgz
 
       - name: Build ${{ matrix.examples }} example
         working-directory: "examples/${{ matrix.examples }}"
