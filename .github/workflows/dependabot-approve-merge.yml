@@ -20,8 +20,8 @@ jobs:
       pull-requests: write
 
     steps:
-      # Nextcloud bot approve and merge request
+      # Approve and merge request
       - uses: ahmadnassri/action-dependabot-auto-merge@v2
         with:
           target: minor
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.DEPENDABOT_AUTOMERGE_TOKEN }}
