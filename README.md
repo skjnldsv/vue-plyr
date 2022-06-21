@@ -1,6 +1,6 @@
 # vue-plyr
 ![github_actions](https://img.shields.io/github/checks-status/skjnldsv/vue-plyr/master?style=flat-square)
-[![npm last version](https://img.shields.io/npm/v/@skjnldsv/vue-plyr.svg?style=flat-square)](https://www.npmjs.com/package/@nextcloud/vue)
+[![npm last version](https://img.shields.io/npm/v/@skjnldsv/vue-plyr.svg?style=flat-square)](https://www.npmjs.com/package/@skjnldsv/vue-plyr)
 ![Dependabot status](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg?longCache=true&style=flat-square&logo=dependabot)
 
 [Changelog](https://github.com/skjnldsv/vue-plyr/blob/master/changelog.md)
