@@ -10,3 +10,47 @@ updates:
   open-pull-requests-limit: 10
   labels:
   - dependencies
+
+- package-ecosystem: npm
+  directory: "examples/html"
+  schedule:
+    interval: weekly
+    day: saturday
+    time: "03:00"
+    timezone: Europe/Paris
+  open-pull-requests-limit: 10
+  labels:
+  - dependencies
+
+- package-ecosystem: npm
+  directory: "examples/nuxt"
+  schedule:
+    interval: weekly
+    day: saturday
+    time: "03:00"
+    timezone: Europe/Paris
+  open-pull-requests-limit: 10
+  labels:
+  - dependencies
+
+- package-ecosystem: npm
+  directory: "examples/vite"
+  schedule:
+    interval: weekly
+    day: saturday
+    time: "03:00"
+    timezone: Europe/Paris
+  open-pull-requests-limit: 10
+  labels:
+  - dependencies
+
+- package-ecosystem: npm
+  directory: "examples/vue-cli"
+  schedule:
+    interval: weekly
+    day: saturday
+    time: "03:00"
+    timezone: Europe/Paris
+  open-pull-requests-limit: 10
+  labels:
+  - dependencies
