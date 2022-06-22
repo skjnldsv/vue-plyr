@@ -1,0 +1,17 @@
+{
+  "name": "vue-plyr-nuxt",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nuxi dev",
+    "build": "nuxi build",
+    "start": "nuxi start",
+    "generate": "nuxi generate"
+  },
+  "devDependencies": {
+    "nuxt": "npm:nuxt3@latest"
+  },
+  "dependencies": {
+    "@skjnldsv/vue-plyr": "file:../.."
+  }
+}

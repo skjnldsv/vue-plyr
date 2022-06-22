@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "bundledDependencies": [
+    "source-map-support",
+    "hookable",
+    "radix3",
+    "unstorage",
+    "pathe",
+    "scule",
+    "ohash",
+    "ufo",
+    "unenv",
+    "destr",
+    "h3",
+    "node-fetch-native",
+    "ohmyfetch",
+    "cookie-es",
+    "source-map",
+    "buffer-from"
+  ]
+}
