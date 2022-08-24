@@ -7,6 +7,7 @@ var fails = require('../internals/fails');
 var uid = require('../internals/uid');
 var isCallable = require('../internals/is-callable');
 var isConstructor = require('../internals/is-constructor');
+var isNullOrUndefined = require('../internals/is-null-or-undefined');
 var isObject = require('../internals/is-object');
 var isSymbol = require('../internals/is-symbol');
 var iterate = require('../internals/iterate');
@@ -48,10 +49,10 @@ var mapSet = uncurryThis(MapPrototype.set);
 var setAdd = uncurryThis(Set.prototype.add);
 var objectKeys = getBuiltin('Object', 'keys');
 var push = uncurryThis([].push);
-var booleanValueOf = uncurryThis(true.valueOf);
-var numberValueOf = uncurryThis(1.0.valueOf);
-var stringValueOf = uncurryThis(''.valueOf);
-var getTime = uncurryThis(Date.prototype.getTime);
+var thisBooleanValue = uncurryThis(true.valueOf);
+var thisNumberValue = uncurryThis(1.0.valueOf);
+var thisStringValue = uncurryThis(''.valueOf);
+var thisTimeValue = uncurryThis(Date.prototype.getTime);
 var PERFORMANCE_MARK = uid('structuredClone');
 var DATA_CLONE_ERROR = 'DataCloneError';
 var TRANSFERRING = 'Transferring';
@@ -121,8 +122,20 @@ var throwUncloneable = function (type) {
   throw new DOMException('Uncloneable type: ' + type, DATA_CLONE_ERROR);
 };
 
-var throwUnpolyfillable = function (type, kind) {
-  throw new DOMException((kind || 'Cloning') + ' of ' + type + ' cannot be properly polyfilled in this engine', DATA_CLONE_ERROR);
+var throwUnpolyfillable = function (type, action) {
+  throw new DOMException((action || 'Cloning') + ' of ' + type + ' cannot be properly polyfilled in this engine', DATA_CLONE_ERROR);
+};
+
+var createDataTransfer = function () {
+  var dataTransfer;
+  try {
+    dataTransfer = new global.DataTransfer();
+  } catch (error) {
+    try {
+      dataTransfer = new global.ClipboardEvent('').clipboardData;
+    } catch (error2) { /* empty */ }
+  }
+  return dataTransfer && dataTransfer.items && dataTransfer.files ? dataTransfer : null;
 };
 
 var structuredCloneInternal = function (value, map) {
@@ -239,9 +252,8 @@ var structuredCloneInternal = function (value, map) {
       }
       break;
     case 'FileList':
-      C = global.DataTransfer;
-      if (isConstructor(C)) {
-        dataTransfer = new C();
+      dataTransfer = createDataTransfer();
+      if (dataTransfer) {
         for (i = 0, length = lengthOfArrayLike(value); i < length; i++) {
           dataTransfer.items.add(structuredCloneInternal(value[i], map));
         }
@@ -273,16 +285,16 @@ var structuredCloneInternal = function (value, map) {
           cloned = Object(value.valueOf());
           break;
         case 'Boolean':
-          cloned = Object(booleanValueOf(value));
+          cloned = Object(thisBooleanValue(value));
           break;
         case 'Number':
-          cloned = Object(numberValueOf(value));
+          cloned = Object(thisNumberValue(value));
           break;
         case 'String':
-          cloned = Object(stringValueOf(value));
+          cloned = Object(thisStringValue(value));
           break;
         case 'Date':
-          cloned = new Date(getTime(value));
+          cloned = new Date(thisTimeValue(value));
           break;
         case 'ArrayBuffer':
           C = global.DataView;
@@ -475,7 +487,7 @@ var tryToTransfer = function (rawTransfer, map) {
 
 $({ global: true, enumerable: true, sham: !PROPER_TRANSFER, forced: FORCED_REPLACEMENT }, {
   structuredClone: function structuredClone(value /* , { transfer } */) {
-    var options = validateArgumentsLength(arguments.length, 1) > 1 && arguments[1] != null ? anObject(arguments[1]) : undefined;
+    var options = validateArgumentsLength(arguments.length, 1) > 1 && !isNullOrUndefined(arguments[1]) ? anObject(arguments[1]) : undefined;
     var transfer = options ? options.transfer : undefined;
     var map;
 

@@ -2,7 +2,7 @@
 var global = require('../internals/global');
 var uncurryThis = require('../internals/function-uncurry-this');
 var DESCRIPTORS = require('../internals/descriptors');
-var NATIVE_ARRAY_BUFFER = require('../internals/array-buffer-native');
+var NATIVE_ARRAY_BUFFER = require('../internals/array-buffer-basic-detection');
 var FunctionName = require('../internals/function-name');
 var createNonEnumerableProperty = require('../internals/create-non-enumerable-property');
 var defineBuiltIns = require('../internals/define-built-ins');
@@ -197,9 +197,9 @@ if (!NATIVE_ARRAY_BUFFER) {
     new NativeArrayBuffer();
     new NativeArrayBuffer(1.5);
     new NativeArrayBuffer(NaN);
-    return INCORRECT_ARRAY_BUFFER_NAME && !CONFIGURABLE_FUNCTION_NAME;
+    return NativeArrayBuffer.length != 1 || INCORRECT_ARRAY_BUFFER_NAME && !CONFIGURABLE_FUNCTION_NAME;
   })) {
-  /* eslint-enable no-new -- required for testing */
+    /* eslint-enable no-new -- required for testing */
     $ArrayBuffer = function ArrayBuffer(length) {
       anInstance(this, ArrayBufferPrototype);
       return new NativeArrayBuffer(toIndex(length));

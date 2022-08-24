@@ -124,6 +124,7 @@ require('../modules/es.object.keys');
 require('../modules/es.object.lookup-getter');
 require('../modules/es.object.lookup-setter');
 require('../modules/es.object.prevent-extensions');
+require('../modules/es.object.proto');
 require('../modules/es.object.seal');
 require('../modules/es.object.set-prototype-of');
 require('../modules/es.object.to-string');
