@@ -357,7 +357,8 @@ function parseName(name) {
             options[m[0].toLowerCase()] = true;
         }
     }
-    return [shared.hyphenate(name.slice(2)), options];
+    const event = name[2] === ':' ? name.slice(3) : shared.hyphenate(name.slice(2));
+    return [event, options];
 }
 function createInvoker(initialValue, instance) {
     const invoker = (e) => {
@@ -369,7 +370,7 @@ function createInvoker(initialValue, instance) {
         // AFTER it was attached.
         const timeStamp = e.timeStamp || _getNow();
         if (skipTimestampCheck || timeStamp >= invoker.attached - 1) {
-            runtimeCore.callWithAsyncErrorHandling(patchStopImmediatePropagation(e, invoker.value), instance, 5 /* NATIVE_EVENT_HANDLER */, [e]);
+            runtimeCore.callWithAsyncErrorHandling(patchStopImmediatePropagation(e, invoker.value), instance, 5 /* ErrorCodes.NATIVE_EVENT_HANDLER */, [e]);
         }
     };
     invoker.value = initialValue;

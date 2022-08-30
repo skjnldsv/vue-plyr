@@ -22,65 +22,65 @@ function createCompilerError(code, loc, messages, additionalMessage) {
 }
 const errorMessages = {
     // parse errors
-    [0 /* ABRUPT_CLOSING_OF_EMPTY_COMMENT */]: 'Illegal comment.',
-    [1 /* CDATA_IN_HTML_CONTENT */]: 'CDATA section is allowed only in XML context.',
-    [2 /* DUPLICATE_ATTRIBUTE */]: 'Duplicate attribute.',
-    [3 /* END_TAG_WITH_ATTRIBUTES */]: 'End tag cannot have attributes.',
-    [4 /* END_TAG_WITH_TRAILING_SOLIDUS */]: "Illegal '/' in tags.",
-    [5 /* EOF_BEFORE_TAG_NAME */]: 'Unexpected EOF in tag.',
-    [6 /* EOF_IN_CDATA */]: 'Unexpected EOF in CDATA section.',
-    [7 /* EOF_IN_COMMENT */]: 'Unexpected EOF in comment.',
-    [8 /* EOF_IN_SCRIPT_HTML_COMMENT_LIKE_TEXT */]: 'Unexpected EOF in script.',
-    [9 /* EOF_IN_TAG */]: 'Unexpected EOF in tag.',
-    [10 /* INCORRECTLY_CLOSED_COMMENT */]: 'Incorrectly closed comment.',
-    [11 /* INCORRECTLY_OPENED_COMMENT */]: 'Incorrectly opened comment.',
-    [12 /* INVALID_FIRST_CHARACTER_OF_TAG_NAME */]: "Illegal tag name. Use '&lt;' to print '<'.",
-    [13 /* MISSING_ATTRIBUTE_VALUE */]: 'Attribute value was expected.',
-    [14 /* MISSING_END_TAG_NAME */]: 'End tag name was expected.',
-    [15 /* MISSING_WHITESPACE_BETWEEN_ATTRIBUTES */]: 'Whitespace was expected.',
-    [16 /* NESTED_COMMENT */]: "Unexpected '<!--' in comment.",
-    [17 /* UNEXPECTED_CHARACTER_IN_ATTRIBUTE_NAME */]: 'Attribute name cannot contain U+0022 ("), U+0027 (\'), and U+003C (<).',
-    [18 /* UNEXPECTED_CHARACTER_IN_UNQUOTED_ATTRIBUTE_VALUE */]: 'Unquoted attribute value cannot contain U+0022 ("), U+0027 (\'), U+003C (<), U+003D (=), and U+0060 (`).',
-    [19 /* UNEXPECTED_EQUALS_SIGN_BEFORE_ATTRIBUTE_NAME */]: "Attribute name cannot start with '='.",
-    [21 /* UNEXPECTED_QUESTION_MARK_INSTEAD_OF_TAG_NAME */]: "'<?' is allowed only in XML context.",
-    [20 /* UNEXPECTED_NULL_CHARACTER */]: `Unexpected null character.`,
-    [22 /* UNEXPECTED_SOLIDUS_IN_TAG */]: "Illegal '/' in tags.",
+    [0 /* ErrorCodes.ABRUPT_CLOSING_OF_EMPTY_COMMENT */]: 'Illegal comment.',
+    [1 /* ErrorCodes.CDATA_IN_HTML_CONTENT */]: 'CDATA section is allowed only in XML context.',
+    [2 /* ErrorCodes.DUPLICATE_ATTRIBUTE */]: 'Duplicate attribute.',
+    [3 /* ErrorCodes.END_TAG_WITH_ATTRIBUTES */]: 'End tag cannot have attributes.',
+    [4 /* ErrorCodes.END_TAG_WITH_TRAILING_SOLIDUS */]: "Illegal '/' in tags.",
+    [5 /* ErrorCodes.EOF_BEFORE_TAG_NAME */]: 'Unexpected EOF in tag.',
+    [6 /* ErrorCodes.EOF_IN_CDATA */]: 'Unexpected EOF in CDATA section.',
+    [7 /* ErrorCodes.EOF_IN_COMMENT */]: 'Unexpected EOF in comment.',
+    [8 /* ErrorCodes.EOF_IN_SCRIPT_HTML_COMMENT_LIKE_TEXT */]: 'Unexpected EOF in script.',
+    [9 /* ErrorCodes.EOF_IN_TAG */]: 'Unexpected EOF in tag.',
+    [10 /* ErrorCodes.INCORRECTLY_CLOSED_COMMENT */]: 'Incorrectly closed comment.',
+    [11 /* ErrorCodes.INCORRECTLY_OPENED_COMMENT */]: 'Incorrectly opened comment.',
+    [12 /* ErrorCodes.INVALID_FIRST_CHARACTER_OF_TAG_NAME */]: "Illegal tag name. Use '&lt;' to print '<'.",
+    [13 /* ErrorCodes.MISSING_ATTRIBUTE_VALUE */]: 'Attribute value was expected.',
+    [14 /* ErrorCodes.MISSING_END_TAG_NAME */]: 'End tag name was expected.',
+    [15 /* ErrorCodes.MISSING_WHITESPACE_BETWEEN_ATTRIBUTES */]: 'Whitespace was expected.',
+    [16 /* ErrorCodes.NESTED_COMMENT */]: "Unexpected '<!--' in comment.",
+    [17 /* ErrorCodes.UNEXPECTED_CHARACTER_IN_ATTRIBUTE_NAME */]: 'Attribute name cannot contain U+0022 ("), U+0027 (\'), and U+003C (<).',
+    [18 /* ErrorCodes.UNEXPECTED_CHARACTER_IN_UNQUOTED_ATTRIBUTE_VALUE */]: 'Unquoted attribute value cannot contain U+0022 ("), U+0027 (\'), U+003C (<), U+003D (=), and U+0060 (`).',
+    [19 /* ErrorCodes.UNEXPECTED_EQUALS_SIGN_BEFORE_ATTRIBUTE_NAME */]: "Attribute name cannot start with '='.",
+    [21 /* ErrorCodes.UNEXPECTED_QUESTION_MARK_INSTEAD_OF_TAG_NAME */]: "'<?' is allowed only in XML context.",
+    [20 /* ErrorCodes.UNEXPECTED_NULL_CHARACTER */]: `Unexpected null character.`,
+    [22 /* ErrorCodes.UNEXPECTED_SOLIDUS_IN_TAG */]: "Illegal '/' in tags.",
     // Vue-specific parse errors
-    [23 /* X_INVALID_END_TAG */]: 'Invalid end tag.',
-    [24 /* X_MISSING_END_TAG */]: 'Element is missing end tag.',
-    [25 /* X_MISSING_INTERPOLATION_END */]: 'Interpolation end sign was not found.',
-    [27 /* X_MISSING_DYNAMIC_DIRECTIVE_ARGUMENT_END */]: 'End bracket for dynamic directive argument was not found. ' +
+    [23 /* ErrorCodes.X_INVALID_END_TAG */]: 'Invalid end tag.',
+    [24 /* ErrorCodes.X_MISSING_END_TAG */]: 'Element is missing end tag.',
+    [25 /* ErrorCodes.X_MISSING_INTERPOLATION_END */]: 'Interpolation end sign was not found.',
+    [27 /* ErrorCodes.X_MISSING_DYNAMIC_DIRECTIVE_ARGUMENT_END */]: 'End bracket for dynamic directive argument was not found. ' +
         'Note that dynamic directive argument cannot contain spaces.',
-    [26 /* X_MISSING_DIRECTIVE_NAME */]: 'Legal directive name was expected.',
+    [26 /* ErrorCodes.X_MISSING_DIRECTIVE_NAME */]: 'Legal directive name was expected.',
     // transform errors
-    [28 /* X_V_IF_NO_EXPRESSION */]: `v-if/v-else-if is missing expression.`,
-    [29 /* X_V_IF_SAME_KEY */]: `v-if/else branches must use unique keys.`,
-    [30 /* X_V_ELSE_NO_ADJACENT_IF */]: `v-else/v-else-if has no adjacent v-if or v-else-if.`,
-    [31 /* X_V_FOR_NO_EXPRESSION */]: `v-for is missing expression.`,
-    [32 /* X_V_FOR_MALFORMED_EXPRESSION */]: `v-for has invalid expression.`,
-    [33 /* X_V_FOR_TEMPLATE_KEY_PLACEMENT */]: `<template v-for> key should be placed on the <template> tag.`,
-    [34 /* X_V_BIND_NO_EXPRESSION */]: `v-bind is missing expression.`,
-    [35 /* X_V_ON_NO_EXPRESSION */]: `v-on is missing expression.`,
-    [36 /* X_V_SLOT_UNEXPECTED_DIRECTIVE_ON_SLOT_OUTLET */]: `Unexpected custom directive on <slot> outlet.`,
-    [37 /* X_V_SLOT_MIXED_SLOT_USAGE */]: `Mixed v-slot usage on both the component and nested <template>.` +
+    [28 /* ErrorCodes.X_V_IF_NO_EXPRESSION */]: `v-if/v-else-if is missing expression.`,
+    [29 /* ErrorCodes.X_V_IF_SAME_KEY */]: `v-if/else branches must use unique keys.`,
+    [30 /* ErrorCodes.X_V_ELSE_NO_ADJACENT_IF */]: `v-else/v-else-if has no adjacent v-if or v-else-if.`,
+    [31 /* ErrorCodes.X_V_FOR_NO_EXPRESSION */]: `v-for is missing expression.`,
+    [32 /* ErrorCodes.X_V_FOR_MALFORMED_EXPRESSION */]: `v-for has invalid expression.`,
+    [33 /* ErrorCodes.X_V_FOR_TEMPLATE_KEY_PLACEMENT */]: `<template v-for> key should be placed on the <template> tag.`,
+    [34 /* ErrorCodes.X_V_BIND_NO_EXPRESSION */]: `v-bind is missing expression.`,
+    [35 /* ErrorCodes.X_V_ON_NO_EXPRESSION */]: `v-on is missing expression.`,
+    [36 /* ErrorCodes.X_V_SLOT_UNEXPECTED_DIRECTIVE_ON_SLOT_OUTLET */]: `Unexpected custom directive on <slot> outlet.`,
+    [37 /* ErrorCodes.X_V_SLOT_MIXED_SLOT_USAGE */]: `Mixed v-slot usage on both the component and nested <template>.` +
         `When there are multiple named slots, all slots should use <template> ` +
         `syntax to avoid scope ambiguity.`,
-    [38 /* X_V_SLOT_DUPLICATE_SLOT_NAMES */]: `Duplicate slot names found. `,
-    [39 /* X_V_SLOT_EXTRANEOUS_DEFAULT_SLOT_CHILDREN */]: `Extraneous children found when component already has explicitly named ` +
+    [38 /* ErrorCodes.X_V_SLOT_DUPLICATE_SLOT_NAMES */]: `Duplicate slot names found. `,
+    [39 /* ErrorCodes.X_V_SLOT_EXTRANEOUS_DEFAULT_SLOT_CHILDREN */]: `Extraneous children found when component already has explicitly named ` +
         `default slot. These children will be ignored.`,
-    [40 /* X_V_SLOT_MISPLACED */]: `v-slot can only be used on components or <template> tags.`,
-    [41 /* X_V_MODEL_NO_EXPRESSION */]: `v-model is missing expression.`,
-    [42 /* X_V_MODEL_MALFORMED_EXPRESSION */]: `v-model value must be a valid JavaScript member expression.`,
-    [43 /* X_V_MODEL_ON_SCOPE_VARIABLE */]: `v-model cannot be used on v-for or v-slot scope variables because they are not writable.`,
-    [44 /* X_INVALID_EXPRESSION */]: `Error parsing JavaScript expression: `,
-    [45 /* X_KEEP_ALIVE_INVALID_CHILDREN */]: `<KeepAlive> expects exactly one child component.`,
+    [40 /* ErrorCodes.X_V_SLOT_MISPLACED */]: `v-slot can only be used on components or <template> tags.`,
+    [41 /* ErrorCodes.X_V_MODEL_NO_EXPRESSION */]: `v-model is missing expression.`,
+    [42 /* ErrorCodes.X_V_MODEL_MALFORMED_EXPRESSION */]: `v-model value must be a valid JavaScript member expression.`,
+    [43 /* ErrorCodes.X_V_MODEL_ON_SCOPE_VARIABLE */]: `v-model cannot be used on v-for or v-slot scope variables because they are not writable.`,
+    [44 /* ErrorCodes.X_INVALID_EXPRESSION */]: `Error parsing JavaScript expression: `,
+    [45 /* ErrorCodes.X_KEEP_ALIVE_INVALID_CHILDREN */]: `<KeepAlive> expects exactly one child component.`,
     // generic errors
-    [46 /* X_PREFIX_ID_NOT_SUPPORTED */]: `"prefixIdentifiers" option is not supported in this build of compiler.`,
-    [47 /* X_MODULE_MODE_NOT_SUPPORTED */]: `ES module mode is not supported in this build of compiler.`,
-    [48 /* X_CACHE_HANDLER_NOT_SUPPORTED */]: `"cacheHandlers" option is only supported when the "prefixIdentifiers" option is enabled.`,
-    [49 /* X_SCOPE_ID_NOT_SUPPORTED */]: `"scopeId" option is only supported in module mode.`,
+    [46 /* ErrorCodes.X_PREFIX_ID_NOT_SUPPORTED */]: `"prefixIdentifiers" option is not supported in this build of compiler.`,
+    [47 /* ErrorCodes.X_MODULE_MODE_NOT_SUPPORTED */]: `ES module mode is not supported in this build of compiler.`,
+    [48 /* ErrorCodes.X_CACHE_HANDLER_NOT_SUPPORTED */]: `"cacheHandlers" option is only supported when the "prefixIdentifiers" option is enabled.`,
+    [49 /* ErrorCodes.X_SCOPE_ID_NOT_SUPPORTED */]: `"scopeId" option is only supported in module mode.`,
     // just to fulfill types
-    [50 /* __EXTEND_POINT__ */]: ``
+    [50 /* ErrorCodes.__EXTEND_POINT__ */]: ``
 };
 
 const FRAGMENT = Symbol(``);
@@ -183,7 +183,7 @@ const locStub = {
 };
 function createRoot(children, loc = locStub) {
     return {
-        type: 0 /* ROOT */,
+        type: 0 /* NodeTypes.ROOT */,
         children,
         helpers: [],
         components: [],
@@ -210,7 +210,7 @@ function createVNodeCall(context, tag, props, children, patchFlag, dynamicProps,
         }
     }
     return {
-        type: 13 /* VNODE_CALL */,
+        type: 13 /* NodeTypes.VNODE_CALL */,
         tag,
         props,
         children,
@@ -225,38 +225,38 @@ function createVNodeCall(context, tag, props, children, patchFlag, dynamicProps,
 }
 function createArrayExpression(elements, loc = locStub) {
     return {
-        type: 17 /* JS_ARRAY_EXPRESSION */,
+        type: 17 /* NodeTypes.JS_ARRAY_EXPRESSION */,
         loc,
         elements
     };
 }
 function createObjectExpression(properties, loc = locStub) {
     return {
-        type: 15 /* JS_OBJECT_EXPRESSION */,
+        type: 15 /* NodeTypes.JS_OBJECT_EXPRESSION */,
         loc,
         properties
     };
 }
 function createObjectProperty(key, value) {
     return {
-        type: 16 /* JS_PROPERTY */,
+        type: 16 /* NodeTypes.JS_PROPERTY */,
         loc: locStub,
         key: shared.isString(key) ? createSimpleExpression(key, true) : key,
         value
     };
 }
-function createSimpleExpression(content, isStatic = false, loc = locStub, constType = 0 /* NOT_CONSTANT */) {
+function createSimpleExpression(content, isStatic = false, loc = locStub, constType = 0 /* ConstantTypes.NOT_CONSTANT */) {
     return {
-        type: 4 /* SIMPLE_EXPRESSION */,
+        type: 4 /* NodeTypes.SIMPLE_EXPRESSION */,
         loc,
         content,
         isStatic,
-        constType: isStatic ? 3 /* CAN_STRINGIFY */ : constType
+        constType: isStatic ? 3 /* ConstantTypes.CAN_STRINGIFY */ : constType
     };
 }
 function createInterpolation(content, loc) {
     return {
-        type: 5 /* INTERPOLATION */,
+        type: 5 /* NodeTypes.INTERPOLATION */,
         loc,
         content: shared.isString(content)
             ? createSimpleExpression(content, false, loc)
@@ -265,14 +265,14 @@ function createInterpolation(content, loc) {
 }
 function createCompoundExpression(children, loc = locStub) {
     return {
-        type: 8 /* COMPOUND_EXPRESSION */,
+        type: 8 /* NodeTypes.COMPOUND_EXPRESSION */,
         loc,
         children
     };
 }
 function createCallExpression(callee, args = [], loc = locStub) {
     return {
-        type: 14 /* JS_CALL_EXPRESSION */,
+        type: 14 /* NodeTypes.JS_CALL_EXPRESSION */,
         loc,
         callee,
         arguments: args
@@ -280,7 +280,7 @@ function createCallExpression(callee, args = [], loc = locStub) {
 }
 function createFunctionExpression(params, returns = undefined, newline = false, isSlot = false, loc = locStub) {
     return {
-        type: 18 /* JS_FUNCTION_EXPRESSION */,
+        type: 18 /* NodeTypes.JS_FUNCTION_EXPRESSION */,
         params,
         returns,
         newline,
@@ -290,7 +290,7 @@ function createFunctionExpression(params, returns = undefined, newline = false, 
 }
 function createConditionalExpression(test, consequent, alternate, newline = true) {
     return {
-        type: 19 /* JS_CONDITIONAL_EXPRESSION */,
+        type: 19 /* NodeTypes.JS_CONDITIONAL_EXPRESSION */,
         test,
         consequent,
         alternate,
@@ -300,7 +300,7 @@ function createConditionalExpression(test, consequent, alternate, newline = true
 }
 function createCacheExpression(index, value, isVNode = false) {
     return {
-        type: 20 /* JS_CACHE_EXPRESSION */,
+        type: 20 /* NodeTypes.JS_CACHE_EXPRESSION */,
         index,
         value,
         isVNode,
@@ -309,21 +309,21 @@ function createCacheExpression(index, value, isVNode = false) {
 }
 function createBlockStatement(body) {
     return {
-        type: 21 /* JS_BLOCK_STATEMENT */,
+        type: 21 /* NodeTypes.JS_BLOCK_STATEMENT */,
         body,
         loc: locStub
     };
 }
 function createTemplateLiteral(elements) {
     return {
-        type: 22 /* JS_TEMPLATE_LITERAL */,
+        type: 22 /* NodeTypes.JS_TEMPLATE_LITERAL */,
         elements,
         loc: locStub
     };
 }
 function createIfStatement(test, consequent, alternate) {
     return {
-        type: 23 /* JS_IF_STATEMENT */,
+        type: 23 /* NodeTypes.JS_IF_STATEMENT */,
         test,
         consequent,
         alternate,
@@ -332,7 +332,7 @@ function createIfStatement(test, consequent, alternate) {
 }
 function createAssignmentExpression(left, right) {
     return {
-        type: 24 /* JS_ASSIGNMENT_EXPRESSION */,
+        type: 24 /* NodeTypes.JS_ASSIGNMENT_EXPRESSION */,
         left,
         right,
         loc: locStub
@@ -340,20 +340,20 @@ function createAssignmentExpression(left, right) {
 }
 function createSequenceExpression(expressions) {
     return {
-        type: 25 /* JS_SEQUENCE_EXPRESSION */,
+        type: 25 /* NodeTypes.JS_SEQUENCE_EXPRESSION */,
         expressions,
         loc: locStub
     };
 }
 function createReturnStatement(returns) {
     return {
-        type: 26 /* JS_RETURN_STATEMENT */,
+        type: 26 /* NodeTypes.JS_RETURN_STATEMENT */,
         returns,
         loc: locStub
     };
 }
 
-const isStaticExp = (p) => p.type === 4 /* SIMPLE_EXPRESSION */ && p.isStatic;
+const isStaticExp = (p) => p.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ && p.isStatic;
 const isBuiltInType = (tag, expected) => tag === expected || tag === shared.hyphenate(expected);
 function isCoreComponent(tag) {
     if (isBuiltInType(tag, 'Teleport')) {
@@ -383,7 +383,7 @@ const whitespaceRE = /\s+[.[]\s*|\s*[.[]\s+/g;
 const isMemberExpressionBrowser = (path) => {
     // remove whitespaces around . or [ first
     path = path.trim().replace(whitespaceRE, s => s.trim());
-    let state = 0 /* inMemberExp */;
+    let state = 0 /* MemberExpLexState.inMemberExp */;
     let stateStack = [];
     let currentOpenBracketCount = 0;
     let currentOpenParensCount = 0;
@@ -391,25 +391,25 @@ const isMemberExpressionBrowser = (path) => {
     for (let i = 0; i < path.length; i++) {
         const char = path.charAt(i);
         switch (state) {
-            case 0 /* inMemberExp */:
+            case 0 /* MemberExpLexState.inMemberExp */:
                 if (char === '[') {
                     stateStack.push(state);
-                    state = 1 /* inBrackets */;
+                    state = 1 /* MemberExpLexState.inBrackets */;
                     currentOpenBracketCount++;
                 }
                 else if (char === '(') {
                     stateStack.push(state);
-                    state = 2 /* inParens */;
+                    state = 2 /* MemberExpLexState.inParens */;
                     currentOpenParensCount++;
                 }
                 else if (!(i === 0 ? validFirstIdentCharRE : validIdentCharRE).test(char)) {
                     return false;
                 }
                 break;
-            case 1 /* inBrackets */:
+            case 1 /* MemberExpLexState.inBrackets */:
                 if (char === `'` || char === `"` || char === '`') {
                     stateStack.push(state);
-                    state = 3 /* inString */;
+                    state = 3 /* MemberExpLexState.inString */;
                     currentStringType = char;
                 }
                 else if (char === `[`) {
@@ -421,10 +421,10 @@ const isMemberExpressionBrowser = (path) => {
                     }
                 }
                 break;
-            case 2 /* inParens */:
+            case 2 /* MemberExpLexState.inParens */:
                 if (char === `'` || char === `"` || char === '`') {
                     stateStack.push(state);
-                    state = 3 /* inString */;
+                    state = 3 /* MemberExpLexState.inString */;
                     currentStringType = char;
                 }
                 else if (char === `(`) {
@@ -440,7 +440,7 @@ const isMemberExpressionBrowser = (path) => {
                     }
                 }
                 break;
-            case 3 /* inString */:
+            case 3 /* MemberExpLexState.inString */:
                 if (char === currentStringType) {
                     state = stateStack.pop();
                     currentStringType = null;
@@ -510,7 +510,7 @@ function assert(condition, msg) {
 function findDir(node, name, allowEmpty = false) {
     for (let i = 0; i < node.props.length; i++) {
         const p = node.props[i];
-        if (p.type === 7 /* DIRECTIVE */ &&
+        if (p.type === 7 /* NodeTypes.DIRECTIVE */ &&
             (allowEmpty || p.exp) &&
             (shared.isString(name) ? p.name === name : name.test(p.name))) {
             return p;
@@ -520,7 +520,7 @@ function findDir(node, name, allowEmpty = false) {
 function findProp(node, name, dynamicOnly = false, allowEmpty = false) {
     for (let i = 0; i < node.props.length; i++) {
         const p = node.props[i];
-        if (p.type === 6 /* ATTRIBUTE */) {
+        if (p.type === 6 /* NodeTypes.ATTRIBUTE */) {
             if (dynamicOnly)
                 continue;
             if (p.name === name && (p.value || allowEmpty)) {
@@ -538,24 +538,24 @@ function isStaticArgOf(arg, name) {
     return !!(arg && isStaticExp(arg) && arg.content === name);
 }
 function hasDynamicKeyVBind(node) {
-    return node.props.some(p => p.type === 7 /* DIRECTIVE */ &&
+    return node.props.some(p => p.type === 7 /* NodeTypes.DIRECTIVE */ &&
         p.name === 'bind' &&
         (!p.arg || // v-bind="obj"
-            p.arg.type !== 4 /* SIMPLE_EXPRESSION */ || // v-bind:[_ctx.foo]
+            p.arg.type !== 4 /* NodeTypes.SIMPLE_EXPRESSION */ || // v-bind:[_ctx.foo]
             !p.arg.isStatic) // v-bind:[foo]
     );
 }
 function isText(node) {
-    return node.type === 5 /* INTERPOLATION */ || node.type === 2 /* TEXT */;
+    return node.type === 5 /* NodeTypes.INTERPOLATION */ || node.type === 2 /* NodeTypes.TEXT */;
 }
 function isVSlot(p) {
-    return p.type === 7 /* DIRECTIVE */ && p.name === 'slot';
+    return p.type === 7 /* NodeTypes.DIRECTIVE */ && p.name === 'slot';
 }
 function isTemplateNode(node) {
-    return (node.type === 1 /* ELEMENT */ && node.tagType === 3 /* TEMPLATE */);
+    return (node.type === 1 /* NodeTypes.ELEMENT */ && node.tagType === 3 /* ElementTypes.TEMPLATE */);
 }
 function isSlotOutlet(node) {
-    return node.type === 1 /* ELEMENT */ && node.tagType === 2 /* SLOT */;
+    return node.type === 1 /* NodeTypes.ELEMENT */ && node.tagType === 2 /* ElementTypes.SLOT */;
 }
 function getVNodeHelper(ssr, isComponent) {
     return ssr || isComponent ? CREATE_VNODE : CREATE_ELEMENT_VNODE;
@@ -567,7 +567,7 @@ const propsHelperSet = new Set([NORMALIZE_PROPS, GUARD_REACTIVE_PROPS]);
 function getUnnormalizedProps(props, callPath = []) {
     if (props &&
         !shared.isString(props) &&
-        props.type === 14 /* JS_CALL_EXPRESSION */) {
+        props.type === 14 /* NodeTypes.JS_CALL_EXPRESSION */) {
         const callee = props.callee;
         if (!shared.isString(callee) && propsHelperSet.has(callee)) {
             return getUnnormalizedProps(props.arguments[0], callPath.concat(props));
@@ -585,12 +585,12 @@ function injectProp(node, prop, context) {
      *
      * we need to get the real props before normalization
      */
-    let props = node.type === 13 /* VNODE_CALL */ ? node.props : node.arguments[2];
+    let props = node.type === 13 /* NodeTypes.VNODE_CALL */ ? node.props : node.arguments[2];
     let callPath = [];
     let parentCall;
     if (props &&
         !shared.isString(props) &&
-        props.type === 14 /* JS_CALL_EXPRESSION */) {
+        props.type === 14 /* NodeTypes.JS_CALL_EXPRESSION */) {
         const ret = getUnnormalizedProps(props);
         props = ret[0];
         callPath = ret[1];
@@ -599,12 +599,12 @@ function injectProp(node, prop, context) {
     if (props == null || shared.isString(props)) {
         propsWithInjection = createObjectExpression([prop]);
     }
-    else if (props.type === 14 /* JS_CALL_EXPRESSION */) {
+    else if (props.type === 14 /* NodeTypes.JS_CALL_EXPRESSION */) {
         // merged props... add ours
         // only inject key to object literal if it's the first argument so that
         // if doesn't override user provided keys
         const first = props.arguments[0];
-        if (!shared.isString(first) && first.type === 15 /* JS_OBJECT_EXPRESSION */) {
+        if (!shared.isString(first) && first.type === 15 /* NodeTypes.JS_OBJECT_EXPRESSION */) {
             first.properties.unshift(prop);
         }
         else {
@@ -621,12 +621,12 @@ function injectProp(node, prop, context) {
         }
         !propsWithInjection && (propsWithInjection = props);
     }
-    else if (props.type === 15 /* JS_OBJECT_EXPRESSION */) {
+    else if (props.type === 15 /* NodeTypes.JS_OBJECT_EXPRESSION */) {
         let alreadyExists = false;
         // check existing key to avoid overriding user provided keys
-        if (prop.key.type === 4 /* SIMPLE_EXPRESSION */) {
+        if (prop.key.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
             const propKeyName = prop.key.content;
-            alreadyExists = props.properties.some(p => p.key.type === 4 /* SIMPLE_EXPRESSION */ &&
+            alreadyExists = props.properties.some(p => p.key.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ &&
                 p.key.content === propKeyName);
         }
         if (!alreadyExists) {
@@ -647,7 +647,7 @@ function injectProp(node, prop, context) {
             parentCall = callPath[callPath.length - 2];
         }
     }
-    if (node.type === 13 /* VNODE_CALL */) {
+    if (node.type === 13 /* NodeTypes.VNODE_CALL */) {
         if (parentCall) {
             parentCall.arguments[0] = propsWithInjection;
         }
@@ -676,45 +676,45 @@ function hasScopeRef(node, ids) {
         return false;
     }
     switch (node.type) {
-        case 1 /* ELEMENT */:
+        case 1 /* NodeTypes.ELEMENT */:
             for (let i = 0; i < node.props.length; i++) {
                 const p = node.props[i];
-                if (p.type === 7 /* DIRECTIVE */ &&
+                if (p.type === 7 /* NodeTypes.DIRECTIVE */ &&
                     (hasScopeRef(p.arg, ids) || hasScopeRef(p.exp, ids))) {
                     return true;
                 }
             }
             return node.children.some(c => hasScopeRef(c, ids));
-        case 11 /* FOR */:
+        case 11 /* NodeTypes.FOR */:
             if (hasScopeRef(node.source, ids)) {
                 return true;
             }
             return node.children.some(c => hasScopeRef(c, ids));
-        case 9 /* IF */:
+        case 9 /* NodeTypes.IF */:
             return node.branches.some(b => hasScopeRef(b, ids));
-        case 10 /* IF_BRANCH */:
+        case 10 /* NodeTypes.IF_BRANCH */:
             if (hasScopeRef(node.condition, ids)) {
                 return true;
             }
             return node.children.some(c => hasScopeRef(c, ids));
-        case 4 /* SIMPLE_EXPRESSION */:
+        case 4 /* NodeTypes.SIMPLE_EXPRESSION */:
             return (!node.isStatic &&
                 isSimpleIdentifier(node.content) &&
                 !!ids[node.content]);
-        case 8 /* COMPOUND_EXPRESSION */:
+        case 8 /* NodeTypes.COMPOUND_EXPRESSION */:
             return node.children.some(c => shared.isObject(c) && hasScopeRef(c, ids));
-        case 5 /* INTERPOLATION */:
-        case 12 /* TEXT_CALL */:
+        case 5 /* NodeTypes.INTERPOLATION */:
+        case 12 /* NodeTypes.TEXT_CALL */:
             return hasScopeRef(node.content, ids);
-        case 2 /* TEXT */:
-        case 3 /* COMMENT */:
+        case 2 /* NodeTypes.TEXT */:
+        case 3 /* NodeTypes.COMMENT */:
             return false;
         default:
             return false;
     }
 }
 function getMemoedVNodeCall(node) {
-    if (node.type === 14 /* JS_CALL_EXPRESSION */ && node.callee === WITH_MEMO) {
+    if (node.type === 14 /* NodeTypes.JS_CALL_EXPRESSION */ && node.callee === WITH_MEMO) {
         return node.arguments[1].returns;
     }
     else {
@@ -731,23 +731,23 @@ function makeBlock(node, { helper, removeHelper, inSSR }) {
 }
 
 const deprecationData = {
-    ["COMPILER_IS_ON_ELEMENT" /* COMPILER_IS_ON_ELEMENT */]: {
+    ["COMPILER_IS_ON_ELEMENT" /* CompilerDeprecationTypes.COMPILER_IS_ON_ELEMENT */]: {
         message: `Platform-native elements with "is" prop will no longer be ` +
             `treated as components in Vue 3 unless the "is" value is explicitly ` +
             `prefixed with "vue:".`,
         link: `https://v3-migration.vuejs.org/breaking-changes/custom-elements-interop.html`
     },
-    ["COMPILER_V_BIND_SYNC" /* COMPILER_V_BIND_SYNC */]: {
+    ["COMPILER_V_BIND_SYNC" /* CompilerDeprecationTypes.COMPILER_V_BIND_SYNC */]: {
         message: key => `.sync modifier for v-bind has been removed. Use v-model with ` +
             `argument instead. \`v-bind:${key}.sync\` should be changed to ` +
             `\`v-model:${key}\`.`,
         link: `https://v3-migration.vuejs.org/breaking-changes/v-model.html`
     },
-    ["COMPILER_V_BIND_PROP" /* COMPILER_V_BIND_PROP */]: {
+    ["COMPILER_V_BIND_PROP" /* CompilerDeprecationTypes.COMPILER_V_BIND_PROP */]: {
         message: `.prop modifier for v-bind has been removed and no longer necessary. ` +
             `Vue 3 will automatically set a binding as DOM property when appropriate.`
     },
-    ["COMPILER_V_BIND_OBJECT_ORDER" /* COMPILER_V_BIND_OBJECT_ORDER */]: {
+    ["COMPILER_V_BIND_OBJECT_ORDER" /* CompilerDeprecationTypes.COMPILER_V_BIND_OBJECT_ORDER */]: {
         message: `v-bind="obj" usage is now order sensitive and behaves like JavaScript ` +
             `object spread: it will now overwrite an existing non-mergeable attribute ` +
             `that appears before v-bind in the case of conflict. ` +
@@ -755,11 +755,11 @@ const deprecationData = {
             `You can also suppress this warning if the usage is intended.`,
         link: `https://v3-migration.vuejs.org/breaking-changes/v-bind.html`
     },
-    ["COMPILER_V_ON_NATIVE" /* COMPILER_V_ON_NATIVE */]: {
+    ["COMPILER_V_ON_NATIVE" /* CompilerDeprecationTypes.COMPILER_V_ON_NATIVE */]: {
         message: `.native modifier for v-on has been removed as is no longer necessary.`,
         link: `https://v3-migration.vuejs.org/breaking-changes/v-on-native-modifier-removed.html`
     },
-    ["COMPILER_V_IF_V_FOR_PRECEDENCE" /* COMPILER_V_IF_V_FOR_PRECEDENCE */]: {
+    ["COMPILER_V_IF_V_FOR_PRECEDENCE" /* CompilerDeprecationTypes.COMPILER_V_IF_V_FOR_PRECEDENCE */]: {
         message: `v-if / v-for precedence when used on the same element has changed ` +
             `in Vue 3: v-if now takes higher precedence and will no longer have ` +
             `access to v-for scope variables. It is best to avoid the ambiguity ` +
@@ -767,15 +767,15 @@ const deprecationData = {
             `data source.`,
         link: `https://v3-migration.vuejs.org/breaking-changes/v-if-v-for.html`
     },
-    ["COMPILER_NATIVE_TEMPLATE" /* COMPILER_NATIVE_TEMPLATE */]: {
+    ["COMPILER_NATIVE_TEMPLATE" /* CompilerDeprecationTypes.COMPILER_NATIVE_TEMPLATE */]: {
         message: `<template> with no special directives will render as a native template ` +
             `element instead of its inner content in Vue 3.`
     },
-    ["COMPILER_INLINE_TEMPLATE" /* COMPILER_INLINE_TEMPLATE */]: {
+    ["COMPILER_INLINE_TEMPLATE" /* CompilerDeprecationTypes.COMPILER_INLINE_TEMPLATE */]: {
         message: `"inline-template" has been removed in Vue 3.`,
         link: `https://v3-migration.vuejs.org/breaking-changes/inline-template-attribute.html`
     },
-    ["COMPILER_FILTER" /* COMPILER_FILTERS */]: {
+    ["COMPILER_FILTER" /* CompilerDeprecationTypes.COMPILER_FILTERS */]: {
         message: `filters have been removed in Vue 3. ` +
             `The "|" symbol will be treated as native JavaScript bitwise OR operator. ` +
             `Use method calls or computed properties instead.`,
@@ -832,8 +832,8 @@ const decodeMap = {
 };
 const defaultParserOptions = {
     delimiters: [`{{`, `}}`],
-    getNamespace: () => 0 /* HTML */,
-    getTextMode: () => 0 /* DATA */,
+    getNamespace: () => 0 /* Namespaces.HTML */,
+    getTextMode: () => 0 /* TextModes.DATA */,
     isVoidTag: shared.NO,
     isPreTag: shared.NO,
     isCustomElement: shared.NO,
@@ -845,7 +845,7 @@ const defaultParserOptions = {
 function baseParse(content, options = {}) {
     const context = createParserContext(content, options);
     const start = getCursor(context);
-    return createRoot(parseChildren(context, 0 /* DATA */, []), getSelection(context, start));
+    return createRoot(parseChildren(context, 0 /* TextModes.DATA */, []), getSelection(context, start));
 }
 function createParserContext(content, rawOptions) {
     const options = shared.extend({}, defaultParserOptions);
@@ -871,20 +871,20 @@ function createParserContext(content, rawOptions) {
 }
 function parseChildren(context, mode, ancestors) {
     const parent = last(ancestors);
-    const ns = parent ? parent.ns : 0 /* HTML */;
+    const ns = parent ? parent.ns : 0 /* Namespaces.HTML */;
     const nodes = [];
     while (!isEnd(context, mode, ancestors)) {
         const s = context.source;
         let node = undefined;
-        if (mode === 0 /* DATA */ || mode === 1 /* RCDATA */) {
+        if (mode === 0 /* TextModes.DATA */ || mode === 1 /* TextModes.RCDATA */) {
             if (!context.inVPre && startsWith(s, context.options.delimiters[0])) {
                 // '{{'
                 node = parseInterpolation(context, mode);
             }
-            else if (mode === 0 /* DATA */ && s[0] === '<') {
+            else if (mode === 0 /* TextModes.DATA */ && s[0] === '<') {
                 // https://html.spec.whatwg.org/multipage/parsing.html#tag-open-state
                 if (s.length === 1) {
-                    emitError(context, 5 /* EOF_BEFORE_TAG_NAME */, 1);
+                    emitError(context, 5 /* ErrorCodes.EOF_BEFORE_TAG_NAME */, 1);
                 }
                 else if (s[1] === '!') {
                     // https://html.spec.whatwg.org/multipage/parsing.html#markup-declaration-open-state
@@ -896,56 +896,56 @@ function parseChildren(context, mode, ancestors) {
                         node = parseBogusComment(context);
                     }
                     else if (startsWith(s, '<![CDATA[')) {
-                        if (ns !== 0 /* HTML */) {
+                        if (ns !== 0 /* Namespaces.HTML */) {
                             node = parseCDATA(context, ancestors);
                         }
                         else {
-                            emitError(context, 1 /* CDATA_IN_HTML_CONTENT */);
+                            emitError(context, 1 /* ErrorCodes.CDATA_IN_HTML_CONTENT */);
                             node = parseBogusComment(context);
                         }
                     }
                     else {
-                        emitError(context, 11 /* INCORRECTLY_OPENED_COMMENT */);
+                        emitError(context, 11 /* ErrorCodes.INCORRECTLY_OPENED_COMMENT */);
                         node = parseBogusComment(context);
                     }
                 }
                 else if (s[1] === '/') {
                     // https://html.spec.whatwg.org/multipage/parsing.html#end-tag-open-state
                     if (s.length === 2) {
-                        emitError(context, 5 /* EOF_BEFORE_TAG_NAME */, 2);
+                        emitError(context, 5 /* ErrorCodes.EOF_BEFORE_TAG_NAME */, 2);
                     }
                     else if (s[2] === '>') {
-                        emitError(context, 14 /* MISSING_END_TAG_NAME */, 2);
+                        emitError(context, 14 /* ErrorCodes.MISSING_END_TAG_NAME */, 2);
                         advanceBy(context, 3);
                         continue;
                     }
                     else if (/[a-z]/i.test(s[2])) {
-                        emitError(context, 23 /* X_INVALID_END_TAG */);
-                        parseTag(context, 1 /* End */, parent);
+                        emitError(context, 23 /* ErrorCodes.X_INVALID_END_TAG */);
+                        parseTag(context, 1 /* TagType.End */, parent);
                         continue;
                     }
                     else {
-                        emitError(context, 12 /* INVALID_FIRST_CHARACTER_OF_TAG_NAME */, 2);
+                        emitError(context, 12 /* ErrorCodes.INVALID_FIRST_CHARACTER_OF_TAG_NAME */, 2);
                         node = parseBogusComment(context);
                     }
                 }
                 else if (/[a-z]/i.test(s[1])) {
                     node = parseElement(context, ancestors);
                     // 2.x <template> with no directive compat
-                    if (isCompatEnabled("COMPILER_NATIVE_TEMPLATE" /* COMPILER_NATIVE_TEMPLATE */, context) &&
+                    if (isCompatEnabled("COMPILER_NATIVE_TEMPLATE" /* CompilerDeprecationTypes.COMPILER_NATIVE_TEMPLATE */, context) &&
                         node &&
                         node.tag === 'template' &&
-                        !node.props.some(p => p.type === 7 /* DIRECTIVE */ &&
+                        !node.props.some(p => p.type === 7 /* NodeTypes.DIRECTIVE */ &&
                             isSpecialTemplateDirective(p.name))) {
                         node = node.children;
                     }
                 }
                 else if (s[1] === '?') {
-                    emitError(context, 21 /* UNEXPECTED_QUESTION_MARK_INSTEAD_OF_TAG_NAME */, 1);
+                    emitError(context, 21 /* ErrorCodes.UNEXPECTED_QUESTION_MARK_INSTEAD_OF_TAG_NAME */, 1);
                     node = parseBogusComment(context);
                 }
                 else {
-                    emitError(context, 12 /* INVALID_FIRST_CHARACTER_OF_TAG_NAME */, 1);
+                    emitError(context, 12 /* ErrorCodes.INVALID_FIRST_CHARACTER_OF_TAG_NAME */, 1);
                 }
             }
         }
@@ -963,11 +963,11 @@ function parseChildren(context, mode, ancestors) {
     }
     // Whitespace handling strategy like v2
     let removedWhitespace = false;
-    if (mode !== 2 /* RAWTEXT */ && mode !== 1 /* RCDATA */) {
+    if (mode !== 2 /* TextModes.RAWTEXT */ && mode !== 1 /* TextModes.RCDATA */) {
         const shouldCondense = context.options.whitespace !== 'preserve';
         for (let i = 0; i < nodes.length; i++) {
             const node = nodes[i];
-            if (!context.inPre && node.type === 2 /* TEXT */) {
+            if (!context.inPre && node.type === 2 /* NodeTypes.TEXT */) {
                 if (!/[^\t\r\n\f ]/.test(node.content)) {
                     const prev = nodes[i - 1];
                     const next = nodes[i + 1];
@@ -978,10 +978,10 @@ function parseChildren(context, mode, ancestors) {
                     if (!prev ||
                         !next ||
                         (shouldCondense &&
-                            (prev.type === 3 /* COMMENT */ ||
-                                next.type === 3 /* COMMENT */ ||
-                                (prev.type === 1 /* ELEMENT */ &&
-                                    next.type === 1 /* ELEMENT */ &&
+                            (prev.type === 3 /* NodeTypes.COMMENT */ ||
+                                next.type === 3 /* NodeTypes.COMMENT */ ||
+                                (prev.type === 1 /* NodeTypes.ELEMENT */ &&
+                                    next.type === 1 /* NodeTypes.ELEMENT */ &&
                                     /[\r\n]/.test(node.content))))) {
                         removedWhitespace = true;
                         nodes[i] = null;
@@ -998,7 +998,7 @@ function parseChildren(context, mode, ancestors) {
                 }
             }
             // Remove comment nodes if desired by configuration.
-            else if (node.type === 3 /* COMMENT */ && !context.options.comments) {
+            else if (node.type === 3 /* NodeTypes.COMMENT */ && !context.options.comments) {
                 removedWhitespace = true;
                 nodes[i] = null;
             }
@@ -1007,7 +1007,7 @@ function parseChildren(context, mode, ancestors) {
             // remove leading newline per html spec
             // https://html.spec.whatwg.org/multipage/grouping-content.html#the-pre-element
             const first = nodes[0];
-            if (first && first.type === 2 /* TEXT */) {
+            if (first && first.type === 2 /* NodeTypes.TEXT */) {
                 first.content = first.content.replace(/^\r?\n/, '');
             }
         }
@@ -1015,12 +1015,12 @@ function parseChildren(context, mode, ancestors) {
     return removedWhitespace ? nodes.filter(Boolean) : nodes;
 }
 function pushNode(nodes, node) {
-    if (node.type === 2 /* TEXT */) {
+    if (node.type === 2 /* NodeTypes.TEXT */) {
         const prev = last(nodes);
         // Merge if both this and the previous node are text and those are
         // consecutive. This happens for cases like "a < b".
         if (prev &&
-            prev.type === 2 /* TEXT */ &&
+            prev.type === 2 /* NodeTypes.TEXT */ &&
             prev.loc.end.offset === node.loc.start.offset) {
             prev.content += node.content;
             prev.loc.end = node.loc.end;
@@ -1032,9 +1032,9 @@ function pushNode(nodes, node) {
 }
 function parseCDATA(context, ancestors) {
     advanceBy(context, 9);
-    const nodes = parseChildren(context, 3 /* CDATA */, ancestors);
+    const nodes = parseChildren(context, 3 /* TextModes.CDATA */, ancestors);
     if (context.source.length === 0) {
-        emitError(context, 6 /* EOF_IN_CDATA */);
+        emitError(context, 6 /* ErrorCodes.EOF_IN_CDATA */);
     }
     else {
         advanceBy(context, 3);
@@ -1049,14 +1049,14 @@ function parseComment(context) {
     if (!match) {
         content = context.source.slice(4);
         advanceBy(context, context.source.length);
-        emitError(context, 7 /* EOF_IN_COMMENT */);
+        emitError(context, 7 /* ErrorCodes.EOF_IN_COMMENT */);
     }
     else {
         if (match.index <= 3) {
-            emitError(context, 0 /* ABRUPT_CLOSING_OF_EMPTY_COMMENT */);
+            emitError(context, 0 /* ErrorCodes.ABRUPT_CLOSING_OF_EMPTY_COMMENT */);
         }
         if (match[1]) {
-            emitError(context, 10 /* INCORRECTLY_CLOSED_COMMENT */);
+            emitError(context, 10 /* ErrorCodes.INCORRECTLY_CLOSED_COMMENT */);
         }
         content = context.source.slice(4, match.index);
         // Advancing with reporting nested comments.
@@ -1065,14 +1065,14 @@ function parseComment(context) {
         while ((nestedIndex = s.indexOf('<!--', prevIndex)) !== -1) {
             advanceBy(context, nestedIndex - prevIndex + 1);
             if (nestedIndex + 4 < s.length) {
-                emitError(context, 16 /* NESTED_COMMENT */);
+                emitError(context, 16 /* ErrorCodes.NESTED_COMMENT */);
             }
             prevIndex = nestedIndex + 1;
         }
         advanceBy(context, match.index + match[0].length - prevIndex + 1);
     }
     return {
-        type: 3 /* COMMENT */,
+        type: 3 /* NodeTypes.COMMENT */,
         content,
         loc: getSelection(context, start)
     };
@@ -1091,7 +1091,7 @@ function parseBogusComment(context) {
         advanceBy(context, closeIndex + 1);
     }
     return {
-        type: 3 /* COMMENT */,
+        type: 3 /* NodeTypes.COMMENT */,
         content,
         loc: getSelection(context, start)
     };
@@ -1101,7 +1101,7 @@ function parseElement(context, ancestors) {
     const wasInPre = context.inPre;
     const wasInVPre = context.inVPre;
     const parent = last(ancestors);
-    const element = parseTag(context, 0 /* Start */, parent);
+    const element = parseTag(context, 0 /* TagType.Start */, parent);
     const isPreBoundary = context.inPre && !wasInPre;
     const isVPreBoundary = context.inVPre && !wasInVPre;
     if (element.isSelfClosing || context.options.isVoidTag(element.tag)) {
@@ -1121,12 +1121,12 @@ function parseElement(context, ancestors) {
     ancestors.pop();
     // 2.x inline-template compat
     {
-        const inlineTemplateProp = element.props.find(p => p.type === 6 /* ATTRIBUTE */ && p.name === 'inline-template');
+        const inlineTemplateProp = element.props.find(p => p.type === 6 /* NodeTypes.ATTRIBUTE */ && p.name === 'inline-template');
         if (inlineTemplateProp &&
-            checkCompatEnabled("COMPILER_INLINE_TEMPLATE" /* COMPILER_INLINE_TEMPLATE */, context, inlineTemplateProp.loc)) {
+            checkCompatEnabled("COMPILER_INLINE_TEMPLATE" /* CompilerDeprecationTypes.COMPILER_INLINE_TEMPLATE */, context, inlineTemplateProp.loc)) {
             const loc = getSelection(context, element.loc.end);
             inlineTemplateProp.value = {
-                type: 2 /* TEXT */,
+                type: 2 /* NodeTypes.TEXT */,
                 content: loc.source,
                 loc
             };
@@ -1135,14 +1135,14 @@ function parseElement(context, ancestors) {
     element.children = children;
     // End tag.
     if (startsWithEndTagOpen(context.source, element.tag)) {
-        parseTag(context, 1 /* End */, parent);
+        parseTag(context, 1 /* TagType.End */, parent);
     }
     else {
-        emitError(context, 24 /* X_MISSING_END_TAG */, 0, element.loc.start);
+        emitError(context, 24 /* ErrorCodes.X_MISSING_END_TAG */, 0, element.loc.start);
         if (context.source.length === 0 && element.tag.toLowerCase() === 'script') {
             const first = children[0];
             if (first && startsWith(first.loc.source, '<!--')) {
-                emitError(context, 8 /* EOF_IN_SCRIPT_HTML_COMMENT_LIKE_TEXT */);
+                emitError(context, 8 /* ErrorCodes.EOF_IN_SCRIPT_HTML_COMMENT_LIKE_TEXT */);
             }
         }
     }
@@ -1174,9 +1174,9 @@ function parseTag(context, type, parent) {
     // Attributes.
     let props = parseAttributes(context, type);
     // check v-pre
-    if (type === 0 /* Start */ &&
+    if (type === 0 /* TagType.Start */ &&
         !context.inVPre &&
-        props.some(p => p.type === 7 /* DIRECTIVE */ && p.name === 'pre')) {
+        props.some(p => p.type === 7 /* NodeTypes.DIRECTIVE */ && p.name === 'pre')) {
         context.inVPre = true;
         // reset context
         shared.extend(context, cursor);
@@ -1187,34 +1187,34 @@ function parseTag(context, type, parent) {
     // Tag close.
     let isSelfClosing = false;
     if (context.source.length === 0) {
-        emitError(context, 9 /* EOF_IN_TAG */);
+        emitError(context, 9 /* ErrorCodes.EOF_IN_TAG */);
     }
     else {
         isSelfClosing = startsWith(context.source, '/>');
-        if (type === 1 /* End */ && isSelfClosing) {
-            emitError(context, 4 /* END_TAG_WITH_TRAILING_SOLIDUS */);
+        if (type === 1 /* TagType.End */ && isSelfClosing) {
+            emitError(context, 4 /* ErrorCodes.END_TAG_WITH_TRAILING_SOLIDUS */);
         }
         advanceBy(context, isSelfClosing ? 2 : 1);
     }
-    if (type === 1 /* End */) {
+    if (type === 1 /* TagType.End */) {
         return;
     }
-    let tagType = 0 /* ELEMENT */;
+    let tagType = 0 /* ElementTypes.ELEMENT */;
     if (!context.inVPre) {
         if (tag === 'slot') {
-            tagType = 2 /* SLOT */;
+            tagType = 2 /* ElementTypes.SLOT */;
         }
         else if (tag === 'template') {
-            if (props.some(p => p.type === 7 /* DIRECTIVE */ && isSpecialTemplateDirective(p.name))) {
-                tagType = 3 /* TEMPLATE */;
+            if (props.some(p => p.type === 7 /* NodeTypes.DIRECTIVE */ && isSpecialTemplateDirective(p.name))) {
+                tagType = 3 /* ElementTypes.TEMPLATE */;
             }
         }
         else if (isComponent(tag, props, context)) {
-            tagType = 1 /* COMPONENT */;
+            tagType = 1 /* ElementTypes.COMPONENT */;
         }
     }
     return {
-        type: 1 /* ELEMENT */,
+        type: 1 /* NodeTypes.ELEMENT */,
         ns,
         tag,
         tagType,
@@ -1241,12 +1241,12 @@ function isComponent(tag, props, context) {
     // casting
     for (let i = 0; i < props.length; i++) {
         const p = props[i];
-        if (p.type === 6 /* ATTRIBUTE */) {
+        if (p.type === 6 /* NodeTypes.ATTRIBUTE */) {
             if (p.name === 'is' && p.value) {
                 if (p.value.content.startsWith('vue:')) {
                     return true;
                 }
-                else if (checkCompatEnabled("COMPILER_IS_ON_ELEMENT" /* COMPILER_IS_ON_ELEMENT */, context, p.loc)) {
+                else if (checkCompatEnabled("COMPILER_IS_ON_ELEMENT" /* CompilerDeprecationTypes.COMPILER_IS_ON_ELEMENT */, context, p.loc)) {
                     return true;
                 }
             }
@@ -1262,7 +1262,7 @@ function isComponent(tag, props, context) {
             p.name === 'bind' &&
                 isStaticArgOf(p.arg, 'is') &&
                 true &&
-                checkCompatEnabled("COMPILER_IS_ON_ELEMENT" /* COMPILER_IS_ON_ELEMENT */, context, p.loc)) {
+                checkCompatEnabled("COMPILER_IS_ON_ELEMENT" /* CompilerDeprecationTypes.COMPILER_IS_ON_ELEMENT */, context, p.loc)) {
                 return true;
             }
         }
@@ -1275,27 +1275,27 @@ function parseAttributes(context, type) {
         !startsWith(context.source, '>') &&
         !startsWith(context.source, '/>')) {
         if (startsWith(context.source, '/')) {
-            emitError(context, 22 /* UNEXPECTED_SOLIDUS_IN_TAG */);
+            emitError(context, 22 /* ErrorCodes.UNEXPECTED_SOLIDUS_IN_TAG */);
             advanceBy(context, 1);
             advanceSpaces(context);
             continue;
         }
-        if (type === 1 /* End */) {
-            emitError(context, 3 /* END_TAG_WITH_ATTRIBUTES */);
+        if (type === 1 /* TagType.End */) {
+            emitError(context, 3 /* ErrorCodes.END_TAG_WITH_ATTRIBUTES */);
         }
         const attr = parseAttribute(context, attributeNames);
         // Trim whitespace between class
         // https://github.com/vuejs/core/issues/4251
-        if (attr.type === 6 /* ATTRIBUTE */ &&
+        if (attr.type === 6 /* NodeTypes.ATTRIBUTE */ &&
             attr.value &&
             attr.name === 'class') {
             attr.value.content = attr.value.content.replace(/\s+/g, ' ').trim();
         }
-        if (type === 0 /* Start */) {
+        if (type === 0 /* TagType.Start */) {
             props.push(attr);
         }
         if (/^[^\t\r\n\f />]/.test(context.source)) {
-            emitError(context, 15 /* MISSING_WHITESPACE_BETWEEN_ATTRIBUTES */);
+            emitError(context, 15 /* ErrorCodes.MISSING_WHITESPACE_BETWEEN_ATTRIBUTES */);
         }
         advanceSpaces(context);
     }
@@ -1307,17 +1307,17 @@ function parseAttribute(context, nameSet) {
     const match = /^[^\t\r\n\f />][^\t\r\n\f />=]*/.exec(context.source);
     const name = match[0];
     if (nameSet.has(name)) {
-        emitError(context, 2 /* DUPLICATE_ATTRIBUTE */);
+        emitError(context, 2 /* ErrorCodes.DUPLICATE_ATTRIBUTE */);
     }
     nameSet.add(name);
     if (name[0] === '=') {
-        emitError(context, 19 /* UNEXPECTED_EQUALS_SIGN_BEFORE_ATTRIBUTE_NAME */);
+        emitError(context, 19 /* ErrorCodes.UNEXPECTED_EQUALS_SIGN_BEFORE_ATTRIBUTE_NAME */);
     }
     {
         const pattern = /["'<]/g;
         let m;
         while ((m = pattern.exec(name))) {
-            emitError(context, 17 /* UNEXPECTED_CHARACTER_IN_ATTRIBUTE_NAME */, m.index);
+            emitError(context, 17 /* ErrorCodes.UNEXPECTED_CHARACTER_IN_ATTRIBUTE_NAME */, m.index);
         }
     }
     advanceBy(context, name.length);
@@ -1329,7 +1329,7 @@ function parseAttribute(context, nameSet) {
         advanceSpaces(context);
         value = parseAttributeValue(context);
         if (!value) {
-            emitError(context, 13 /* MISSING_ATTRIBUTE_VALUE */);
+            emitError(context, 13 /* ErrorCodes.MISSING_ATTRIBUTE_VALUE */);
         }
     }
     const loc = getSelection(context, start);
@@ -1352,7 +1352,7 @@ function parseAttribute(context, nameSet) {
             if (content.startsWith('[')) {
                 isStatic = false;
                 if (!content.endsWith(']')) {
-                    emitError(context, 27 /* X_MISSING_DYNAMIC_DIRECTIVE_ARGUMENT_END */);
+                    emitError(context, 27 /* ErrorCodes.X_MISSING_DYNAMIC_DIRECTIVE_ARGUMENT_END */);
                     content = content.slice(1);
                 }
                 else {
@@ -1366,12 +1366,12 @@ function parseAttribute(context, nameSet) {
                 content += match[3] || '';
             }
             arg = {
-                type: 4 /* SIMPLE_EXPRESSION */,
+                type: 4 /* NodeTypes.SIMPLE_EXPRESSION */,
                 content,
                 isStatic,
                 constType: isStatic
-                    ? 3 /* CAN_STRINGIFY */
-                    : 0 /* NOT_CONSTANT */,
+                    ? 3 /* ConstantTypes.CAN_STRINGIFY */
+                    : 0 /* ConstantTypes.NOT_CONSTANT */,
                 loc
             };
         }
@@ -1388,21 +1388,21 @@ function parseAttribute(context, nameSet) {
         // 2.x compat v-bind:foo.sync -> v-model:foo
         if (dirName === 'bind' && arg) {
             if (modifiers.includes('sync') &&
-                checkCompatEnabled("COMPILER_V_BIND_SYNC" /* COMPILER_V_BIND_SYNC */, context, loc, arg.loc.source)) {
+                checkCompatEnabled("COMPILER_V_BIND_SYNC" /* CompilerDeprecationTypes.COMPILER_V_BIND_SYNC */, context, loc, arg.loc.source)) {
                 dirName = 'model';
                 modifiers.splice(modifiers.indexOf('sync'), 1);
             }
         }
         return {
-            type: 7 /* DIRECTIVE */,
+            type: 7 /* NodeTypes.DIRECTIVE */,
             name: dirName,
             exp: value && {
-                type: 4 /* SIMPLE_EXPRESSION */,
+                type: 4 /* NodeTypes.SIMPLE_EXPRESSION */,
                 content: value.content,
                 isStatic: false,
                 // Treat as non-constant by default. This can be potentially set to
                 // other values by `transformExpression` to make it eligible for hoisting.
-                constType: 0 /* NOT_CONSTANT */,
+                constType: 0 /* ConstantTypes.NOT_CONSTANT */,
                 loc: value.loc
             },
             arg,
@@ -1412,13 +1412,13 @@ function parseAttribute(context, nameSet) {
     }
     // missing directive name or illegal directive name
     if (!context.inVPre && startsWith(name, 'v-')) {
-        emitError(context, 26 /* X_MISSING_DIRECTIVE_NAME */);
+        emitError(context, 26 /* ErrorCodes.X_MISSING_DIRECTIVE_NAME */);
     }
     return {
-        type: 6 /* ATTRIBUTE */,
+        type: 6 /* NodeTypes.ATTRIBUTE */,
         name,
         value: value && {
-            type: 2 /* TEXT */,
+            type: 2 /* NodeTypes.TEXT */,
             content: value.content,
             loc: value.loc
         },
@@ -1435,10 +1435,10 @@ function parseAttributeValue(context) {
         advanceBy(context, 1);
         const endIndex = context.source.indexOf(quote);
         if (endIndex === -1) {
-            content = parseTextData(context, context.source.length, 4 /* ATTRIBUTE_VALUE */);
+            content = parseTextData(context, context.source.length, 4 /* TextModes.ATTRIBUTE_VALUE */);
         }
         else {
-            content = parseTextData(context, endIndex, 4 /* ATTRIBUTE_VALUE */);
+            content = parseTextData(context, endIndex, 4 /* TextModes.ATTRIBUTE_VALUE */);
             advanceBy(context, 1);
         }
     }
@@ -1451,9 +1451,9 @@ function parseAttributeValue(context) {
         const unexpectedChars = /["'<=`]/g;
         let m;
         while ((m = unexpectedChars.exec(match[0]))) {
-            emitError(context, 18 /* UNEXPECTED_CHARACTER_IN_UNQUOTED_ATTRIBUTE_VALUE */, m.index);
+            emitError(context, 18 /* ErrorCodes.UNEXPECTED_CHARACTER_IN_UNQUOTED_ATTRIBUTE_VALUE */, m.index);
         }
-        content = parseTextData(context, match[0].length, 4 /* ATTRIBUTE_VALUE */);
+        content = parseTextData(context, match[0].length, 4 /* TextModes.ATTRIBUTE_VALUE */);
     }
     return { content, isQuoted, loc: getSelection(context, start) };
 }
@@ -1461,7 +1461,7 @@ function parseInterpolation(context, mode) {
     const [open, close] = context.options.delimiters;
     const closeIndex = context.source.indexOf(close, open.length);
     if (closeIndex === -1) {
-        emitError(context, 25 /* X_MISSING_INTERPOLATION_END */);
+        emitError(context, 25 /* ErrorCodes.X_MISSING_INTERPOLATION_END */);
         return undefined;
     }
     const start = getCursor(context);
@@ -1480,12 +1480,12 @@ function parseInterpolation(context, mode) {
     advancePositionWithMutation(innerEnd, rawContent, endOffset);
     advanceBy(context, close.length);
     return {
-        type: 5 /* INTERPOLATION */,
+        type: 5 /* NodeTypes.INTERPOLATION */,
         content: {
-            type: 4 /* SIMPLE_EXPRESSION */,
+            type: 4 /* NodeTypes.SIMPLE_EXPRESSION */,
             isStatic: false,
             // Set `isConstant` to false by default and will decide in transformExpression
-            constType: 0 /* NOT_CONSTANT */,
+            constType: 0 /* ConstantTypes.NOT_CONSTANT */,
             content,
             loc: getSelection(context, innerStart, innerEnd)
         },
@@ -1493,7 +1493,7 @@ function parseInterpolation(context, mode) {
     };
 }
 function parseText(context, mode) {
-    const endTokens = mode === 3 /* CDATA */ ? [']]>'] : ['<', context.options.delimiters[0]];
+    const endTokens = mode === 3 /* TextModes.CDATA */ ? [']]>'] : ['<', context.options.delimiters[0]];
     let endIndex = context.source.length;
     for (let i = 0; i < endTokens.length; i++) {
         const index = context.source.indexOf(endTokens[i], 1);
@@ -1504,7 +1504,7 @@ function parseText(context, mode) {
     const start = getCursor(context);
     const content = parseTextData(context, endIndex, mode);
     return {
-        type: 2 /* TEXT */,
+        type: 2 /* NodeTypes.TEXT */,
         content,
         loc: getSelection(context, start)
     };
@@ -1516,14 +1516,14 @@ function parseText(context, mode) {
 function parseTextData(context, length, mode) {
     const rawText = context.source.slice(0, length);
     advanceBy(context, length);
-    if (mode === 2 /* RAWTEXT */ ||
-        mode === 3 /* CDATA */ ||
+    if (mode === 2 /* TextModes.RAWTEXT */ ||
+        mode === 3 /* TextModes.CDATA */ ||
         !rawText.includes('&')) {
         return rawText;
     }
     else {
         // DATA or RCDATA containing "&"". Entity decoding required.
-        return context.options.decodeEntities(rawText, mode === 4 /* ATTRIBUTE_VALUE */);
+        return context.options.decodeEntities(rawText, mode === 4 /* TextModes.ATTRIBUTE_VALUE */);
     }
 }
 function getCursor(context) {
@@ -1572,7 +1572,7 @@ function emitError(context, code, offset, loc = getCursor(context)) {
 function isEnd(context, mode, ancestors) {
     const s = context.source;
     switch (mode) {
-        case 0 /* DATA */:
+        case 0 /* TextModes.DATA */:
             if (startsWith(s, '</')) {
                 // TODO: probably bad performance
                 for (let i = ancestors.length - 1; i >= 0; --i) {
@@ -1582,15 +1582,15 @@ function isEnd(context, mode, ancestors) {
                 }
             }
             break;
-        case 1 /* RCDATA */:
-        case 2 /* RAWTEXT */: {
+        case 1 /* TextModes.RCDATA */:
+        case 2 /* TextModes.RAWTEXT */: {
             const parent = last(ancestors);
             if (parent && startsWithEndTagOpen(s, parent.tag)) {
                 return true;
             }
             break;
         }
-        case 3 /* CDATA */:
+        case 3 /* TextModes.CDATA */:
             if (startsWith(s, ']]>')) {
                 return true;
             }
@@ -1613,7 +1613,7 @@ function hoistStatic(root, context) {
 function isSingleElementRoot(root, child) {
     const { children } = root;
     return (children.length === 1 &&
-        child.type === 1 /* ELEMENT */ &&
+        child.type === 1 /* NodeTypes.ELEMENT */ &&
         !isSlotOutlet(child));
 }
 function walk(node, context, doNotHoistNode = false) {
@@ -1623,15 +1623,15 @@ function walk(node, context, doNotHoistNode = false) {
     for (let i = 0; i < children.length; i++) {
         const child = children[i];
         // only plain elements & text calls are eligible for hoisting.
-        if (child.type === 1 /* ELEMENT */ &&
-            child.tagType === 0 /* ELEMENT */) {
+        if (child.type === 1 /* NodeTypes.ELEMENT */ &&
+            child.tagType === 0 /* ElementTypes.ELEMENT */) {
             const constantType = doNotHoistNode
-                ? 0 /* NOT_CONSTANT */
+                ? 0 /* ConstantTypes.NOT_CONSTANT */
                 : getConstantType(child, context);
-            if (constantType > 0 /* NOT_CONSTANT */) {
-                if (constantType >= 2 /* CAN_HOIST */) {
+            if (constantType > 0 /* ConstantTypes.NOT_CONSTANT */) {
+                if (constantType >= 2 /* ConstantTypes.CAN_HOIST */) {
                     child.codegenNode.patchFlag =
-                        -1 /* HOISTED */ + (``);
+                        -1 /* PatchFlags.HOISTED */ + (``);
                     child.codegenNode = context.hoist(child.codegenNode);
                     hoistedCount++;
                     continue;
@@ -1641,13 +1641,13 @@ function walk(node, context, doNotHoistNode = false) {
                 // node may contain dynamic children, but its props may be eligible for
                 // hoisting.
                 const codegenNode = child.codegenNode;
-                if (codegenNode.type === 13 /* VNODE_CALL */) {
+                if (codegenNode.type === 13 /* NodeTypes.VNODE_CALL */) {
                     const flag = getPatchFlag(codegenNode);
                     if ((!flag ||
-                        flag === 512 /* NEED_PATCH */ ||
-                        flag === 1 /* TEXT */) &&
+                        flag === 512 /* PatchFlags.NEED_PATCH */ ||
+                        flag === 1 /* PatchFlags.TEXT */) &&
                         getGeneratedPropsConstantType(child, context) >=
-                            2 /* CAN_HOIST */) {
+                            2 /* ConstantTypes.CAN_HOIST */) {
                         const props = getNodeProps(child);
                         if (props) {
                             codegenNode.props = context.hoist(props);
@@ -1659,14 +1659,14 @@ function walk(node, context, doNotHoistNode = false) {
                 }
             }
         }
-        else if (child.type === 12 /* TEXT_CALL */ &&
-            getConstantType(child.content, context) >= 2 /* CAN_HOIST */) {
+        else if (child.type === 12 /* NodeTypes.TEXT_CALL */ &&
+            getConstantType(child.content, context) >= 2 /* ConstantTypes.CAN_HOIST */) {
             child.codegenNode = context.hoist(child.codegenNode);
             hoistedCount++;
         }
         // walk further
-        if (child.type === 1 /* ELEMENT */) {
-            const isComponent = child.tagType === 1 /* COMPONENT */;
+        if (child.type === 1 /* NodeTypes.ELEMENT */) {
+            const isComponent = child.tagType === 1 /* ElementTypes.COMPONENT */;
             if (isComponent) {
                 context.scopes.vSlot++;
             }
@@ -1675,11 +1675,11 @@ function walk(node, context, doNotHoistNode = false) {
                 context.scopes.vSlot--;
             }
         }
-        else if (child.type === 11 /* FOR */) {
+        else if (child.type === 11 /* NodeTypes.FOR */) {
             // Do not hoist v-for single child because it has to be a block
             walk(child, context, child.children.length === 1);
         }
-        else if (child.type === 9 /* IF */) {
+        else if (child.type === 9 /* NodeTypes.IF */) {
             for (let i = 0; i < child.branches.length; i++) {
                 // Do not hoist v-if single child because it has to be a block
                 walk(child.branches[i], context, child.branches[i].children.length === 1);
@@ -1692,10 +1692,10 @@ function walk(node, context, doNotHoistNode = false) {
     // all children were hoisted - the entire children array is hoistable.
     if (hoistedCount &&
         hoistedCount === originalCount &&
-        node.type === 1 /* ELEMENT */ &&
-        node.tagType === 0 /* ELEMENT */ &&
+        node.type === 1 /* NodeTypes.ELEMENT */ &&
+        node.tagType === 0 /* ElementTypes.ELEMENT */ &&
         node.codegenNode &&
-        node.codegenNode.type === 13 /* VNODE_CALL */ &&
+        node.codegenNode.type === 13 /* NodeTypes.VNODE_CALL */ &&
         shared.isArray(node.codegenNode.children)) {
         node.codegenNode.children = context.hoist(createArrayExpression(node.codegenNode.children));
     }
@@ -1703,35 +1703,35 @@ function walk(node, context, doNotHoistNode = false) {
 function getConstantType(node, context) {
     const { constantCache } = context;
     switch (node.type) {
-        case 1 /* ELEMENT */:
-            if (node.tagType !== 0 /* ELEMENT */) {
-                return 0 /* NOT_CONSTANT */;
+        case 1 /* NodeTypes.ELEMENT */:
+            if (node.tagType !== 0 /* ElementTypes.ELEMENT */) {
+                return 0 /* ConstantTypes.NOT_CONSTANT */;
             }
             const cached = constantCache.get(node);
             if (cached !== undefined) {
                 return cached;
             }
             const codegenNode = node.codegenNode;
-            if (codegenNode.type !== 13 /* VNODE_CALL */) {
-                return 0 /* NOT_CONSTANT */;
+            if (codegenNode.type !== 13 /* NodeTypes.VNODE_CALL */) {
+                return 0 /* ConstantTypes.NOT_CONSTANT */;
             }
             if (codegenNode.isBlock &&
                 node.tag !== 'svg' &&
                 node.tag !== 'foreignObject') {
-                return 0 /* NOT_CONSTANT */;
+                return 0 /* ConstantTypes.NOT_CONSTANT */;
             }
             const flag = getPatchFlag(codegenNode);
             if (!flag) {
-                let returnType = 3 /* CAN_STRINGIFY */;
+                let returnType = 3 /* ConstantTypes.CAN_STRINGIFY */;
                 // Element itself has no patch flag. However we still need to check:
                 // 1. Even for a node with no patch flag, it is possible for it to contain
                 // non-hoistable expressions that refers to scope variables, e.g. compiler
                 // injected keys or cached event handlers. Therefore we need to always
                 // check the codegenNode's props to be sure.
                 const generatedPropsType = getGeneratedPropsConstantType(node, context);
-                if (generatedPropsType === 0 /* NOT_CONSTANT */) {
-                    constantCache.set(node, 0 /* NOT_CONSTANT */);
-                    return 0 /* NOT_CONSTANT */;
+                if (generatedPropsType === 0 /* ConstantTypes.NOT_CONSTANT */) {
+                    constantCache.set(node, 0 /* ConstantTypes.NOT_CONSTANT */);
+                    return 0 /* ConstantTypes.NOT_CONSTANT */;
                 }
                 if (generatedPropsType < returnType) {
                     returnType = generatedPropsType;
@@ -1739,9 +1739,9 @@ function getConstantType(node, context) {
                 // 2. its children.
                 for (let i = 0; i < node.children.length; i++) {
                     const childType = getConstantType(node.children[i], context);
-                    if (childType === 0 /* NOT_CONSTANT */) {
-                        constantCache.set(node, 0 /* NOT_CONSTANT */);
-                        return 0 /* NOT_CONSTANT */;
+                    if (childType === 0 /* ConstantTypes.NOT_CONSTANT */) {
+                        constantCache.set(node, 0 /* ConstantTypes.NOT_CONSTANT */);
+                        return 0 /* ConstantTypes.NOT_CONSTANT */;
                     }
                     if (childType < returnType) {
                         returnType = childType;
@@ -1751,14 +1751,14 @@ function getConstantType(node, context) {
                 // type, check if any of the props can cause the type to be lowered
                 // we can skip can_patch because it's guaranteed by the absence of a
                 // patchFlag.
-                if (returnType > 1 /* CAN_SKIP_PATCH */) {
+                if (returnType > 1 /* ConstantTypes.CAN_SKIP_PATCH */) {
                     for (let i = 0; i < node.props.length; i++) {
                         const p = node.props[i];
-                        if (p.type === 7 /* DIRECTIVE */ && p.name === 'bind' && p.exp) {
+                        if (p.type === 7 /* NodeTypes.DIRECTIVE */ && p.name === 'bind' && p.exp) {
                             const expType = getConstantType(p.exp, context);
-                            if (expType === 0 /* NOT_CONSTANT */) {
-                                constantCache.set(node, 0 /* NOT_CONSTANT */);
-                                return 0 /* NOT_CONSTANT */;
+                            if (expType === 0 /* ConstantTypes.NOT_CONSTANT */) {
+                                constantCache.set(node, 0 /* ConstantTypes.NOT_CONSTANT */);
+                                return 0 /* ConstantTypes.NOT_CONSTANT */;
                             }
                             if (expType < returnType) {
                                 returnType = expType;
@@ -1773,9 +1773,9 @@ function getConstantType(node, context) {
                     // except set custom directives.
                     for (let i = 0; i < node.props.length; i++) {
                         const p = node.props[i];
-                        if (p.type === 7 /* DIRECTIVE */) {
-                            constantCache.set(node, 0 /* NOT_CONSTANT */);
-                            return 0 /* NOT_CONSTANT */;
+                        if (p.type === 7 /* NodeTypes.DIRECTIVE */) {
+                            constantCache.set(node, 0 /* ConstantTypes.NOT_CONSTANT */);
+                            return 0 /* ConstantTypes.NOT_CONSTANT */;
                         }
                     }
                     context.removeHelper(OPEN_BLOCK);
@@ -1787,31 +1787,31 @@ function getConstantType(node, context) {
                 return returnType;
             }
             else {
-                constantCache.set(node, 0 /* NOT_CONSTANT */);
-                return 0 /* NOT_CONSTANT */;
+                constantCache.set(node, 0 /* ConstantTypes.NOT_CONSTANT */);
+                return 0 /* ConstantTypes.NOT_CONSTANT */;
             }
-        case 2 /* TEXT */:
-        case 3 /* COMMENT */:
-            return 3 /* CAN_STRINGIFY */;
-        case 9 /* IF */:
-        case 11 /* FOR */:
-        case 10 /* IF_BRANCH */:
-            return 0 /* NOT_CONSTANT */;
-        case 5 /* INTERPOLATION */:
-        case 12 /* TEXT_CALL */:
+        case 2 /* NodeTypes.TEXT */:
+        case 3 /* NodeTypes.COMMENT */:
+            return 3 /* ConstantTypes.CAN_STRINGIFY */;
+        case 9 /* NodeTypes.IF */:
+        case 11 /* NodeTypes.FOR */:
+        case 10 /* NodeTypes.IF_BRANCH */:
+            return 0 /* ConstantTypes.NOT_CONSTANT */;
+        case 5 /* NodeTypes.INTERPOLATION */:
+        case 12 /* NodeTypes.TEXT_CALL */:
             return getConstantType(node.content, context);
-        case 4 /* SIMPLE_EXPRESSION */:
+        case 4 /* NodeTypes.SIMPLE_EXPRESSION */:
             return node.constType;
-        case 8 /* COMPOUND_EXPRESSION */:
-            let returnType = 3 /* CAN_STRINGIFY */;
+        case 8 /* NodeTypes.COMPOUND_EXPRESSION */:
+            let returnType = 3 /* ConstantTypes.CAN_STRINGIFY */;
             for (let i = 0; i < node.children.length; i++) {
                 const child = node.children[i];
                 if (shared.isString(child) || shared.isSymbol(child)) {
                     continue;
                 }
                 const childType = getConstantType(child, context);
-                if (childType === 0 /* NOT_CONSTANT */) {
-                    return 0 /* NOT_CONSTANT */;
+                if (childType === 0 /* ConstantTypes.NOT_CONSTANT */) {
+                    return 0 /* ConstantTypes.NOT_CONSTANT */;
                 }
                 else if (childType < returnType) {
                     returnType = childType;
@@ -1819,7 +1819,7 @@ function getConstantType(node, context) {
             }
             return returnType;
         default:
-            return 0 /* NOT_CONSTANT */;
+            return 0 /* ConstantTypes.NOT_CONSTANT */;
     }
 }
 const allowHoistedHelperSet = new Set([
@@ -1829,48 +1829,48 @@ const allowHoistedHelperSet = new Set([
     GUARD_REACTIVE_PROPS
 ]);
 function getConstantTypeOfHelperCall(value, context) {
-    if (value.type === 14 /* JS_CALL_EXPRESSION */ &&
+    if (value.type === 14 /* NodeTypes.JS_CALL_EXPRESSION */ &&
         !shared.isString(value.callee) &&
         allowHoistedHelperSet.has(value.callee)) {
         const arg = value.arguments[0];
-        if (arg.type === 4 /* SIMPLE_EXPRESSION */) {
+        if (arg.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
             return getConstantType(arg, context);
         }
-        else if (arg.type === 14 /* JS_CALL_EXPRESSION */) {
+        else if (arg.type === 14 /* NodeTypes.JS_CALL_EXPRESSION */) {
             // in the case of nested helper call, e.g. `normalizeProps(guardReactiveProps(exp))`
             return getConstantTypeOfHelperCall(arg, context);
         }
     }
-    return 0 /* NOT_CONSTANT */;
+    return 0 /* ConstantTypes.NOT_CONSTANT */;
 }
 function getGeneratedPropsConstantType(node, context) {
-    let returnType = 3 /* CAN_STRINGIFY */;
+    let returnType = 3 /* ConstantTypes.CAN_STRINGIFY */;
     const props = getNodeProps(node);
-    if (props && props.type === 15 /* JS_OBJECT_EXPRESSION */) {
+    if (props && props.type === 15 /* NodeTypes.JS_OBJECT_EXPRESSION */) {
         const { properties } = props;
         for (let i = 0; i < properties.length; i++) {
             const { key, value } = properties[i];
             const keyType = getConstantType(key, context);
-            if (keyType === 0 /* NOT_CONSTANT */) {
+            if (keyType === 0 /* ConstantTypes.NOT_CONSTANT */) {
                 return keyType;
             }
             if (keyType < returnType) {
                 returnType = keyType;
             }
             let valueType;
-            if (value.type === 4 /* SIMPLE_EXPRESSION */) {
+            if (value.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
                 valueType = getConstantType(value, context);
             }
-            else if (value.type === 14 /* JS_CALL_EXPRESSION */) {
+            else if (value.type === 14 /* NodeTypes.JS_CALL_EXPRESSION */) {
                 // some helper calls can be hoisted,
                 // such as the `normalizeProps` generated by the compiler for pre-normalize class,
                 // in this case we need to respect the ConstantType of the helper's arguments
                 valueType = getConstantTypeOfHelperCall(value, context);
             }
             else {
-                valueType = 0 /* NOT_CONSTANT */;
+                valueType = 0 /* ConstantTypes.NOT_CONSTANT */;
             }
-            if (valueType === 0 /* NOT_CONSTANT */) {
+            if (valueType === 0 /* ConstantTypes.NOT_CONSTANT */) {
                 return valueType;
             }
             if (valueType < returnType) {
@@ -1882,7 +1882,7 @@ function getGeneratedPropsConstantType(node, context) {
 }
 function getNodeProps(node) {
     const codegenNode = node.codegenNode;
-    if (codegenNode.type === 13 /* VNODE_CALL */) {
+    if (codegenNode.type === 13 /* NodeTypes.VNODE_CALL */) {
         return codegenNode.props;
     }
 }
@@ -1992,7 +1992,7 @@ function createTransformContext(root, { filename = '', prefixIdentifiers = false
                 else if (exp.identifiers) {
                     exp.identifiers.forEach(addId);
                 }
-                else if (exp.type === 4 /* SIMPLE_EXPRESSION */) {
+                else if (exp.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
                     addId(exp.content);
                 }
             }
@@ -2005,7 +2005,7 @@ function createTransformContext(root, { filename = '', prefixIdentifiers = false
                 else if (exp.identifiers) {
                     exp.identifiers.forEach(removeId);
                 }
-                else if (exp.type === 4 /* SIMPLE_EXPRESSION */) {
+                else if (exp.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
                     removeId(exp.content);
                 }
             }
@@ -2014,7 +2014,7 @@ function createTransformContext(root, { filename = '', prefixIdentifiers = false
             if (shared.isString(exp))
                 exp = createSimpleExpression(exp);
             context.hoists.push(exp);
-            const identifier = createSimpleExpression(`_hoisted_${context.hoists.length}`, false, exp.loc, 2 /* CAN_HOIST */);
+            const identifier = createSimpleExpression(`_hoisted_${context.hoists.length}`, false, exp.loc, 2 /* ConstantTypes.CAN_HOIST */);
             identifier.hoisted = exp;
             return identifier;
         },
@@ -2068,7 +2068,7 @@ function createRootCodegen(root, context) {
             // single element root is never hoisted so codegenNode will never be
             // SimpleExpressionNode
             const codegenNode = child.codegenNode;
-            if (codegenNode.type === 13 /* VNODE_CALL */) {
+            if (codegenNode.type === 13 /* NodeTypes.VNODE_CALL */) {
                 makeBlock(codegenNode, context);
             }
             root.codegenNode = codegenNode;
@@ -2082,8 +2082,8 @@ function createRootCodegen(root, context) {
     }
     else if (children.length > 1) {
         // root has multiple nodes - return a fragment block.
-        let patchFlag = 64 /* STABLE_FRAGMENT */;
-        shared.PatchFlagNames[64 /* STABLE_FRAGMENT */];
+        let patchFlag = 64 /* PatchFlags.STABLE_FRAGMENT */;
+        shared.PatchFlagNames[64 /* PatchFlags.STABLE_FRAGMENT */];
         root.codegenNode = createVNodeCall(context, helper(FRAGMENT), undefined, root.children, patchFlag + (``), undefined, undefined, true, undefined, false /* isComponent */);
     }
     else ;
@@ -2128,29 +2128,29 @@ function traverseNode(node, context) {
         }
     }
     switch (node.type) {
-        case 3 /* COMMENT */:
+        case 3 /* NodeTypes.COMMENT */:
             if (!context.ssr) {
                 // inject import for the Comment symbol, which is needed for creating
                 // comment nodes with `createVNode`
                 context.helper(CREATE_COMMENT);
             }
             break;
-        case 5 /* INTERPOLATION */:
+        case 5 /* NodeTypes.INTERPOLATION */:
             // no need to traverse, but we need to inject toString helper
             if (!context.ssr) {
                 context.helper(TO_DISPLAY_STRING);
             }
             break;
         // for container types, further traverse downwards
-        case 9 /* IF */:
+        case 9 /* NodeTypes.IF */:
             for (let i = 0; i < node.branches.length; i++) {
                 traverseNode(node.branches[i], context);
             }
             break;
-        case 10 /* IF_BRANCH */:
-        case 11 /* FOR */:
-        case 1 /* ELEMENT */:
-        case 0 /* ROOT */:
+        case 10 /* NodeTypes.IF_BRANCH */:
+        case 11 /* NodeTypes.FOR */:
+        case 1 /* NodeTypes.ELEMENT */:
+        case 0 /* NodeTypes.ROOT */:
             traverseChildren(node, context);
             break;
     }
@@ -2166,17 +2166,17 @@ function createStructuralDirectiveTransform(name, fn) {
         ? (n) => n === name
         : (n) => name.test(n);
     return (node, context) => {
-        if (node.type === 1 /* ELEMENT */) {
+        if (node.type === 1 /* NodeTypes.ELEMENT */) {
             const { props } = node;
             // structural directive transforms are not concerned with slots
             // as they are handled separately in vSlot.ts
-            if (node.tagType === 3 /* TEMPLATE */ && props.some(isVSlot)) {
+            if (node.tagType === 3 /* ElementTypes.TEMPLATE */ && props.some(isVSlot)) {
                 return;
             }
             const exitFns = [];
             for (let i = 0; i < props.length; i++) {
                 const prop = props[i];
-                if (prop.type === 7 /* DIRECTIVE */ && matches(prop.name)) {
+                if (prop.type === 7 /* NodeTypes.DIRECTIVE */ && matches(prop.name)) {
                     // structural directives are removed to avoid infinite recursion
                     // also we remove them *before* applying so that it can further
                     // traverse itself in case it moves the node around
@@ -2224,7 +2224,7 @@ function createCodegenContext(ast, { mode = 'function', prefixIdentifiers = mode
             if (context.map) {
                 if (node) {
                     let name;
-                    if (node.type === 4 /* SIMPLE_EXPRESSION */ && !node.isStatic) {
+                    if (node.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ && !node.isStatic) {
                         const content = node.content.replace(/^_ctx\./, '');
                         if (content !== node.content && isSimpleIdentifier(content)) {
                             name = content;
@@ -2500,7 +2500,7 @@ function genHoists(hoists, context) {
     for (let i = 0; i < hoists.length; i++) {
         const exp = hoists[i];
         if (exp) {
-            const needScopeIdWrapper = genScopeId && exp.type === 13 /* VNODE_CALL */;
+            const needScopeIdWrapper = genScopeId && exp.type === 13 /* NodeTypes.VNODE_CALL */;
             push(`const _hoisted_${i + 1} = ${needScopeIdWrapper ? `${PURE_ANNOTATION} _withScopeId(() => ` : ``}`);
             genNode(exp, context);
             if (needScopeIdWrapper) {
@@ -2524,10 +2524,10 @@ function genImports(importsOptions, context) {
 }
 function isText$1(n) {
     return (shared.isString(n) ||
-        n.type === 4 /* SIMPLE_EXPRESSION */ ||
-        n.type === 2 /* TEXT */ ||
-        n.type === 5 /* INTERPOLATION */ ||
-        n.type === 8 /* COMPOUND_EXPRESSION */);
+        n.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ ||
+        n.type === 2 /* NodeTypes.TEXT */ ||
+        n.type === 5 /* NodeTypes.INTERPOLATION */ ||
+        n.type === 8 /* NodeTypes.COMPOUND_EXPRESSION */);
 }
 function genNodeListAsArray(nodes, context) {
     const multilines = nodes.length > 3 ||
@@ -2572,67 +2572,67 @@ function genNode(node, context) {
         return;
     }
     switch (node.type) {
-        case 1 /* ELEMENT */:
-        case 9 /* IF */:
-        case 11 /* FOR */:
+        case 1 /* NodeTypes.ELEMENT */:
+        case 9 /* NodeTypes.IF */:
+        case 11 /* NodeTypes.FOR */:
             genNode(node.codegenNode, context);
             break;
-        case 2 /* TEXT */:
+        case 2 /* NodeTypes.TEXT */:
             genText(node, context);
             break;
-        case 4 /* SIMPLE_EXPRESSION */:
+        case 4 /* NodeTypes.SIMPLE_EXPRESSION */:
             genExpression(node, context);
             break;
-        case 5 /* INTERPOLATION */:
+        case 5 /* NodeTypes.INTERPOLATION */:
             genInterpolation(node, context);
             break;
-        case 12 /* TEXT_CALL */:
+        case 12 /* NodeTypes.TEXT_CALL */:
             genNode(node.codegenNode, context);
             break;
-        case 8 /* COMPOUND_EXPRESSION */:
+        case 8 /* NodeTypes.COMPOUND_EXPRESSION */:
             genCompoundExpression(node, context);
             break;
-        case 3 /* COMMENT */:
+        case 3 /* NodeTypes.COMMENT */:
             genComment(node, context);
             break;
-        case 13 /* VNODE_CALL */:
+        case 13 /* NodeTypes.VNODE_CALL */:
             genVNodeCall(node, context);
             break;
-        case 14 /* JS_CALL_EXPRESSION */:
+        case 14 /* NodeTypes.JS_CALL_EXPRESSION */:
             genCallExpression(node, context);
             break;
-        case 15 /* JS_OBJECT_EXPRESSION */:
+        case 15 /* NodeTypes.JS_OBJECT_EXPRESSION */:
             genObjectExpression(node, context);
             break;
-        case 17 /* JS_ARRAY_EXPRESSION */:
+        case 17 /* NodeTypes.JS_ARRAY_EXPRESSION */:
             genArrayExpression(node, context);
             break;
-        case 18 /* JS_FUNCTION_EXPRESSION */:
+        case 18 /* NodeTypes.JS_FUNCTION_EXPRESSION */:
             genFunctionExpression(node, context);
             break;
-        case 19 /* JS_CONDITIONAL_EXPRESSION */:
+        case 19 /* NodeTypes.JS_CONDITIONAL_EXPRESSION */:
             genConditionalExpression(node, context);
             break;
-        case 20 /* JS_CACHE_EXPRESSION */:
+        case 20 /* NodeTypes.JS_CACHE_EXPRESSION */:
             genCacheExpression(node, context);
             break;
-        case 21 /* JS_BLOCK_STATEMENT */:
+        case 21 /* NodeTypes.JS_BLOCK_STATEMENT */:
             genNodeList(node.body, context, true, false);
             break;
         // SSR only types
-        case 22 /* JS_TEMPLATE_LITERAL */:
+        case 22 /* NodeTypes.JS_TEMPLATE_LITERAL */:
             genTemplateLiteral(node, context);
             break;
-        case 23 /* JS_IF_STATEMENT */:
+        case 23 /* NodeTypes.JS_IF_STATEMENT */:
             genIfStatement(node, context);
             break;
-        case 24 /* JS_ASSIGNMENT_EXPRESSION */:
+        case 24 /* NodeTypes.JS_ASSIGNMENT_EXPRESSION */:
             genAssignmentExpression(node, context);
             break;
-        case 25 /* JS_SEQUENCE_EXPRESSION */:
+        case 25 /* NodeTypes.JS_SEQUENCE_EXPRESSION */:
             genSequenceExpression(node, context);
             break;
-        case 26 /* JS_RETURN_STATEMENT */:
+        case 26 /* NodeTypes.JS_RETURN_STATEMENT */:
             genReturnStatement(node, context);
             break;
     }
@@ -2665,7 +2665,7 @@ function genCompoundExpression(node, context) {
 }
 function genExpressionAsPropertyKey(node, context) {
     const { push } = context;
-    if (node.type === 8 /* COMPOUND_EXPRESSION */) {
+    if (node.type === 8 /* NodeTypes.COMPOUND_EXPRESSION */) {
         push(`[`);
         genCompoundExpression(node, context);
         push(`]`);
@@ -2742,7 +2742,7 @@ function genObjectExpression(node, context) {
         return;
     }
     const multilines = properties.length > 1 ||
-        (properties.some(p => p.value.type !== 4 /* SIMPLE_EXPRESSION */));
+        (properties.some(p => p.value.type !== 4 /* NodeTypes.SIMPLE_EXPRESSION */));
     push(multilines ? `{` : `{ `);
     multilines && indent();
     for (let i = 0; i < properties.length; i++) {
@@ -2811,7 +2811,7 @@ function genFunctionExpression(node, context) {
 function genConditionalExpression(node, context) {
     const { test, consequent, alternate, newline: needNewline } = node;
     const { push, indent, deindent, newline } = context;
-    if (test.type === 4 /* SIMPLE_EXPRESSION */) {
+    if (test.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
         const needsParens = !isSimpleIdentifier(test.content);
         needsParens && push(`(`);
         genExpression(test, context);
@@ -2831,7 +2831,7 @@ function genConditionalExpression(node, context) {
     needNewline && newline();
     needNewline || push(` `);
     push(`: `);
-    const isNested = alternate.type === 19 /* JS_CONDITIONAL_EXPRESSION */;
+    const isNested = alternate.type === 19 /* NodeTypes.JS_CONDITIONAL_EXPRESSION */;
     if (!isNested) {
         context.indentLevel++;
     }
@@ -2895,7 +2895,7 @@ function genIfStatement(node, context) {
     push(`}`);
     if (alternate) {
         push(` else `);
-        if (alternate.type === 23 /* JS_IF_STATEMENT */) {
+        if (alternate.type === 23 /* NodeTypes.JS_IF_STATEMENT */) {
             genIfStatement(alternate, context);
         }
         else {
@@ -3252,27 +3252,27 @@ function isReferenced(node, parent, grandparent) {
 
 const isLiteralWhitelisted = /*#__PURE__*/ shared.makeMap('true,false,null,this');
 const transformExpression = (node, context) => {
-    if (node.type === 5 /* INTERPOLATION */) {
+    if (node.type === 5 /* NodeTypes.INTERPOLATION */) {
         node.content = processExpression(node.content, context);
     }
-    else if (node.type === 1 /* ELEMENT */) {
+    else if (node.type === 1 /* NodeTypes.ELEMENT */) {
         // handle directives on element
         for (let i = 0; i < node.props.length; i++) {
             const dir = node.props[i];
             // do not process for v-on & v-for since they are special handled
-            if (dir.type === 7 /* DIRECTIVE */ && dir.name !== 'for') {
+            if (dir.type === 7 /* NodeTypes.DIRECTIVE */ && dir.name !== 'for') {
                 const exp = dir.exp;
                 const arg = dir.arg;
                 // do not process exp if this is v-on:arg - we need special handling
                 // for wrapping inline statements.
                 if (exp &&
-                    exp.type === 4 /* SIMPLE_EXPRESSION */ &&
+                    exp.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ &&
                     !(dir.name === 'on' && arg)) {
                     dir.exp = processExpression(exp, context, 
                     // slot args must be processed as function params
                     dir.name === 'slot');
                 }
-                if (arg && arg.type === 4 /* SIMPLE_EXPRESSION */ && !arg.isStatic) {
+                if (arg && arg.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ && !arg.isStatic) {
                     dir.arg = processExpression(arg, context);
                 }
             }
@@ -3301,15 +3301,15 @@ asRawStatements = false, localVars = Object.create(context.identifiers)) {
             const isUpdateArg = parent && parent.type === 'UpdateExpression' && parent.argument === id;
             // ({ x } = y)
             const isDestructureAssignment = parent && isInDestructureAssignment(parent, parentStack);
-            if (type === "setup-const" /* SETUP_CONST */ ||
-                type === "setup-reactive-const" /* SETUP_REACTIVE_CONST */ ||
+            if (type === "setup-const" /* BindingTypes.SETUP_CONST */ ||
+                type === "setup-reactive-const" /* BindingTypes.SETUP_REACTIVE_CONST */ ||
                 localVars[raw]) {
                 return raw;
             }
-            else if (type === "setup-ref" /* SETUP_REF */) {
+            else if (type === "setup-ref" /* BindingTypes.SETUP_REF */) {
                 return `${raw}.value`;
             }
-            else if (type === "setup-maybe-ref" /* SETUP_MAYBE_REF */) {
+            else if (type === "setup-maybe-ref" /* BindingTypes.SETUP_MAYBE_REF */) {
                 // const binding that may or may not be ref
                 // if it's not a ref, then assignments don't make sense -
                 // so we ignore the non-ref assignment case and generate code
@@ -3318,7 +3318,7 @@ asRawStatements = false, localVars = Object.create(context.identifiers)) {
                     ? `${raw}.value`
                     : `${context.helperString(UNREF)}(${raw})`;
             }
-            else if (type === "setup-let" /* SETUP_LET */) {
+            else if (type === "setup-let" /* BindingTypes.SETUP_LET */) {
                 if (isAssignmentLVal) {
                     // let binding.
                     // this is a bit more tricky as we need to cover the case where
@@ -3354,12 +3354,12 @@ asRawStatements = false, localVars = Object.create(context.identifiers)) {
                     return `${context.helperString(UNREF)}(${raw})`;
                 }
             }
-            else if (type === "props" /* PROPS */) {
+            else if (type === "props" /* BindingTypes.PROPS */) {
                 // use __props which is generated by compileScript so in ts mode
                 // it gets correct type
                 return shared.genPropsAccessExp(raw);
             }
-            else if (type === "props-aliased" /* PROPS_ALIASED */) {
+            else if (type === "props-aliased" /* BindingTypes.PROPS_ALIASED */) {
                 // prop with a different local alias (from defineProps() destructure)
                 return shared.genPropsAccessExp(bindingMetadata.__propsAliases[raw]);
             }
@@ -3369,7 +3369,7 @@ asRawStatements = false, localVars = Object.create(context.identifiers)) {
                 // setup bindings in non-inline mode
                 return `$setup.${raw}`;
             }
-            else if (type === "props-aliased" /* PROPS_ALIASED */) {
+            else if (type === "props-aliased" /* BindingTypes.PROPS_ALIASED */) {
                 return `$props['${bindingMetadata.__propsAliases[raw]}']`;
             }
             else if (type) {
@@ -3390,17 +3390,17 @@ asRawStatements = false, localVars = Object.create(context.identifiers)) {
         if (!asParams && !isScopeVarReference && !isAllowedGlobal && !isLiteral) {
             // const bindings exposed from setup can be skipped for patching but
             // cannot be hoisted to module scope
-            if (bindingMetadata[node.content] === "setup-const" /* SETUP_CONST */) {
-                node.constType = 1 /* CAN_SKIP_PATCH */;
+            if (bindingMetadata[node.content] === "setup-const" /* BindingTypes.SETUP_CONST */) {
+                node.constType = 1 /* ConstantTypes.CAN_SKIP_PATCH */;
             }
             node.content = rewriteIdentifier(rawExp);
         }
         else if (!isScopeVarReference) {
             if (isLiteral) {
-                node.constType = 3 /* CAN_STRINGIFY */;
+                node.constType = 3 /* ConstantTypes.CAN_STRINGIFY */;
             }
             else {
-                node.constType = 2 /* CAN_HOIST */;
+                node.constType = 2 /* ConstantTypes.CAN_HOIST */;
             }
         }
         return node;
@@ -3420,7 +3420,7 @@ asRawStatements = false, localVars = Object.create(context.identifiers)) {
         }).program;
     }
     catch (e) {
-        context.onError(createCompilerError(44 /* X_INVALID_EXPRESSION */, node.loc, undefined, e.message));
+        context.onError(createCompilerError(44 /* ErrorCodes.X_INVALID_EXPRESSION */, node.loc, undefined, e.message));
         return node;
     }
     const ids = [];
@@ -3474,7 +3474,7 @@ asRawStatements = false, localVars = Object.create(context.identifiers)) {
             source,
             start: advancePositionWithClone(node.loc.start, source, start),
             end: advancePositionWithClone(node.loc.start, source, end)
-        }, id.isConstant ? 3 /* CAN_STRINGIFY */ : 0 /* NOT_CONSTANT */));
+        }, id.isConstant ? 3 /* ConstantTypes.CAN_STRINGIFY */ : 0 /* ConstantTypes.NOT_CONSTANT */));
         if (i === ids.length - 1 && end < rawExp.length) {
             children.push(rawExp.slice(end));
         }
@@ -3486,8 +3486,8 @@ asRawStatements = false, localVars = Object.create(context.identifiers)) {
     else {
         ret = node;
         ret.constType = bailConstant
-            ? 0 /* NOT_CONSTANT */
-            : 3 /* CAN_STRINGIFY */;
+            ? 0 /* ConstantTypes.NOT_CONSTANT */
+            : 3 /* ConstantTypes.CAN_STRINGIFY */;
     }
     ret.identifiers = Object.keys(knownIds);
     return ret;
@@ -3507,7 +3507,7 @@ function stringifyExpression(exp) {
     if (shared.isString(exp)) {
         return exp;
     }
-    else if (exp.type === 4 /* SIMPLE_EXPRESSION */) {
+    else if (exp.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
         return exp.content;
     }
     else {
@@ -3527,7 +3527,7 @@ const transformIf = createStructuralDirectiveTransform(/^(if|else|else-if)$/, (n
         let key = 0;
         while (i-- >= 0) {
             const sibling = siblings[i];
-            if (sibling && sibling.type === 9 /* IF */) {
+            if (sibling && sibling.type === 9 /* NodeTypes.IF */) {
                 key += sibling.branches.length;
             }
         }
@@ -3550,7 +3550,7 @@ function processIf(node, dir, context, processCodegen) {
     if (dir.name !== 'else' &&
         (!dir.exp || !dir.exp.content.trim())) {
         const loc = dir.exp ? dir.exp.loc : node.loc;
-        context.onError(createCompilerError(28 /* X_V_IF_NO_EXPRESSION */, dir.loc));
+        context.onError(createCompilerError(28 /* ErrorCodes.X_V_IF_NO_EXPRESSION */, dir.loc));
         dir.exp = createSimpleExpression(`true`, false, loc);
     }
     if (context.prefixIdentifiers && dir.exp) {
@@ -3561,7 +3561,7 @@ function processIf(node, dir, context, processCodegen) {
     if (dir.name === 'if') {
         const branch = createIfBranch(node, dir);
         const ifNode = {
-            type: 9 /* IF */,
+            type: 9 /* NodeTypes.IF */,
             loc: node.loc,
             branches: [branch]
         };
@@ -3577,16 +3577,16 @@ function processIf(node, dir, context, processCodegen) {
         while (i-- >= -1) {
             const sibling = siblings[i];
             if (sibling &&
-                sibling.type === 2 /* TEXT */ &&
+                sibling.type === 2 /* NodeTypes.TEXT */ &&
                 !sibling.content.trim().length) {
                 context.removeNode(sibling);
                 continue;
             }
-            if (sibling && sibling.type === 9 /* IF */) {
+            if (sibling && sibling.type === 9 /* NodeTypes.IF */) {
                 // Check if v-else was followed by v-else-if
                 if (dir.name === 'else-if' &&
                     sibling.branches[sibling.branches.length - 1].condition === undefined) {
-                    context.onError(createCompilerError(30 /* X_V_ELSE_NO_ADJACENT_IF */, node.loc));
+                    context.onError(createCompilerError(30 /* ErrorCodes.X_V_ELSE_NO_ADJACENT_IF */, node.loc));
                 }
                 // move the node to the if node's branches
                 context.removeNode();
@@ -3597,7 +3597,7 @@ function processIf(node, dir, context, processCodegen) {
                     if (key) {
                         sibling.branches.forEach(({ userKey }) => {
                             if (isSameKey(userKey, key)) {
-                                context.onError(createCompilerError(29 /* X_V_IF_SAME_KEY */, branch.userKey.loc));
+                                context.onError(createCompilerError(29 /* ErrorCodes.X_V_IF_SAME_KEY */, branch.userKey.loc));
                             }
                         });
                     }
@@ -3615,16 +3615,16 @@ function processIf(node, dir, context, processCodegen) {
                 context.currentNode = null;
             }
             else {
-                context.onError(createCompilerError(30 /* X_V_ELSE_NO_ADJACENT_IF */, node.loc));
+                context.onError(createCompilerError(30 /* ErrorCodes.X_V_ELSE_NO_ADJACENT_IF */, node.loc));
             }
             break;
         }
     }
 }
 function createIfBranch(node, dir) {
-    const isTemplateIf = node.tagType === 3 /* TEMPLATE */;
+    const isTemplateIf = node.tagType === 3 /* ElementTypes.TEMPLATE */;
     return {
-        type: 10 /* IF_BRANCH */,
+        type: 10 /* NodeTypes.IF_BRANCH */,
         loc: node.loc,
         condition: dir.name === 'else' ? undefined : dir.exp,
         children: isTemplateIf && !findDir(node, 'for') ? node.children : [node],
@@ -3648,20 +3648,20 @@ function createCodegenNodeForBranch(branch, keyIndex, context) {
 }
 function createChildrenCodegenNode(branch, keyIndex, context) {
     const { helper } = context;
-    const keyProperty = createObjectProperty(`key`, createSimpleExpression(`${keyIndex}`, false, locStub, 2 /* CAN_HOIST */));
+    const keyProperty = createObjectProperty(`key`, createSimpleExpression(`${keyIndex}`, false, locStub, 2 /* ConstantTypes.CAN_HOIST */));
     const { children } = branch;
     const firstChild = children[0];
-    const needFragmentWrapper = children.length !== 1 || firstChild.type !== 1 /* ELEMENT */;
+    const needFragmentWrapper = children.length !== 1 || firstChild.type !== 1 /* NodeTypes.ELEMENT */;
     if (needFragmentWrapper) {
-        if (children.length === 1 && firstChild.type === 11 /* FOR */) {
+        if (children.length === 1 && firstChild.type === 11 /* NodeTypes.FOR */) {
             // optimize away nested fragments when child is a ForNode
             const vnodeCall = firstChild.codegenNode;
             injectProp(vnodeCall, keyProperty, context);
             return vnodeCall;
         }
         else {
-            let patchFlag = 64 /* STABLE_FRAGMENT */;
-            shared.PatchFlagNames[64 /* STABLE_FRAGMENT */];
+            let patchFlag = 64 /* PatchFlags.STABLE_FRAGMENT */;
+            shared.PatchFlagNames[64 /* PatchFlags.STABLE_FRAGMENT */];
             return createVNodeCall(context, helper(FRAGMENT), createObjectExpression([keyProperty]), children, patchFlag + (``), undefined, undefined, true, false, false /* isComponent */, branch.loc);
         }
     }
@@ -3669,7 +3669,7 @@ function createChildrenCodegenNode(branch, keyIndex, context) {
         const ret = firstChild.codegenNode;
         const vnodeCall = getMemoedVNodeCall(ret);
         // Change createVNode to createBlock.
-        if (vnodeCall.type === 13 /* VNODE_CALL */) {
+        if (vnodeCall.type === 13 /* NodeTypes.VNODE_CALL */) {
             makeBlock(vnodeCall, context);
         }
         // inject branch key
@@ -3681,7 +3681,7 @@ function isSameKey(a, b) {
     if (!a || a.type !== b.type) {
         return false;
     }
-    if (a.type === 6 /* ATTRIBUTE */) {
+    if (a.type === 6 /* NodeTypes.ATTRIBUTE */) {
         if (a.value.content !== b.value.content) {
             return false;
         }
@@ -3693,7 +3693,7 @@ function isSameKey(a, b) {
         if (exp.type !== branchExp.type) {
             return false;
         }
-        if (exp.type !== 4 /* SIMPLE_EXPRESSION */ ||
+        if (exp.type !== 4 /* NodeTypes.SIMPLE_EXPRESSION */ ||
             exp.isStatic !== branchExp.isStatic ||
             exp.content !== branchExp.content) {
             return false;
@@ -3703,15 +3703,15 @@ function isSameKey(a, b) {
 }
 function getParentCondition(node) {
     while (true) {
-        if (node.type === 19 /* JS_CONDITIONAL_EXPRESSION */) {
-            if (node.alternate.type === 19 /* JS_CONDITIONAL_EXPRESSION */) {
+        if (node.type === 19 /* NodeTypes.JS_CONDITIONAL_EXPRESSION */) {
+            if (node.alternate.type === 19 /* NodeTypes.JS_CONDITIONAL_EXPRESSION */) {
                 node = node.alternate;
             }
             else {
                 return node;
             }
         }
-        else if (node.type === 20 /* JS_CACHE_EXPRESSION */) {
+        else if (node.type === 20 /* NodeTypes.JS_CACHE_EXPRESSION */) {
             node = node.value;
         }
     }
@@ -3729,7 +3729,7 @@ const transformFor = createStructuralDirectiveTransform('for', (node, dir, conte
         const memo = findDir(node, 'memo');
         const keyProp = findProp(node, `key`);
         const keyExp = keyProp &&
-            (keyProp.type === 6 /* ATTRIBUTE */
+            (keyProp.type === 6 /* NodeTypes.ATTRIBUTE */
                 ? createSimpleExpression(keyProp.value.content, true)
                 : keyProp.exp);
         const keyProperty = keyProp ? createObjectProperty(`key`, keyExp) : null;
@@ -3741,17 +3741,17 @@ const transformFor = createStructuralDirectiveTransform('for', (node, dir, conte
             if (memo) {
                 memo.exp = processExpression(memo.exp, context);
             }
-            if (keyProperty && keyProp.type !== 6 /* ATTRIBUTE */) {
+            if (keyProperty && keyProp.type !== 6 /* NodeTypes.ATTRIBUTE */) {
                 keyProperty.value = processExpression(keyProperty.value, context);
             }
         }
-        const isStableFragment = forNode.source.type === 4 /* SIMPLE_EXPRESSION */ &&
-            forNode.source.constType > 0 /* NOT_CONSTANT */;
+        const isStableFragment = forNode.source.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ &&
+            forNode.source.constType > 0 /* ConstantTypes.NOT_CONSTANT */;
         const fragmentFlag = isStableFragment
-            ? 64 /* STABLE_FRAGMENT */
+            ? 64 /* PatchFlags.STABLE_FRAGMENT */
             : keyProp
-                ? 128 /* KEYED_FRAGMENT */
-                : 256 /* UNKEYED_FRAGMENT */;
+                ? 128 /* PatchFlags.KEYED_FRAGMENT */
+                : 256 /* PatchFlags.UNKEYED_FRAGMENT */;
         forNode.codegenNode = createVNodeCall(context, helper(FRAGMENT), undefined, renderExp, fragmentFlag +
             (``), undefined, undefined, true /* isBlock */, !isStableFragment /* disableTracking */, false /* isComponent */, node.loc);
         return () => {
@@ -3761,16 +3761,16 @@ const transformFor = createStructuralDirectiveTransform('for', (node, dir, conte
             // check <template v-for> key placement
             if (isTemplate) {
                 node.children.some(c => {
-                    if (c.type === 1 /* ELEMENT */) {
+                    if (c.type === 1 /* NodeTypes.ELEMENT */) {
                         const key = findProp(c, 'key');
                         if (key) {
-                            context.onError(createCompilerError(33 /* X_V_FOR_TEMPLATE_KEY_PLACEMENT */, key.loc));
+                            context.onError(createCompilerError(33 /* ErrorCodes.X_V_FOR_TEMPLATE_KEY_PLACEMENT */, key.loc));
                             return true;
                         }
                     }
                 });
             }
-            const needFragmentWrapper = children.length !== 1 || children[0].type !== 1 /* ELEMENT */;
+            const needFragmentWrapper = children.length !== 1 || children[0].type !== 1 /* NodeTypes.ELEMENT */;
             const slotOutlet = isSlotOutlet(node)
                 ? node
                 : isTemplate &&
@@ -3791,7 +3791,7 @@ const transformFor = createStructuralDirectiveTransform('for', (node, dir, conte
             else if (needFragmentWrapper) {
                 // <template v-for="..."> with text or multi-elements
                 // should generate a fragment block for each loop
-                childBlock = createVNodeCall(context, helper(FRAGMENT), keyProperty ? createObjectExpression([keyProperty]) : undefined, node.children, 64 /* STABLE_FRAGMENT */ +
+                childBlock = createVNodeCall(context, helper(FRAGMENT), keyProperty ? createObjectExpression([keyProperty]) : undefined, node.children, 64 /* PatchFlags.STABLE_FRAGMENT */ +
                     (``), undefined, undefined, true, undefined, false /* isComponent */);
             }
             else {
@@ -3848,7 +3848,7 @@ const transformFor = createStructuralDirectiveTransform('for', (node, dir, conte
 // target-agnostic transform used for both Client and SSR
 function processFor(node, dir, context, processCodegen) {
     if (!dir.exp) {
-        context.onError(createCompilerError(31 /* X_V_FOR_NO_EXPRESSION */, dir.loc));
+        context.onError(createCompilerError(31 /* ErrorCodes.X_V_FOR_NO_EXPRESSION */, dir.loc));
         return;
     }
     const parseResult = parseForExpression(
@@ -3856,13 +3856,13 @@ function processFor(node, dir, context, processCodegen) {
     // before expression transform.
     dir.exp, context);
     if (!parseResult) {
-        context.onError(createCompilerError(32 /* X_V_FOR_MALFORMED_EXPRESSION */, dir.loc));
+        context.onError(createCompilerError(32 /* ErrorCodes.X_V_FOR_MALFORMED_EXPRESSION */, dir.loc));
         return;
     }
     const { addIdentifiers, removeIdentifiers, scopes } = context;
     const { source, value, key, index } = parseResult;
     const forNode = {
-        type: 11 /* FOR */,
+        type: 11 /* NodeTypes.FOR */,
         loc: dir.loc,
         source,
         valueAlias: value,
@@ -3974,9 +3974,9 @@ const defaultFallback = createSimpleExpression(`undefined`, false);
 //    Note the exit callback is executed before buildSlots() on the same node,
 //    so only nested slots see positive numbers.
 const trackSlotScopes = (node, context) => {
-    if (node.type === 1 /* ELEMENT */ &&
-        (node.tagType === 1 /* COMPONENT */ ||
-            node.tagType === 3 /* TEMPLATE */)) {
+    if (node.type === 1 /* NodeTypes.ELEMENT */ &&
+        (node.tagType === 1 /* ElementTypes.COMPONENT */ ||
+            node.tagType === 3 /* ElementTypes.TEMPLATE */)) {
         // We are only checking non-empty v-slot here
         // since we only care about slots that introduce scope variables.
         const vSlot = findDir(node, 'slot');
@@ -4049,20 +4049,21 @@ function buildSlots(node, context, buildSlotFn = buildClientSlotFn) {
     let hasNamedDefaultSlot = false;
     const implicitDefaultChildren = [];
     const seenSlotNames = new Set();
+    let conditionalBranchIndex = 0;
     for (let i = 0; i < children.length; i++) {
         const slotElement = children[i];
         let slotDir;
         if (!isTemplateNode(slotElement) ||
             !(slotDir = findDir(slotElement, 'slot', true))) {
             // not a <template v-slot>, skip.
-            if (slotElement.type !== 3 /* COMMENT */) {
+            if (slotElement.type !== 3 /* NodeTypes.COMMENT */) {
                 implicitDefaultChildren.push(slotElement);
             }
             continue;
         }
         if (onComponentSlot) {
             // already has on-component slot - this is incorrect usage.
-            context.onError(createCompilerError(37 /* X_V_SLOT_MIXED_SLOT_USAGE */, slotDir.loc));
+            context.onError(createCompilerError(37 /* ErrorCodes.X_V_SLOT_MIXED_SLOT_USAGE */, slotDir.loc));
             break;
         }
         hasTemplateSlots = true;
@@ -4083,7 +4084,7 @@ function buildSlots(node, context, buildSlotFn = buildClientSlotFn) {
         let vFor;
         if ((vIf = findDir(slotElement, 'if'))) {
             hasDynamicSlots = true;
-            dynamicSlots.push(createConditionalExpression(vIf.exp, buildDynamicSlot(slotName, slotFunction), defaultFallback));
+            dynamicSlots.push(createConditionalExpression(vIf.exp, buildDynamicSlot(slotName, slotFunction, conditionalBranchIndex++), defaultFallback));
         }
         else if ((vElse = findDir(slotElement, /^else(-if)?$/, true /* allowEmpty */))) {
             // find adjacent v-if
@@ -4091,7 +4092,7 @@ function buildSlots(node, context, buildSlotFn = buildClientSlotFn) {
             let prev;
             while (j--) {
                 prev = children[j];
-                if (prev.type !== 3 /* COMMENT */) {
+                if (prev.type !== 3 /* NodeTypes.COMMENT */) {
                     break;
                 }
             }
@@ -4101,15 +4102,15 @@ function buildSlots(node, context, buildSlotFn = buildClientSlotFn) {
                 i--;
                 // attach this slot to previous conditional
                 let conditional = dynamicSlots[dynamicSlots.length - 1];
-                while (conditional.alternate.type === 19 /* JS_CONDITIONAL_EXPRESSION */) {
+                while (conditional.alternate.type === 19 /* NodeTypes.JS_CONDITIONAL_EXPRESSION */) {
                     conditional = conditional.alternate;
                 }
                 conditional.alternate = vElse.exp
-                    ? createConditionalExpression(vElse.exp, buildDynamicSlot(slotName, slotFunction), defaultFallback)
-                    : buildDynamicSlot(slotName, slotFunction);
+                    ? createConditionalExpression(vElse.exp, buildDynamicSlot(slotName, slotFunction, conditionalBranchIndex++), defaultFallback)
+                    : buildDynamicSlot(slotName, slotFunction, conditionalBranchIndex++);
             }
             else {
-                context.onError(createCompilerError(30 /* X_V_ELSE_NO_ADJACENT_IF */, vElse.loc));
+                context.onError(createCompilerError(30 /* ErrorCodes.X_V_ELSE_NO_ADJACENT_IF */, vElse.loc));
             }
         }
         else if ((vFor = findDir(slotElement, 'for'))) {
@@ -4125,14 +4126,14 @@ function buildSlots(node, context, buildSlotFn = buildClientSlotFn) {
                 ]));
             }
             else {
-                context.onError(createCompilerError(32 /* X_V_FOR_MALFORMED_EXPRESSION */, vFor.loc));
+                context.onError(createCompilerError(32 /* ErrorCodes.X_V_FOR_MALFORMED_EXPRESSION */, vFor.loc));
             }
         }
         else {
             // check duplicate static names
             if (staticSlotName) {
                 if (seenSlotNames.has(staticSlotName)) {
-                    context.onError(createCompilerError(38 /* X_V_SLOT_DUPLICATE_SLOT_NAMES */, dirLoc));
+                    context.onError(createCompilerError(38 /* ErrorCodes.X_V_SLOT_DUPLICATE_SLOT_NAMES */, dirLoc));
                     continue;
                 }
                 seenSlotNames.add(staticSlotName);
@@ -4162,7 +4163,7 @@ function buildSlots(node, context, buildSlotFn = buildClientSlotFn) {
             implicitDefaultChildren.some(node => isNonWhitespaceContent(node))) {
             // implicit default slot (mixed with named slots)
             if (hasNamedDefaultSlot) {
-                context.onError(createCompilerError(39 /* X_V_SLOT_EXTRANEOUS_DEFAULT_SLOT_CHILDREN */, implicitDefaultChildren[0].loc));
+                context.onError(createCompilerError(39 /* ErrorCodes.X_V_SLOT_EXTRANEOUS_DEFAULT_SLOT_CHILDREN */, implicitDefaultChildren[0].loc));
             }
             else {
                 slotsProperties.push(buildDefaultSlotProperty(undefined, implicitDefaultChildren));
@@ -4170,10 +4171,10 @@ function buildSlots(node, context, buildSlotFn = buildClientSlotFn) {
         }
     }
     const slotFlag = hasDynamicSlots
-        ? 2 /* DYNAMIC */
+        ? 2 /* SlotFlags.DYNAMIC */
         : hasForwardedSlots(node.children)
-            ? 3 /* FORWARDED */
-            : 1 /* STABLE */;
+            ? 3 /* SlotFlags.FORWARDED */
+            : 1 /* SlotFlags.STABLE */;
     let slots = createObjectExpression(slotsProperties.concat(createObjectProperty(`_`, 
     // 2 = compiled but dynamic = can skip normalization, but must run diff
     // 1 = compiled and static = can skip normalization AND diff as optimized
@@ -4189,28 +4190,32 @@ function buildSlots(node, context, buildSlotFn = buildClientSlotFn) {
         hasDynamicSlots
     };
 }
-function buildDynamicSlot(name, fn) {
-    return createObjectExpression([
+function buildDynamicSlot(name, fn, index) {
+    const props = [
         createObjectProperty(`name`, name),
         createObjectProperty(`fn`, fn)
-    ]);
+    ];
+    if (index != null) {
+        props.push(createObjectProperty(`key`, createSimpleExpression(String(index), true)));
+    }
+    return createObjectExpression(props);
 }
 function hasForwardedSlots(children) {
     for (let i = 0; i < children.length; i++) {
         const child = children[i];
         switch (child.type) {
-            case 1 /* ELEMENT */:
-                if (child.tagType === 2 /* SLOT */ ||
+            case 1 /* NodeTypes.ELEMENT */:
+                if (child.tagType === 2 /* ElementTypes.SLOT */ ||
                     hasForwardedSlots(child.children)) {
                     return true;
                 }
                 break;
-            case 9 /* IF */:
+            case 9 /* NodeTypes.IF */:
                 if (hasForwardedSlots(child.branches))
                     return true;
                 break;
-            case 10 /* IF_BRANCH */:
-            case 11 /* FOR */:
+            case 10 /* NodeTypes.IF_BRANCH */:
+            case 11 /* NodeTypes.FOR */:
                 if (hasForwardedSlots(child.children))
                     return true;
                 break;
@@ -4219,9 +4224,9 @@ function hasForwardedSlots(children) {
     return false;
 }
 function isNonWhitespaceContent(node) {
-    if (node.type !== 2 /* TEXT */ && node.type !== 12 /* TEXT_CALL */)
+    if (node.type !== 2 /* NodeTypes.TEXT */ && node.type !== 12 /* NodeTypes.TEXT_CALL */)
         return true;
-    return node.type === 2 /* TEXT */
+    return node.type === 2 /* NodeTypes.TEXT */
         ? !!node.content.trim()
         : isNonWhitespaceContent(node.content);
 }
@@ -4235,13 +4240,13 @@ const transformElement = (node, context) => {
     // processed and merged.
     return function postTransformElement() {
         node = context.currentNode;
-        if (!(node.type === 1 /* ELEMENT */ &&
-            (node.tagType === 0 /* ELEMENT */ ||
-                node.tagType === 1 /* COMPONENT */))) {
+        if (!(node.type === 1 /* NodeTypes.ELEMENT */ &&
+            (node.tagType === 0 /* ElementTypes.ELEMENT */ ||
+                node.tagType === 1 /* ElementTypes.COMPONENT */))) {
             return;
         }
         const { tag, props } = node;
-        const isComponent = node.tagType === 1 /* COMPONENT */;
+        const isComponent = node.tagType === 1 /* ElementTypes.COMPONENT */;
         // The goal of the transform is to create a codegenNode implementing the
         // VNodeCall interface.
         let vnodeTag = isComponent
@@ -4292,7 +4297,7 @@ const transformElement = (node, context) => {
                 //    collected by a parent block.
                 shouldUseBlock = true;
                 // 2. Force keep-alive to always be updated, since it uses raw children.
-                patchFlag |= 1024 /* DYNAMIC_SLOTS */;
+                patchFlag |= 1024 /* PatchFlags.DYNAMIC_SLOTS */;
             }
             const shouldBuildAsSlots = isComponent &&
                 // Teleport is not a real component and has dedicated runtime handling
@@ -4303,22 +4308,22 @@ const transformElement = (node, context) => {
                 const { slots, hasDynamicSlots } = buildSlots(node, context);
                 vnodeChildren = slots;
                 if (hasDynamicSlots) {
-                    patchFlag |= 1024 /* DYNAMIC_SLOTS */;
+                    patchFlag |= 1024 /* PatchFlags.DYNAMIC_SLOTS */;
                 }
             }
             else if (node.children.length === 1 && vnodeTag !== TELEPORT) {
                 const child = node.children[0];
                 const type = child.type;
                 // check for dynamic text children
-                const hasDynamicTextChild = type === 5 /* INTERPOLATION */ ||
-                    type === 8 /* COMPOUND_EXPRESSION */;
+                const hasDynamicTextChild = type === 5 /* NodeTypes.INTERPOLATION */ ||
+                    type === 8 /* NodeTypes.COMPOUND_EXPRESSION */;
                 if (hasDynamicTextChild &&
-                    getConstantType(child, context) === 0 /* NOT_CONSTANT */) {
-                    patchFlag |= 1 /* TEXT */;
+                    getConstantType(child, context) === 0 /* ConstantTypes.NOT_CONSTANT */) {
+                    patchFlag |= 1 /* PatchFlags.TEXT */;
                 }
                 // pass directly if the only child is a text node
                 // (plain / interpolation / expression)
-                if (hasDynamicTextChild || type === 2 /* TEXT */) {
+                if (hasDynamicTextChild || type === 2 /* NodeTypes.TEXT */) {
                     vnodeChildren = child;
                 }
                 else {
@@ -4348,8 +4353,8 @@ function resolveComponentType(node, context, ssr = false) {
     const isProp = findProp(node, 'is');
     if (isProp) {
         if (isExplicitDynamic ||
-            (isCompatEnabled("COMPILER_IS_ON_ELEMENT" /* COMPILER_IS_ON_ELEMENT */, context))) {
-            const exp = isProp.type === 6 /* ATTRIBUTE */
+            (isCompatEnabled("COMPILER_IS_ON_ELEMENT" /* CompilerDeprecationTypes.COMPILER_IS_ON_ELEMENT */, context))) {
+            const exp = isProp.type === 6 /* NodeTypes.ATTRIBUTE */
                 ? isProp.value && createSimpleExpression(isProp.value.content, true)
                 : isProp.exp;
             if (exp) {
@@ -4358,7 +4363,7 @@ function resolveComponentType(node, context, ssr = false) {
                 ]);
             }
         }
-        else if (isProp.type === 6 /* ATTRIBUTE */ &&
+        else if (isProp.type === 6 /* NodeTypes.ATTRIBUTE */ &&
             isProp.value.content.startsWith('vue:')) {
             // <button is="vue:xxx">
             // if not <component>, only is value that starts with "vue:" will be
@@ -4432,17 +4437,17 @@ function resolveSetupReference(name, context) {
             return PascalName;
         }
     };
-    const fromConst = checkType("setup-const" /* SETUP_CONST */) ||
-        checkType("setup-reactive-const" /* SETUP_REACTIVE_CONST */);
+    const fromConst = checkType("setup-const" /* BindingTypes.SETUP_CONST */) ||
+        checkType("setup-reactive-const" /* BindingTypes.SETUP_REACTIVE_CONST */);
     if (fromConst) {
         return context.inline
             ? // in inline mode, const setup bindings (e.g. imports) can be used as-is
                 fromConst
             : `$setup[${JSON.stringify(fromConst)}]`;
     }
-    const fromMaybeRef = checkType("setup-let" /* SETUP_LET */) ||
-        checkType("setup-ref" /* SETUP_REF */) ||
-        checkType("setup-maybe-ref" /* SETUP_MAYBE_REF */);
+    const fromMaybeRef = checkType("setup-let" /* BindingTypes.SETUP_LET */) ||
+        checkType("setup-ref" /* BindingTypes.SETUP_REF */) ||
+        checkType("setup-maybe-ref" /* BindingTypes.SETUP_MAYBE_REF */);
     if (fromMaybeRef) {
         return context.inline
             ? // setup scope bindings that may be refs need to be unrefed
@@ -4484,9 +4489,9 @@ function buildProps(node, context, props = node.props, isComponent, isDynamicCom
             if (isEventHandler && shared.isReservedProp(name)) {
                 hasVnodeHook = true;
             }
-            if (value.type === 20 /* JS_CACHE_EXPRESSION */ ||
-                ((value.type === 4 /* SIMPLE_EXPRESSION */ ||
-                    value.type === 8 /* COMPOUND_EXPRESSION */) &&
+            if (value.type === 20 /* NodeTypes.JS_CACHE_EXPRESSION */ ||
+                ((value.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ ||
+                    value.type === 8 /* NodeTypes.COMPOUND_EXPRESSION */) &&
                     getConstantType(value, context) > 0)) {
                 // skip if the prop is a cached handler or has constant value
                 return;
@@ -4517,7 +4522,7 @@ function buildProps(node, context, props = node.props, isComponent, isDynamicCom
     for (let i = 0; i < props.length; i++) {
         // static attribute
         const prop = props[i];
-        if (prop.type === 6 /* ATTRIBUTE */) {
+        if (prop.type === 6 /* NodeTypes.ATTRIBUTE */) {
             const { loc, name, value } = prop;
             let isStatic = true;
             if (name === 'ref') {
@@ -4539,7 +4544,7 @@ function buildProps(node, context, props = node.props, isComponent, isDynamicCom
             if (name === 'is' &&
                 (isComponentTag(tag) ||
                     (value && value.content.startsWith('vue:')) ||
-                    (isCompatEnabled("COMPILER_IS_ON_ELEMENT" /* COMPILER_IS_ON_ELEMENT */, context)))) {
+                    (isCompatEnabled("COMPILER_IS_ON_ELEMENT" /* CompilerDeprecationTypes.COMPILER_IS_ON_ELEMENT */, context)))) {
                 continue;
             }
             properties.push(createObjectProperty(createSimpleExpression(name, true, getInnerRange(loc, 0, name.length)), createSimpleExpression(value ? value.content : '', isStatic, value ? value.loc : loc)));
@@ -4552,7 +4557,7 @@ function buildProps(node, context, props = node.props, isComponent, isDynamicCom
             // skip v-slot - it is handled by its dedicated transform.
             if (name === 'slot') {
                 if (!isComponent) {
-                    context.onError(createCompilerError(40 /* X_V_SLOT_MISPLACED */, loc));
+                    context.onError(createCompilerError(40 /* ErrorCodes.X_V_SLOT_MISPLACED */, loc));
                 }
                 continue;
             }
@@ -4565,7 +4570,7 @@ function buildProps(node, context, props = node.props, isComponent, isDynamicCom
                 (isVBind &&
                     isStaticArgOf(arg, 'is') &&
                     (isComponentTag(tag) ||
-                        (isCompatEnabled("COMPILER_IS_ON_ELEMENT" /* COMPILER_IS_ON_ELEMENT */, context))))) {
+                        (isCompatEnabled("COMPILER_IS_ON_ELEMENT" /* CompilerDeprecationTypes.COMPILER_IS_ON_ELEMENT */, context))))) {
                 continue;
             }
             // skip v-on in SSR compilation
@@ -4593,7 +4598,7 @@ function buildProps(node, context, props = node.props, isComponent, isDynamicCom
                     }
                     if (isVBind) {
                         {
-                            if (isCompatEnabled("COMPILER_V_BIND_OBJECT_ORDER" /* COMPILER_V_BIND_OBJECT_ORDER */, context)) {
+                            if (isCompatEnabled("COMPILER_V_BIND_OBJECT_ORDER" /* CompilerDeprecationTypes.COMPILER_V_BIND_OBJECT_ORDER */, context)) {
                                 mergeArgs.unshift(exp);
                                 continue;
                             }
@@ -4603,17 +4608,17 @@ function buildProps(node, context, props = node.props, isComponent, isDynamicCom
                     else {
                         // v-on="obj" -> toHandlers(obj)
                         mergeArgs.push({
-                            type: 14 /* JS_CALL_EXPRESSION */,
+                            type: 14 /* NodeTypes.JS_CALL_EXPRESSION */,
                             loc,
                             callee: context.helper(TO_HANDLERS),
-                            arguments: [exp]
+                            arguments: isComponent ? [exp] : [exp, `true`]
                         });
                     }
                 }
                 else {
                     context.onError(createCompilerError(isVBind
-                        ? 34 /* X_V_BIND_NO_EXPRESSION */
-                        : 35 /* X_V_ON_NO_EXPRESSION */, loc));
+                        ? 34 /* ErrorCodes.X_V_BIND_NO_EXPRESSION */
+                        : 35 /* ErrorCodes.X_V_ON_NO_EXPRESSION */, loc));
                 }
                 continue;
             }
@@ -4660,31 +4665,31 @@ function buildProps(node, context, props = node.props, isComponent, isDynamicCom
     }
     // patchFlag analysis
     if (hasDynamicKeys) {
-        patchFlag |= 16 /* FULL_PROPS */;
+        patchFlag |= 16 /* PatchFlags.FULL_PROPS */;
     }
     else {
         if (hasClassBinding && !isComponent) {
-            patchFlag |= 2 /* CLASS */;
+            patchFlag |= 2 /* PatchFlags.CLASS */;
         }
         if (hasStyleBinding && !isComponent) {
-            patchFlag |= 4 /* STYLE */;
+            patchFlag |= 4 /* PatchFlags.STYLE */;
         }
         if (dynamicPropNames.length) {
-            patchFlag |= 8 /* PROPS */;
+            patchFlag |= 8 /* PatchFlags.PROPS */;
         }
         if (hasHydrationEventBinding) {
-            patchFlag |= 32 /* HYDRATE_EVENTS */;
+            patchFlag |= 32 /* PatchFlags.HYDRATE_EVENTS */;
         }
     }
     if (!shouldUseBlock &&
-        (patchFlag === 0 || patchFlag === 32 /* HYDRATE_EVENTS */) &&
+        (patchFlag === 0 || patchFlag === 32 /* PatchFlags.HYDRATE_EVENTS */) &&
         (hasRef || hasVnodeHook || runtimeDirectives.length > 0)) {
-        patchFlag |= 512 /* NEED_PATCH */;
+        patchFlag |= 512 /* PatchFlags.NEED_PATCH */;
     }
     // pre-normalize props, SSR is skipped for now
     if (!context.inSSR && propsExpression) {
         switch (propsExpression.type) {
-            case 15 /* JS_OBJECT_EXPRESSION */:
+            case 15 /* NodeTypes.JS_OBJECT_EXPRESSION */:
                 // means that there is no v-bind,
                 // but still need to deal with dynamic key binding
                 let classKeyIndex = -1;
@@ -4715,11 +4720,11 @@ function buildProps(node, context, props = node.props, isComponent, isDynamicCom
                         // the static style is compiled into an object,
                         // so use `hasStyleBinding` to ensure that it is a dynamic style binding
                         (hasStyleBinding ||
-                            (styleProp.value.type === 4 /* SIMPLE_EXPRESSION */ &&
+                            (styleProp.value.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ &&
                                 styleProp.value.content.trim()[0] === `[`) ||
                             // v-bind:style and style both exist,
                             // v-bind:style with static literal object
-                            styleProp.value.type === 17 /* JS_ARRAY_EXPRESSION */)) {
+                            styleProp.value.type === 17 /* NodeTypes.JS_ARRAY_EXPRESSION */)) {
                         styleProp.value = createCallExpression(context.helper(NORMALIZE_STYLE), [styleProp.value]);
                     }
                 }
@@ -4728,7 +4733,7 @@ function buildProps(node, context, props = node.props, isComponent, isDynamicCom
                     propsExpression = createCallExpression(context.helper(NORMALIZE_PROPS), [propsExpression]);
                 }
                 break;
-            case 14 /* JS_CALL_EXPRESSION */:
+            case 14 /* NodeTypes.JS_CALL_EXPRESSION */:
                 // mergeProps call, do nothing
                 break;
             default:
@@ -4761,7 +4766,7 @@ function dedupeProperties(properties) {
     for (let i = 0; i < properties.length; i++) {
         const prop = properties[i];
         // dynamic keys are always allowed
-        if (prop.key.type === 8 /* COMPOUND_EXPRESSION */ || !prop.key.isStatic) {
+        if (prop.key.type === 8 /* NodeTypes.COMPOUND_EXPRESSION */ || !prop.key.isStatic) {
             deduped.push(prop);
             continue;
         }
@@ -4781,7 +4786,7 @@ function dedupeProperties(properties) {
     return deduped;
 }
 function mergeAsArray(existing, incoming) {
-    if (existing.value.type === 17 /* JS_ARRAY_EXPRESSION */) {
+    if (existing.value.type === 17 /* NodeTypes.JS_ARRAY_EXPRESSION */) {
         existing.value.elements.push(incoming.value);
     }
     else {
@@ -4891,7 +4896,7 @@ function processSlotOutlet(node, context) {
     const nonNameProps = [];
     for (let i = 0; i < node.props.length; i++) {
         const p = node.props[i];
-        if (p.type === 6 /* ATTRIBUTE */) {
+        if (p.type === 6 /* NodeTypes.ATTRIBUTE */) {
             if (p.value) {
                 if (p.name === 'name') {
                     slotName = JSON.stringify(p.value.content);
@@ -4919,7 +4924,7 @@ function processSlotOutlet(node, context) {
         const { props, directives } = buildProps(node, context, nonNameProps, false, false);
         slotProps = props;
         if (directives.length) {
-            context.onError(createCompilerError(36 /* X_V_SLOT_UNEXPECTED_DIRECTIVE_ON_SLOT_OUTLET */, directives[0].loc));
+            context.onError(createCompilerError(36 /* ErrorCodes.X_V_SLOT_UNEXPECTED_DIRECTIVE_ON_SLOT_OUTLET */, directives[0].loc));
         }
     }
     return {
@@ -4932,18 +4937,26 @@ const fnExpRE = /^\s*([\w$_]+|(async\s*)?\([^)]*?\))\s*=>|^\s*(async\s+)?functio
 const transformOn = (dir, node, context, augmentor) => {
     const { loc, modifiers, arg } = dir;
     if (!dir.exp && !modifiers.length) {
-        context.onError(createCompilerError(35 /* X_V_ON_NO_EXPRESSION */, loc));
+        context.onError(createCompilerError(35 /* ErrorCodes.X_V_ON_NO_EXPRESSION */, loc));
     }
     let eventName;
-    if (arg.type === 4 /* SIMPLE_EXPRESSION */) {
+    if (arg.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
         if (arg.isStatic) {
             let rawName = arg.content;
             // TODO deprecate @vnodeXXX usage
             if (rawName.startsWith('vue:')) {
                 rawName = `vnode-${rawName.slice(4)}`;
             }
-            // for all event listeners, auto convert it to camelCase. See issue #2249
-            eventName = createSimpleExpression(shared.toHandlerKey(shared.camelize(rawName)), true, arg.loc);
+            const eventString = node.tagType === 1 /* ElementTypes.COMPONENT */ ||
+                rawName.startsWith('vnode') ||
+                !/[A-Z]/.test(rawName)
+                ? // for component and vnode lifecycle event listeners, auto convert
+                    // it to camelCase. See issue #2249
+                    shared.toHandlerKey(shared.camelize(rawName))
+                // preserve case for plain element listeners that have uppercase
+                // letters, as these may be custom elements' custom events
+                : `on:${rawName}`;
+            eventName = createSimpleExpression(eventString, true, arg.loc);
         }
         else {
             // #2388
@@ -4983,13 +4996,13 @@ const transformOn = (dir, node, context, augmentor) => {
                     !context.inVOnce &&
                     // runtime constants don't need to be cached
                     // (this is analyzed by compileScript in SFC <script setup>)
-                    !(exp.type === 4 /* SIMPLE_EXPRESSION */ && exp.constType > 0) &&
+                    !(exp.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ && exp.constType > 0) &&
                     // #1541 bail if this is a member exp handler passed to a component -
                     // we need to use the original function to preserve arity,
                     // e.g. <transition> relies on checking cb.length to determine
                     // transition end handling. Inline function is ok since its arity
                     // is preserved even when cached.
-                    !(isMemberExp && node.tagType === 1 /* COMPONENT */) &&
+                    !(isMemberExp && node.tagType === 1 /* ElementTypes.COMPONENT */) &&
                     // bail if the function references closure variables (v-for, v-slot)
                     // it must be passed fresh to avoid stale values.
                     !hasScopeRef(exp, context.identifiers);
@@ -4998,7 +5011,7 @@ const transformOn = (dir, node, context, augmentor) => {
             // below) so that it always accesses the latest value when called - thus
             // avoiding the need to be patched.
             if (shouldCache && isMemberExp) {
-                if (exp.type === 4 /* SIMPLE_EXPRESSION */) {
+                if (exp.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
                     exp.content = `${exp.content} && ${exp.content}(...args)`;
                 }
                 else {
@@ -5045,7 +5058,7 @@ const transformOn = (dir, node, context, augmentor) => {
 const transformBind = (dir, _node, context) => {
     const { exp, modifiers, loc } = dir;
     const arg = dir.arg;
-    if (arg.type !== 4 /* SIMPLE_EXPRESSION */) {
+    if (arg.type !== 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
         arg.children.unshift(`(`);
         arg.children.push(`) || ""`);
     }
@@ -5054,7 +5067,7 @@ const transformBind = (dir, _node, context) => {
     }
     // .sync is replaced by v-model:arg
     if (modifiers.includes('camel')) {
-        if (arg.type === 4 /* SIMPLE_EXPRESSION */) {
+        if (arg.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
             if (arg.isStatic) {
                 arg.content = shared.camelize(arg.content);
             }
@@ -5076,8 +5089,8 @@ const transformBind = (dir, _node, context) => {
         }
     }
     if (!exp ||
-        (exp.type === 4 /* SIMPLE_EXPRESSION */ && !exp.content.trim())) {
-        context.onError(createCompilerError(34 /* X_V_BIND_NO_EXPRESSION */, loc));
+        (exp.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ && !exp.content.trim())) {
+        context.onError(createCompilerError(34 /* ErrorCodes.X_V_BIND_NO_EXPRESSION */, loc));
         return {
             props: [createObjectProperty(arg, createSimpleExpression('', true, loc))]
         };
@@ -5087,7 +5100,7 @@ const transformBind = (dir, _node, context) => {
     };
 };
 const injectPrefix = (arg, prefix) => {
-    if (arg.type === 4 /* SIMPLE_EXPRESSION */) {
+    if (arg.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
         if (arg.isStatic) {
             arg.content = prefix + arg.content;
         }
@@ -5104,10 +5117,10 @@ const injectPrefix = (arg, prefix) => {
 // Merge adjacent text nodes and expressions into a single expression
 // e.g. <div>abc {{ d }} {{ e }}</div> should have a single expression node as child.
 const transformText = (node, context) => {
-    if (node.type === 0 /* ROOT */ ||
-        node.type === 1 /* ELEMENT */ ||
-        node.type === 11 /* FOR */ ||
-        node.type === 10 /* IF_BRANCH */) {
+    if (node.type === 0 /* NodeTypes.ROOT */ ||
+        node.type === 1 /* NodeTypes.ELEMENT */ ||
+        node.type === 11 /* NodeTypes.FOR */ ||
+        node.type === 10 /* NodeTypes.IF_BRANCH */) {
         // perform the transform on node exit so that all expressions have already
         // been processed.
         return () => {
@@ -5142,15 +5155,15 @@ const transformText = (node, context) => {
                 // setting textContent of the element.
                 // for component root it's always normalized anyway.
                 (children.length === 1 &&
-                    (node.type === 0 /* ROOT */ ||
-                        (node.type === 1 /* ELEMENT */ &&
-                            node.tagType === 0 /* ELEMENT */ &&
+                    (node.type === 0 /* NodeTypes.ROOT */ ||
+                        (node.type === 1 /* NodeTypes.ELEMENT */ &&
+                            node.tagType === 0 /* ElementTypes.ELEMENT */ &&
                             // #3756
                             // custom directives can potentially add DOM elements arbitrarily,
                             // we need to avoid setting textContent of the element at runtime
                             // to avoid accidentally overwriting the DOM elements added
                             // by the user through custom directives.
-                            !node.props.find(p => p.type === 7 /* DIRECTIVE */ &&
+                            !node.props.find(p => p.type === 7 /* NodeTypes.DIRECTIVE */ &&
                                 !context.directiveTransforms[p.name]) &&
                             // in compat mode, <template> tags with no special directives
                             // will be rendered as a fragment so its children must be
@@ -5162,21 +5175,21 @@ const transformText = (node, context) => {
             // runtime normalization.
             for (let i = 0; i < children.length; i++) {
                 const child = children[i];
-                if (isText(child) || child.type === 8 /* COMPOUND_EXPRESSION */) {
+                if (isText(child) || child.type === 8 /* NodeTypes.COMPOUND_EXPRESSION */) {
                     const callArgs = [];
                     // createTextVNode defaults to single whitespace, so if it is a
                     // single space the code could be an empty call to save bytes.
-                    if (child.type !== 2 /* TEXT */ || child.content !== ' ') {
+                    if (child.type !== 2 /* NodeTypes.TEXT */ || child.content !== ' ') {
                         callArgs.push(child);
                     }
                     // mark dynamic text with flag so it gets patched inside a block
                     if (!context.ssr &&
-                        getConstantType(child, context) === 0 /* NOT_CONSTANT */) {
-                        callArgs.push(1 /* TEXT */ +
+                        getConstantType(child, context) === 0 /* ConstantTypes.NOT_CONSTANT */) {
+                        callArgs.push(1 /* PatchFlags.TEXT */ +
                             (``));
                     }
                     children[i] = {
-                        type: 12 /* TEXT_CALL */,
+                        type: 12 /* NodeTypes.TEXT_CALL */,
                         content: child,
                         loc: child.loc,
                         codegenNode: createCallExpression(context.helper(CREATE_TEXT), callArgs)
@@ -5189,7 +5202,7 @@ const transformText = (node, context) => {
 
 const seen = new WeakSet();
 const transformOnce = (node, context) => {
-    if (node.type === 1 /* ELEMENT */ && findDir(node, 'once', true)) {
+    if (node.type === 1 /* NodeTypes.ELEMENT */ && findDir(node, 'once', true)) {
         if (seen.has(node) || context.inVOnce) {
             return;
         }
@@ -5209,26 +5222,26 @@ const transformOnce = (node, context) => {
 const transformModel = (dir, node, context) => {
     const { exp, arg } = dir;
     if (!exp) {
-        context.onError(createCompilerError(41 /* X_V_MODEL_NO_EXPRESSION */, dir.loc));
+        context.onError(createCompilerError(41 /* ErrorCodes.X_V_MODEL_NO_EXPRESSION */, dir.loc));
         return createTransformProps();
     }
     const rawExp = exp.loc.source;
-    const expString = exp.type === 4 /* SIMPLE_EXPRESSION */ ? exp.content : rawExp;
+    const expString = exp.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ ? exp.content : rawExp;
     // im SFC <script setup> inline mode, the exp may have been transformed into
     // _unref(exp)
     const bindingType = context.bindingMetadata[rawExp];
     const maybeRef = context.inline &&
         bindingType &&
-        bindingType !== "setup-const" /* SETUP_CONST */;
+        bindingType !== "setup-const" /* BindingTypes.SETUP_CONST */;
     if (!expString.trim() ||
         (!isMemberExpression(expString, context) && !maybeRef)) {
-        context.onError(createCompilerError(42 /* X_V_MODEL_MALFORMED_EXPRESSION */, exp.loc));
+        context.onError(createCompilerError(42 /* ErrorCodes.X_V_MODEL_MALFORMED_EXPRESSION */, exp.loc));
         return createTransformProps();
     }
     if (context.prefixIdentifiers &&
         isSimpleIdentifier(expString) &&
         context.identifiers[expString]) {
-        context.onError(createCompilerError(43 /* X_V_MODEL_ON_SCOPE_VARIABLE */, exp.loc));
+        context.onError(createCompilerError(43 /* ErrorCodes.X_V_MODEL_ON_SCOPE_VARIABLE */, exp.loc));
         return createTransformProps();
     }
     const propName = arg ? arg : createSimpleExpression('modelValue', true);
@@ -5240,7 +5253,7 @@ const transformModel = (dir, node, context) => {
     let assignmentExp;
     const eventArg = context.isTS ? `($event: any)` : `$event`;
     if (maybeRef) {
-        if (bindingType === "setup-ref" /* SETUP_REF */) {
+        if (bindingType === "setup-ref" /* BindingTypes.SETUP_REF */) {
             // v-model used on known ref.
             assignmentExp = createCompoundExpression([
                 `${eventArg} => ((`,
@@ -5251,7 +5264,7 @@ const transformModel = (dir, node, context) => {
         else {
             // v-model used on a potentially ref binding in <script setup> inline mode.
             // the assignment needs to check whether the binding is actually a ref.
-            const altAssignment = bindingType === "setup-let" /* SETUP_LET */ ? `${rawExp} = $event` : `null`;
+            const altAssignment = bindingType === "setup-let" /* BindingTypes.SETUP_LET */ ? `${rawExp} = $event` : `null`;
             assignmentExp = createCompoundExpression([
                 `${eventArg} => (${context.helperString(IS_REF)}(${rawExp}) ? (`,
                 createSimpleExpression(rawExp, false, exp.loc),
@@ -5280,7 +5293,7 @@ const transformModel = (dir, node, context) => {
         props[1].value = context.cache(props[1].value);
     }
     // modelModifiers: { foo: true, "bar-baz": true }
-    if (dir.modifiers.length && node.tagType === 1 /* COMPONENT */) {
+    if (dir.modifiers.length && node.tagType === 1 /* ElementTypes.COMPONENT */) {
         const modifiers = dir.modifiers
             .map(m => (isSimpleIdentifier(m) ? m : JSON.stringify(m)) + `: true`)
             .join(`, `);
@@ -5289,7 +5302,7 @@ const transformModel = (dir, node, context) => {
                 ? `${arg.content}Modifiers`
                 : createCompoundExpression([arg, ' + "Modifiers"'])
             : `modelModifiers`;
-        props.push(createObjectProperty(modifiersKey, createSimpleExpression(`{ ${modifiers} }`, false, dir.loc, 2 /* CAN_HOIST */)));
+        props.push(createObjectProperty(modifiersKey, createSimpleExpression(`{ ${modifiers} }`, false, dir.loc, 2 /* ConstantTypes.CAN_HOIST */)));
     }
     return createTransformProps(props);
 };
@@ -5299,17 +5312,17 @@ function createTransformProps(props = []) {
 
 const validDivisionCharRE = /[\w).+\-_$\]]/;
 const transformFilter = (node, context) => {
-    if (!isCompatEnabled("COMPILER_FILTER" /* COMPILER_FILTERS */, context)) {
+    if (!isCompatEnabled("COMPILER_FILTER" /* CompilerDeprecationTypes.COMPILER_FILTERS */, context)) {
         return;
     }
-    if (node.type === 5 /* INTERPOLATION */) {
+    if (node.type === 5 /* NodeTypes.INTERPOLATION */) {
         // filter rewrite is applied before expression transform so only
         // simple expressions are possible at this stage
         rewriteFilter(node.content, context);
     }
-    if (node.type === 1 /* ELEMENT */) {
+    if (node.type === 1 /* NodeTypes.ELEMENT */) {
         node.props.forEach((prop) => {
-            if (prop.type === 7 /* DIRECTIVE */ &&
+            if (prop.type === 7 /* NodeTypes.DIRECTIVE */ &&
                 prop.name !== 'for' &&
                 prop.exp) {
                 rewriteFilter(prop.exp, context);
@@ -5318,7 +5331,7 @@ const transformFilter = (node, context) => {
     }
 };
 function rewriteFilter(node, context) {
-    if (node.type === 4 /* SIMPLE_EXPRESSION */) {
+    if (node.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
         parseFilter(node, context);
     }
     else {
@@ -5326,13 +5339,13 @@ function rewriteFilter(node, context) {
             const child = node.children[i];
             if (typeof child !== 'object')
                 continue;
-            if (child.type === 4 /* SIMPLE_EXPRESSION */) {
+            if (child.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
                 parseFilter(child, context);
             }
-            else if (child.type === 8 /* COMPOUND_EXPRESSION */) {
+            else if (child.type === 8 /* NodeTypes.COMPOUND_EXPRESSION */) {
                 rewriteFilter(node, context);
             }
-            else if (child.type === 5 /* INTERPOLATION */) {
+            else if (child.type === 5 /* NodeTypes.INTERPOLATION */) {
                 rewriteFilter(child.content, context);
             }
         }
@@ -5463,7 +5476,7 @@ function wrapFilter(exp, filter, context) {
 
 const seen$1 = new WeakSet();
 const transformMemo = (node, context) => {
-    if (node.type === 1 /* ELEMENT */) {
+    if (node.type === 1 /* NodeTypes.ELEMENT */) {
         const dir = findDir(node, 'memo');
         if (!dir || seen$1.has(node)) {
             return;
@@ -5472,9 +5485,9 @@ const transformMemo = (node, context) => {
         return () => {
             const codegenNode = node.codegenNode ||
                 context.currentNode.codegenNode;
-            if (codegenNode && codegenNode.type === 13 /* VNODE_CALL */) {
+            if (codegenNode && codegenNode.type === 13 /* NodeTypes.VNODE_CALL */) {
                 // non-component sub tree should be turned into a block
-                if (node.tagType !== 1 /* COMPONENT */) {
+                if (node.tagType !== 1 /* ElementTypes.COMPONENT */) {
                     makeBlock(codegenNode, context);
                 }
                 node.codegenNode = createCallExpression(context.helper(WITH_MEMO), [
@@ -5522,10 +5535,10 @@ function baseCompile(template, options = {}) {
     const isModuleMode = options.mode === 'module';
     const prefixIdentifiers = (options.prefixIdentifiers === true || isModuleMode);
     if (!prefixIdentifiers && options.cacheHandlers) {
-        onError(createCompilerError(48 /* X_CACHE_HANDLER_NOT_SUPPORTED */));
+        onError(createCompilerError(48 /* ErrorCodes.X_CACHE_HANDLER_NOT_SUPPORTED */));
     }
     if (options.scopeId && !isModuleMode) {
-        onError(createCompilerError(49 /* X_SCOPE_ID_NOT_SUPPORTED */));
+        onError(createCompilerError(49 /* ErrorCodes.X_SCOPE_ID_NOT_SUPPORTED */));
     }
     const ast = shared.isString(template) ? baseParse(template, options) : template;
     const [nodeTransforms, directiveTransforms] = getBaseTransformPreset(prefixIdentifiers);

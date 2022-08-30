@@ -2400,54 +2400,54 @@ const parserOptions = {
     },
     // https://html.spec.whatwg.org/multipage/parsing.html#tree-construction-dispatcher
     getNamespace(tag, parent) {
-        let ns = parent ? parent.ns : 0 /* HTML */;
-        if (parent && ns === 2 /* MATH_ML */) {
+        let ns = parent ? parent.ns : 0 /* DOMNamespaces.HTML */;
+        if (parent && ns === 2 /* DOMNamespaces.MATH_ML */) {
             if (parent.tag === 'annotation-xml') {
                 if (tag === 'svg') {
-                    return 1 /* SVG */;
+                    return 1 /* DOMNamespaces.SVG */;
                 }
-                if (parent.props.some(a => a.type === 6 /* ATTRIBUTE */ &&
+                if (parent.props.some(a => a.type === 6 /* NodeTypes.ATTRIBUTE */ &&
                     a.name === 'encoding' &&
                     a.value != null &&
                     (a.value.content === 'text/html' ||
                         a.value.content === 'application/xhtml+xml'))) {
-                    ns = 0 /* HTML */;
+                    ns = 0 /* DOMNamespaces.HTML */;
                 }
             }
             else if (/^m(?:[ions]|text)$/.test(parent.tag) &&
                 tag !== 'mglyph' &&
                 tag !== 'malignmark') {
-                ns = 0 /* HTML */;
+                ns = 0 /* DOMNamespaces.HTML */;
             }
         }
-        else if (parent && ns === 1 /* SVG */) {
+        else if (parent && ns === 1 /* DOMNamespaces.SVG */) {
             if (parent.tag === 'foreignObject' ||
                 parent.tag === 'desc' ||
                 parent.tag === 'title') {
-                ns = 0 /* HTML */;
+                ns = 0 /* DOMNamespaces.HTML */;
             }
         }
-        if (ns === 0 /* HTML */) {
+        if (ns === 0 /* DOMNamespaces.HTML */) {
             if (tag === 'svg') {
-                return 1 /* SVG */;
+                return 1 /* DOMNamespaces.SVG */;
             }
             if (tag === 'math') {
-                return 2 /* MATH_ML */;
+                return 2 /* DOMNamespaces.MATH_ML */;
             }
         }
         return ns;
     },
     // https://html.spec.whatwg.org/multipage/parsing.html#parsing-html-fragments
     getTextMode({ tag, ns }) {
-        if (ns === 0 /* HTML */) {
+        if (ns === 0 /* DOMNamespaces.HTML */) {
             if (tag === 'textarea' || tag === 'title') {
-                return 1 /* RCDATA */;
+                return 1 /* TextModes.RCDATA */;
             }
             if (isRawTextContainer(tag)) {
-                return 2 /* RAWTEXT */;
+                return 2 /* TextModes.RAWTEXT */;
             }
         }
-        return 0 /* DATA */;
+        return 0 /* TextModes.DATA */;
     }
 };
 
@@ -2458,12 +2458,12 @@ const parserOptions = {
 // It is then processed by `transformElement` and included in the generated
 // props.
 const transformStyle = node => {
-    if (node.type === 1 /* ELEMENT */) {
+    if (node.type === 1 /* NodeTypes.ELEMENT */) {
         node.props.forEach((p, i) => {
-            if (p.type === 6 /* ATTRIBUTE */ && p.name === 'style' && p.value) {
+            if (p.type === 6 /* NodeTypes.ATTRIBUTE */ && p.name === 'style' && p.value) {
                 // replace p with an expression node
                 node.props[i] = {
-                    type: 7 /* DIRECTIVE */,
+                    type: 7 /* NodeTypes.DIRECTIVE */,
                     name: `bind`,
                     arg: compilerCore.createSimpleExpression(`style`, true, p.loc),
                     exp: parseInlineCSS(p.value.content, p.loc),
@@ -2476,33 +2476,33 @@ const transformStyle = node => {
 };
 const parseInlineCSS = (cssText, loc) => {
     const normalized = shared.parseStringStyle(cssText);
-    return compilerCore.createSimpleExpression(JSON.stringify(normalized), false, loc, 3 /* CAN_STRINGIFY */);
+    return compilerCore.createSimpleExpression(JSON.stringify(normalized), false, loc, 3 /* ConstantTypes.CAN_STRINGIFY */);
 };
 
 function createDOMCompilerError(code, loc) {
     return compilerCore.createCompilerError(code, loc, DOMErrorMessages );
 }
 const DOMErrorMessages = {
-    [50 /* X_V_HTML_NO_EXPRESSION */]: `v-html is missing expression.`,
-    [51 /* X_V_HTML_WITH_CHILDREN */]: `v-html will override element children.`,
-    [52 /* X_V_TEXT_NO_EXPRESSION */]: `v-text is missing expression.`,
-    [53 /* X_V_TEXT_WITH_CHILDREN */]: `v-text will override element children.`,
-    [54 /* X_V_MODEL_ON_INVALID_ELEMENT */]: `v-model can only be used on <input>, <textarea> and <select> elements.`,
-    [55 /* X_V_MODEL_ARG_ON_ELEMENT */]: `v-model argument is not supported on plain elements.`,
-    [56 /* X_V_MODEL_ON_FILE_INPUT_ELEMENT */]: `v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead.`,
-    [57 /* X_V_MODEL_UNNECESSARY_VALUE */]: `Unnecessary value binding used alongside v-model. It will interfere with v-model's behavior.`,
-    [58 /* X_V_SHOW_NO_EXPRESSION */]: `v-show is missing expression.`,
-    [59 /* X_TRANSITION_INVALID_CHILDREN */]: `<Transition> expects exactly one child element or component.`,
-    [60 /* X_IGNORED_SIDE_EFFECT_TAG */]: `Tags with side effect (<script> and <style>) are ignored in client component templates.`
+    [50 /* DOMErrorCodes.X_V_HTML_NO_EXPRESSION */]: `v-html is missing expression.`,
+    [51 /* DOMErrorCodes.X_V_HTML_WITH_CHILDREN */]: `v-html will override element children.`,
+    [52 /* DOMErrorCodes.X_V_TEXT_NO_EXPRESSION */]: `v-text is missing expression.`,
+    [53 /* DOMErrorCodes.X_V_TEXT_WITH_CHILDREN */]: `v-text will override element children.`,
+    [54 /* DOMErrorCodes.X_V_MODEL_ON_INVALID_ELEMENT */]: `v-model can only be used on <input>, <textarea> and <select> elements.`,
+    [55 /* DOMErrorCodes.X_V_MODEL_ARG_ON_ELEMENT */]: `v-model argument is not supported on plain elements.`,
+    [56 /* DOMErrorCodes.X_V_MODEL_ON_FILE_INPUT_ELEMENT */]: `v-model cannot be used on file inputs since they are read-only. Use a v-on:change listener instead.`,
+    [57 /* DOMErrorCodes.X_V_MODEL_UNNECESSARY_VALUE */]: `Unnecessary value binding used alongside v-model. It will interfere with v-model's behavior.`,
+    [58 /* DOMErrorCodes.X_V_SHOW_NO_EXPRESSION */]: `v-show is missing expression.`,
+    [59 /* DOMErrorCodes.X_TRANSITION_INVALID_CHILDREN */]: `<Transition> expects exactly one child element or component.`,
+    [60 /* DOMErrorCodes.X_IGNORED_SIDE_EFFECT_TAG */]: `Tags with side effect (<script> and <style>) are ignored in client component templates.`
 };
 
 const transformVHtml = (dir, node, context) => {
     const { exp, loc } = dir;
     if (!exp) {
-        context.onError(createDOMCompilerError(50 /* X_V_HTML_NO_EXPRESSION */, loc));
+        context.onError(createDOMCompilerError(50 /* DOMErrorCodes.X_V_HTML_NO_EXPRESSION */, loc));
     }
     if (node.children.length) {
-        context.onError(createDOMCompilerError(51 /* X_V_HTML_WITH_CHILDREN */, loc));
+        context.onError(createDOMCompilerError(51 /* DOMErrorCodes.X_V_HTML_WITH_CHILDREN */, loc));
         node.children.length = 0;
     }
     return {
@@ -2515,10 +2515,10 @@ const transformVHtml = (dir, node, context) => {
 const transformVText = (dir, node, context) => {
     const { exp, loc } = dir;
     if (!exp) {
-        context.onError(createDOMCompilerError(52 /* X_V_TEXT_NO_EXPRESSION */, loc));
+        context.onError(createDOMCompilerError(52 /* DOMErrorCodes.X_V_TEXT_NO_EXPRESSION */, loc));
     }
     if (node.children.length) {
-        context.onError(createDOMCompilerError(53 /* X_V_TEXT_WITH_CHILDREN */, loc));
+        context.onError(createDOMCompilerError(53 /* DOMErrorCodes.X_V_TEXT_WITH_CHILDREN */, loc));
         node.children.length = 0;
     }
     return {
@@ -2535,11 +2535,11 @@ const transformVText = (dir, node, context) => {
 const transformModel = (dir, node, context) => {
     const baseResult = compilerCore.transformModel(dir, node, context);
     // base transform has errors OR component v-model (only need props)
-    if (!baseResult.props.length || node.tagType === 1 /* COMPONENT */) {
+    if (!baseResult.props.length || node.tagType === 1 /* ElementTypes.COMPONENT */) {
         return baseResult;
     }
     if (dir.arg) {
-        context.onError(createDOMCompilerError(55 /* X_V_MODEL_ARG_ON_ELEMENT */, dir.arg.loc));
+        context.onError(createDOMCompilerError(55 /* DOMErrorCodes.X_V_MODEL_ARG_ON_ELEMENT */, dir.arg.loc));
     }
     const { tag } = node;
     const isCustomElement = context.isCustomElement(tag);
@@ -2552,7 +2552,7 @@ const transformModel = (dir, node, context) => {
         if (tag === 'input' || isCustomElement) {
             const type = compilerCore.findProp(node, `type`);
             if (type) {
-                if (type.type === 7 /* DIRECTIVE */) {
+                if (type.type === 7 /* NodeTypes.DIRECTIVE */) {
                     // :type="foo"
                     directiveToUse = V_MODEL_DYNAMIC;
                 }
@@ -2566,7 +2566,7 @@ const transformModel = (dir, node, context) => {
                             break;
                         case 'file':
                             isInvalidType = true;
-                            context.onError(createDOMCompilerError(56 /* X_V_MODEL_ON_FILE_INPUT_ELEMENT */, dir.loc));
+                            context.onError(createDOMCompilerError(56 /* DOMErrorCodes.X_V_MODEL_ON_FILE_INPUT_ELEMENT */, dir.loc));
                             break;
                     }
                 }
@@ -2590,11 +2590,11 @@ const transformModel = (dir, node, context) => {
         }
     }
     else {
-        context.onError(createDOMCompilerError(54 /* X_V_MODEL_ON_INVALID_ELEMENT */, dir.loc));
+        context.onError(createDOMCompilerError(54 /* DOMErrorCodes.X_V_MODEL_ON_INVALID_ELEMENT */, dir.loc));
     }
     // native vmodel doesn't need the `modelValue` props since they are also
     // passed to the runtime as `binding.value`. removing it reduces code size.
-    baseResult.props = baseResult.props.filter(p => !(p.key.type === 4 /* SIMPLE_EXPRESSION */ &&
+    baseResult.props = baseResult.props.filter(p => !(p.key.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ &&
         p.key.content === 'modelValue'));
     return baseResult;
 };
@@ -2617,7 +2617,7 @@ const resolveModifiers = (key, modifiers, context, loc) => {
     for (let i = 0; i < modifiers.length; i++) {
         const modifier = modifiers[i];
         if (modifier === 'native' &&
-            compilerCore.checkCompatEnabled("COMPILER_V_ON_NATIVE" /* COMPILER_V_ON_NATIVE */, context, loc)) {
+            compilerCore.checkCompatEnabled("COMPILER_V_ON_NATIVE" /* CompilerDeprecationTypes.COMPILER_V_ON_NATIVE */, context, loc)) {
             eventOptionModifiers.push(modifier);
         }
         else if (isEventOptionModifier(modifier)) {
@@ -2661,7 +2661,7 @@ const transformClick = (key, event) => {
     const isStaticClick = compilerCore.isStaticExp(key) && key.content.toLowerCase() === 'onclick';
     return isStaticClick
         ? compilerCore.createSimpleExpression(event, true)
-        : key.type !== 4 /* SIMPLE_EXPRESSION */
+        : key.type !== 4 /* NodeTypes.SIMPLE_EXPRESSION */
             ? compilerCore.createCompoundExpression([
                 `(`,
                 key,
@@ -2714,7 +2714,7 @@ const transformOn = (dir, node, context) => {
 const transformShow = (dir, node, context) => {
     const { exp, loc } = dir;
     if (!exp) {
-        context.onError(createDOMCompilerError(58 /* X_V_SHOW_NO_EXPRESSION */, loc));
+        context.onError(createDOMCompilerError(58 /* DOMErrorCodes.X_V_SHOW_NO_EXPRESSION */, loc));
     }
     return {
         props: [],
@@ -2762,8 +2762,8 @@ const stringifyStatic = (children, context, parent) => {
     let ec = 0; // current element with binding count
     const currentChunk = [];
     const stringifyCurrentChunk = (currentIndex) => {
-        if (nc >= 20 /* NODE_COUNT */ ||
-            ec >= 5 /* ELEMENT_WITH_BINDING_COUNT */) {
+        if (nc >= 20 /* StringifyThresholds.NODE_COUNT */ ||
+            ec >= 5 /* StringifyThresholds.ELEMENT_WITH_BINDING_COUNT */) {
             // combine all currently eligible nodes into a single static vnode call
             const staticCall = compilerCore.createCallExpression(context.helper(compilerCore.CREATE_STATIC), [
                 JSON.stringify(currentChunk.map(node => stringifyNode(node, context)).join('')).replace(expReplaceRE, `" + $1 + "`),
@@ -2814,16 +2814,16 @@ const stringifyStatic = (children, context, parent) => {
     // in case the last node was also stringifiable
     stringifyCurrentChunk(i);
 };
-const getHoistedNode = (node) => ((node.type === 1 /* ELEMENT */ && node.tagType === 0 /* ELEMENT */) ||
-    node.type == 12 /* TEXT_CALL */) &&
+const getHoistedNode = (node) => ((node.type === 1 /* NodeTypes.ELEMENT */ && node.tagType === 0 /* ElementTypes.ELEMENT */) ||
+    node.type == 12 /* NodeTypes.TEXT_CALL */) &&
     node.codegenNode &&
-    node.codegenNode.type === 4 /* SIMPLE_EXPRESSION */ &&
+    node.codegenNode.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */ &&
     node.codegenNode.hoisted;
 const dataAriaRE = /^(data|aria)-/;
 const isStringifiableAttr = (name, ns) => {
-    return ((ns === 0 /* HTML */
+    return ((ns === 0 /* DOMNamespaces.HTML */
         ? shared.isKnownHtmlAttr(name)
-        : ns === 1 /* SVG */
+        : ns === 1 /* DOMNamespaces.SVG */
             ? shared.isKnownSvgAttr(name)
             : false) || dataAriaRE.test(name));
 };
@@ -2840,10 +2840,10 @@ const isNonStringifiable = /*#__PURE__*/ shared.makeMap(`caption,thead,tr,th,tbo
  *   - ec is the number of element with bindings inside
  */
 function analyzeNode(node) {
-    if (node.type === 1 /* ELEMENT */ && isNonStringifiable(node.tag)) {
+    if (node.type === 1 /* NodeTypes.ELEMENT */ && isNonStringifiable(node.tag)) {
         return false;
     }
-    if (node.type === 12 /* TEXT_CALL */) {
+    if (node.type === 12 /* NodeTypes.TEXT_CALL */) {
         return [1, 0];
     }
     let nc = 1; // node count
@@ -2861,20 +2861,20 @@ function analyzeNode(node) {
         for (let i = 0; i < node.props.length; i++) {
             const p = node.props[i];
             // bail on non-attr bindings
-            if (p.type === 6 /* ATTRIBUTE */ &&
+            if (p.type === 6 /* NodeTypes.ATTRIBUTE */ &&
                 !isStringifiableAttr(p.name, node.ns)) {
                 return bail();
             }
-            if (p.type === 7 /* DIRECTIVE */ && p.name === 'bind') {
+            if (p.type === 7 /* NodeTypes.DIRECTIVE */ && p.name === 'bind') {
                 // bail on non-attr bindings
                 if (p.arg &&
-                    (p.arg.type === 8 /* COMPOUND_EXPRESSION */ ||
+                    (p.arg.type === 8 /* NodeTypes.COMPOUND_EXPRESSION */ ||
                         (p.arg.isStatic && !isStringifiableAttr(p.arg.content, node.ns)))) {
                     return bail();
                 }
                 if (p.exp &&
-                    (p.exp.type === 8 /* COMPOUND_EXPRESSION */ ||
-                        p.exp.constType < 3 /* CAN_STRINGIFY */)) {
+                    (p.exp.type === 8 /* NodeTypes.COMPOUND_EXPRESSION */ ||
+                        p.exp.constType < 3 /* ConstantTypes.CAN_STRINGIFY */)) {
                     return bail();
                 }
             }
@@ -2882,7 +2882,7 @@ function analyzeNode(node) {
         for (let i = 0; i < node.children.length; i++) {
             nc++;
             const child = node.children[i];
-            if (child.type === 1 /* ELEMENT */) {
+            if (child.type === 1 /* NodeTypes.ELEMENT */) {
                 if (child.props.length > 0) {
                     ec++;
                 }
@@ -2904,17 +2904,17 @@ function stringifyNode(node, context) {
         return ``;
     }
     switch (node.type) {
-        case 1 /* ELEMENT */:
+        case 1 /* NodeTypes.ELEMENT */:
             return stringifyElement(node, context);
-        case 2 /* TEXT */:
+        case 2 /* NodeTypes.TEXT */:
             return shared.escapeHtml(node.content);
-        case 3 /* COMMENT */:
+        case 3 /* NodeTypes.COMMENT */:
             return `<!--${shared.escapeHtml(node.content)}-->`;
-        case 5 /* INTERPOLATION */:
+        case 5 /* NodeTypes.INTERPOLATION */:
             return shared.escapeHtml(shared.toDisplayString(evaluateConstant(node.content)));
-        case 8 /* COMPOUND_EXPRESSION */:
+        case 8 /* NodeTypes.COMPOUND_EXPRESSION */:
             return shared.escapeHtml(evaluateConstant(node));
-        case 12 /* TEXT_CALL */:
+        case 12 /* NodeTypes.TEXT_CALL */:
             return stringifyNode(node.content, context);
         default:
             // static trees will not contain if/for nodes
@@ -2926,13 +2926,13 @@ function stringifyElement(node, context) {
     let innerHTML = '';
     for (let i = 0; i < node.props.length; i++) {
         const p = node.props[i];
-        if (p.type === 6 /* ATTRIBUTE */) {
+        if (p.type === 6 /* NodeTypes.ATTRIBUTE */) {
             res += ` ${p.name}`;
             if (p.value) {
                 res += `="${shared.escapeHtml(p.value.content)}"`;
             }
         }
-        else if (p.type === 7 /* DIRECTIVE */) {
+        else if (p.type === 7 /* NodeTypes.DIRECTIVE */) {
             if (p.name === 'bind') {
                 const exp = p.exp;
                 if (exp.content[0] === '_') {
@@ -2989,7 +2989,7 @@ function stringifyElement(node, context) {
 // run JSFuck in here. But we mark it unsafe for security review purposes.
 // (see compiler-core/src/transforms/transformExpression)
 function evaluateConstant(exp) {
-    if (exp.type === 4 /* SIMPLE_EXPRESSION */) {
+    if (exp.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */) {
         return new Function(`return ${exp.content}`)();
     }
     else {
@@ -2999,10 +2999,10 @@ function evaluateConstant(exp) {
             if (shared.isString(c) || shared.isSymbol(c)) {
                 return;
             }
-            if (c.type === 2 /* TEXT */) {
+            if (c.type === 2 /* NodeTypes.TEXT */) {
                 res += c.content;
             }
-            else if (c.type === 5 /* INTERPOLATION */) {
+            else if (c.type === 5 /* NodeTypes.INTERPOLATION */) {
                 res += shared.toDisplayString(evaluateConstant(c.content));
             }
             else {
@@ -3014,10 +3014,10 @@ function evaluateConstant(exp) {
 }
 
 const ignoreSideEffectTags = (node, context) => {
-    if (node.type === 1 /* ELEMENT */ &&
-        node.tagType === 0 /* ELEMENT */ &&
+    if (node.type === 1 /* NodeTypes.ELEMENT */ &&
+        node.tagType === 0 /* ElementTypes.ELEMENT */ &&
         (node.tag === 'script' || node.tag === 'style')) {
-        context.onError(createDOMCompilerError(60 /* X_IGNORED_SIDE_EFFECT_TAG */, node.loc));
+        context.onError(createDOMCompilerError(60 /* DOMErrorCodes.X_IGNORED_SIDE_EFFECT_TAG */, node.loc));
         context.removeNode();
     }
 };

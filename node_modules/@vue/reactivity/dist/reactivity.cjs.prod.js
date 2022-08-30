@@ -284,7 +284,7 @@ function trigger(target, type, key, newValue, oldValue, oldTarget) {
         return;
     }
     let deps = [];
-    if (type === "clear" /* CLEAR */) {
+    if (type === "clear" /* TriggerOpTypes.CLEAR */) {
         // collection being cleared
         // trigger all effects for target
         deps = [...depsMap.values()];
@@ -303,7 +303,7 @@ function trigger(target, type, key, newValue, oldValue, oldTarget) {
         }
         // also run for iteration key on ADD | DELETE | Map.SET
         switch (type) {
-            case "add" /* ADD */:
+            case "add" /* TriggerOpTypes.ADD */:
                 if (!shared.isArray(target)) {
                     deps.push(depsMap.get(ITERATE_KEY));
                     if (shared.isMap(target)) {
@@ -315,7 +315,7 @@ function trigger(target, type, key, newValue, oldValue, oldTarget) {
                     deps.push(depsMap.get('length'));
                 }
                 break;
-            case "delete" /* DELETE */:
+            case "delete" /* TriggerOpTypes.DELETE */:
                 if (!shared.isArray(target)) {
                     deps.push(depsMap.get(ITERATE_KEY));
                     if (shared.isMap(target)) {
@@ -323,7 +323,7 @@ function trigger(target, type, key, newValue, oldValue, oldTarget) {
                     }
                 }
                 break;
-            case "set" /* SET */:
+            case "set" /* TriggerOpTypes.SET */:
                 if (shared.isMap(target)) {
                     deps.push(depsMap.get(ITERATE_KEY));
                 }
@@ -395,7 +395,7 @@ function createArrayInstrumentations() {
         instrumentations[key] = function (...args) {
             const arr = toRaw(this);
             for (let i = 0, l = this.length; i < l; i++) {
-                track(arr, "get" /* GET */, i + '');
+                track(arr, "get" /* TrackOpTypes.GET */, i + '');
             }
             // we run the method using the original args first (which may be reactive)
             const res = arr[key](...args);
@@ -420,16 +420,16 @@ function createArrayInstrumentations() {
 }
 function createGetter(isReadonly = false, shallow = false) {
     return function get(target, key, receiver) {
-        if (key === "__v_isReactive" /* IS_REACTIVE */) {
+        if (key === "__v_isReactive" /* ReactiveFlags.IS_REACTIVE */) {
             return !isReadonly;
         }
-        else if (key === "__v_isReadonly" /* IS_READONLY */) {
+        else if (key === "__v_isReadonly" /* ReactiveFlags.IS_READONLY */) {
             return isReadonly;
         }
-        else if (key === "__v_isShallow" /* IS_SHALLOW */) {
+        else if (key === "__v_isShallow" /* ReactiveFlags.IS_SHALLOW */) {
             return shallow;
         }
-        else if (key === "__v_raw" /* RAW */ &&
+        else if (key === "__v_raw" /* ReactiveFlags.RAW */ &&
             receiver ===
                 (isReadonly
                     ? shallow
@@ -449,7 +449,7 @@ function createGetter(isReadonly = false, shallow = false) {
             return res;
         }
         if (!isReadonly) {
-            track(target, "get" /* GET */, key);
+            track(target, "get" /* TrackOpTypes.GET */, key);
         }
         if (shallow) {
             return res;
@@ -475,10 +475,10 @@ function createSetter(shallow = false) {
         if (isReadonly(oldValue) && isRef(oldValue) && !isRef(value)) {
             return false;
         }
-        if (!shallow && !isReadonly(value)) {
-            if (!isShallow(value)) {
-                value = toRaw(value);
+        if (!shallow) {
+            if (!isShallow(value) && !isReadonly(value)) {
                 oldValue = toRaw(oldValue);
+                value = toRaw(value);
             }
             if (!shared.isArray(target) && isRef(oldValue) && !isRef(value)) {
                 oldValue.value = value;
@@ -492,10 +492,10 @@ function createSetter(shallow = false) {
         // don't trigger if target is something up in the prototype chain of original
         if (target === toRaw(receiver)) {
             if (!hadKey) {
-                trigger(target, "add" /* ADD */, key, value);
+                trigger(target, "add" /* TriggerOpTypes.ADD */, key, value);
             }
             else if (shared.hasChanged(value, oldValue)) {
-                trigger(target, "set" /* SET */, key, value);
+                trigger(target, "set" /* TriggerOpTypes.SET */, key, value);
             }
         }
         return result;
@@ -506,19 +506,19 @@ function deleteProperty(target, key) {
     target[key];
     const result = Reflect.deleteProperty(target, key);
     if (result && hadKey) {
-        trigger(target, "delete" /* DELETE */, key, undefined);
+        trigger(target, "delete" /* TriggerOpTypes.DELETE */, key, undefined);
     }
     return result;
 }
 function has(target, key) {
     const result = Reflect.has(target, key);
     if (!shared.isSymbol(key) || !builtInSymbols.has(key)) {
-        track(target, "has" /* HAS */, key);
+        track(target, "has" /* TrackOpTypes.HAS */, key);
     }
     return result;
 }
 function ownKeys(target) {
-    track(target, "iterate" /* ITERATE */, shared.isArray(target) ? 'length' : ITERATE_KEY);
+    track(target, "iterate" /* TrackOpTypes.ITERATE */, shared.isArray(target) ? 'length' : ITERATE_KEY);
     return Reflect.ownKeys(target);
 }
 const mutableHandlers = {
@@ -553,14 +553,14 @@ const getProto = (v) => Reflect.getPrototypeOf(v);
 function get$1(target, key, isReadonly = false, isShallow = false) {
     // #1772: readonly(reactive(Map)) should return readonly + reactive version
     // of the value
-    target = target["__v_raw" /* RAW */];
+    target = target["__v_raw" /* ReactiveFlags.RAW */];
     const rawTarget = toRaw(target);
     const rawKey = toRaw(key);
     if (!isReadonly) {
         if (key !== rawKey) {
-            track(rawTarget, "get" /* GET */, key);
+            track(rawTarget, "get" /* TrackOpTypes.GET */, key);
         }
-        track(rawTarget, "get" /* GET */, rawKey);
+        track(rawTarget, "get" /* TrackOpTypes.GET */, rawKey);
     }
     const { has } = getProto(rawTarget);
     const wrap = isShallow ? toShallow : isReadonly ? toReadonly : toReactive;
@@ -577,22 +577,22 @@ function get$1(target, key, isReadonly = false, isShallow = false) {
     }
 }
 function has$1(key, isReadonly = false) {
-    const target = this["__v_raw" /* RAW */];
+    const target = this["__v_raw" /* ReactiveFlags.RAW */];
     const rawTarget = toRaw(target);
     const rawKey = toRaw(key);
     if (!isReadonly) {
         if (key !== rawKey) {
-            track(rawTarget, "has" /* HAS */, key);
+            track(rawTarget, "has" /* TrackOpTypes.HAS */, key);
         }
-        track(rawTarget, "has" /* HAS */, rawKey);
+        track(rawTarget, "has" /* TrackOpTypes.HAS */, rawKey);
     }
     return key === rawKey
         ? target.has(key)
         : target.has(key) || target.has(rawKey);
 }
 function size(target, isReadonly = false) {
-    target = target["__v_raw" /* RAW */];
-    !isReadonly && track(toRaw(target), "iterate" /* ITERATE */, ITERATE_KEY);
+    target = target["__v_raw" /* ReactiveFlags.RAW */];
+    !isReadonly && track(toRaw(target), "iterate" /* TrackOpTypes.ITERATE */, ITERATE_KEY);
     return Reflect.get(target, 'size', target);
 }
 function add(value) {
@@ -602,7 +602,7 @@ function add(value) {
     const hadKey = proto.has.call(target, value);
     if (!hadKey) {
         target.add(value);
-        trigger(target, "add" /* ADD */, value, value);
+        trigger(target, "add" /* TriggerOpTypes.ADD */, value, value);
     }
     return this;
 }
@@ -618,10 +618,10 @@ function set$1(key, value) {
     const oldValue = get.call(target, key);
     target.set(key, value);
     if (!hadKey) {
-        trigger(target, "add" /* ADD */, key, value);
+        trigger(target, "add" /* TriggerOpTypes.ADD */, key, value);
     }
     else if (shared.hasChanged(value, oldValue)) {
-        trigger(target, "set" /* SET */, key, value);
+        trigger(target, "set" /* TriggerOpTypes.SET */, key, value);
     }
     return this;
 }
@@ -637,7 +637,7 @@ function deleteEntry(key) {
     // forward the operation before queueing reactions
     const result = target.delete(key);
     if (hadKey) {
-        trigger(target, "delete" /* DELETE */, key, undefined);
+        trigger(target, "delete" /* TriggerOpTypes.DELETE */, key, undefined);
     }
     return result;
 }
@@ -647,17 +647,17 @@ function clear() {
     // forward the operation before queueing reactions
     const result = target.clear();
     if (hadItems) {
-        trigger(target, "clear" /* CLEAR */, undefined, undefined);
+        trigger(target, "clear" /* TriggerOpTypes.CLEAR */, undefined, undefined);
     }
     return result;
 }
 function createForEach(isReadonly, isShallow) {
     return function forEach(callback, thisArg) {
         const observed = this;
-        const target = observed["__v_raw" /* RAW */];
+        const target = observed["__v_raw" /* ReactiveFlags.RAW */];
         const rawTarget = toRaw(target);
         const wrap = isShallow ? toShallow : isReadonly ? toReadonly : toReactive;
-        !isReadonly && track(rawTarget, "iterate" /* ITERATE */, ITERATE_KEY);
+        !isReadonly && track(rawTarget, "iterate" /* TrackOpTypes.ITERATE */, ITERATE_KEY);
         return target.forEach((value, key) => {
             // important: make sure the callback is
             // 1. invoked with the reactive map as `this` and 3rd arg
@@ -668,7 +668,7 @@ function createForEach(isReadonly, isShallow) {
 }
 function createIterableMethod(method, isReadonly, isShallow) {
     return function (...args) {
-        const target = this["__v_raw" /* RAW */];
+        const target = this["__v_raw" /* ReactiveFlags.RAW */];
         const rawTarget = toRaw(target);
         const targetIsMap = shared.isMap(rawTarget);
         const isPair = method === 'entries' || (method === Symbol.iterator && targetIsMap);
@@ -676,7 +676,7 @@ function createIterableMethod(method, isReadonly, isShallow) {
         const innerIterator = target[method](...args);
         const wrap = isShallow ? toShallow : isReadonly ? toReadonly : toReactive;
         !isReadonly &&
-            track(rawTarget, "iterate" /* ITERATE */, isKeyOnly ? MAP_KEY_ITERATE_KEY : ITERATE_KEY);
+            track(rawTarget, "iterate" /* TrackOpTypes.ITERATE */, isKeyOnly ? MAP_KEY_ITERATE_KEY : ITERATE_KEY);
         // return a wrapped iterator which returns observed versions of the
         // values emitted from the real iterator
         return {
@@ -699,7 +699,7 @@ function createIterableMethod(method, isReadonly, isShallow) {
 }
 function createReadonlyMethod(type) {
     return function (...args) {
-        return type === "delete" /* DELETE */ ? false : this;
+        return type === "delete" /* TriggerOpTypes.DELETE */ ? false : this;
     };
 }
 function createInstrumentations() {
@@ -741,10 +741,10 @@ function createInstrumentations() {
         has(key) {
             return has$1.call(this, key, true);
         },
-        add: createReadonlyMethod("add" /* ADD */),
-        set: createReadonlyMethod("set" /* SET */),
-        delete: createReadonlyMethod("delete" /* DELETE */),
-        clear: createReadonlyMethod("clear" /* CLEAR */),
+        add: createReadonlyMethod("add" /* TriggerOpTypes.ADD */),
+        set: createReadonlyMethod("set" /* TriggerOpTypes.SET */),
+        delete: createReadonlyMethod("delete" /* TriggerOpTypes.DELETE */),
+        clear: createReadonlyMethod("clear" /* TriggerOpTypes.CLEAR */),
         forEach: createForEach(true, false)
     };
     const shallowReadonlyInstrumentations = {
@@ -757,10 +757,10 @@ function createInstrumentations() {
         has(key) {
             return has$1.call(this, key, true);
         },
-        add: createReadonlyMethod("add" /* ADD */),
-        set: createReadonlyMethod("set" /* SET */),
-        delete: createReadonlyMethod("delete" /* DELETE */),
-        clear: createReadonlyMethod("clear" /* CLEAR */),
+        add: createReadonlyMethod("add" /* TriggerOpTypes.ADD */),
+        set: createReadonlyMethod("set" /* TriggerOpTypes.SET */),
+        delete: createReadonlyMethod("delete" /* TriggerOpTypes.DELETE */),
+        clear: createReadonlyMethod("clear" /* TriggerOpTypes.CLEAR */),
         forEach: createForEach(true, true)
     };
     const iteratorMethods = ['keys', 'values', 'entries', Symbol.iterator];
@@ -787,13 +787,13 @@ function createInstrumentationGetter(isReadonly, shallow) {
             ? readonlyInstrumentations
             : mutableInstrumentations;
     return (target, key, receiver) => {
-        if (key === "__v_isReactive" /* IS_REACTIVE */) {
+        if (key === "__v_isReactive" /* ReactiveFlags.IS_REACTIVE */) {
             return !isReadonly;
         }
-        else if (key === "__v_isReadonly" /* IS_READONLY */) {
+        else if (key === "__v_isReadonly" /* ReactiveFlags.IS_READONLY */) {
             return isReadonly;
         }
-        else if (key === "__v_raw" /* RAW */) {
+        else if (key === "__v_raw" /* ReactiveFlags.RAW */) {
             return target;
         }
         return Reflect.get(shared.hasOwn(instrumentations, key) && key in target
@@ -822,19 +822,19 @@ function targetTypeMap(rawType) {
     switch (rawType) {
         case 'Object':
         case 'Array':
-            return 1 /* COMMON */;
+            return 1 /* TargetType.COMMON */;
         case 'Map':
         case 'Set':
         case 'WeakMap':
         case 'WeakSet':
-            return 2 /* COLLECTION */;
+            return 2 /* TargetType.COLLECTION */;
         default:
-            return 0 /* INVALID */;
+            return 0 /* TargetType.INVALID */;
     }
 }
 function getTargetType(value) {
-    return value["__v_skip" /* SKIP */] || !Object.isExtensible(value)
-        ? 0 /* INVALID */
+    return value["__v_skip" /* ReactiveFlags.SKIP */] || !Object.isExtensible(value)
+        ? 0 /* TargetType.INVALID */
         : targetTypeMap(shared.toRawType(value));
 }
 function reactive(target) {
@@ -874,8 +874,8 @@ function createReactiveObject(target, isReadonly, baseHandlers, collectionHandle
     }
     // target is already a Proxy, return it.
     // exception: calling readonly() on a reactive object
-    if (target["__v_raw" /* RAW */] &&
-        !(isReadonly && target["__v_isReactive" /* IS_REACTIVE */])) {
+    if (target["__v_raw" /* ReactiveFlags.RAW */] &&
+        !(isReadonly && target["__v_isReactive" /* ReactiveFlags.IS_REACTIVE */])) {
         return target;
     }
     // target already has corresponding Proxy
@@ -885,34 +885,34 @@ function createReactiveObject(target, isReadonly, baseHandlers, collectionHandle
     }
     // only specific value types can be observed.
     const targetType = getTargetType(target);
-    if (targetType === 0 /* INVALID */) {
+    if (targetType === 0 /* TargetType.INVALID */) {
         return target;
     }
-    const proxy = new Proxy(target, targetType === 2 /* COLLECTION */ ? collectionHandlers : baseHandlers);
+    const proxy = new Proxy(target, targetType === 2 /* TargetType.COLLECTION */ ? collectionHandlers : baseHandlers);
     proxyMap.set(target, proxy);
     return proxy;
 }
 function isReactive(value) {
     if (isReadonly(value)) {
-        return isReactive(value["__v_raw" /* RAW */]);
+        return isReactive(value["__v_raw" /* ReactiveFlags.RAW */]);
     }
-    return !!(value && value["__v_isReactive" /* IS_REACTIVE */]);
+    return !!(value && value["__v_isReactive" /* ReactiveFlags.IS_REACTIVE */]);
 }
 function isReadonly(value) {
-    return !!(value && value["__v_isReadonly" /* IS_READONLY */]);
+    return !!(value && value["__v_isReadonly" /* ReactiveFlags.IS_READONLY */]);
 }
 function isShallow(value) {
-    return !!(value && value["__v_isShallow" /* IS_SHALLOW */]);
+    return !!(value && value["__v_isShallow" /* ReactiveFlags.IS_SHALLOW */]);
 }
 function isProxy(value) {
     return isReactive(value) || isReadonly(value);
 }
 function toRaw(observed) {
-    const raw = observed && observed["__v_raw" /* RAW */];
+    const raw = observed && observed["__v_raw" /* ReactiveFlags.RAW */];
     return raw ? toRaw(raw) : observed;
 }
 function markRaw(value) {
-    shared.def(value, "__v_skip" /* SKIP */, true);
+    shared.def(value, "__v_skip" /* ReactiveFlags.SKIP */, true);
     return value;
 }
 const toReactive = (value) => shared.isObject(value) ? reactive(value) : value;
@@ -962,10 +962,11 @@ class RefImpl {
         return this._value;
     }
     set value(newVal) {
-        newVal = this.__v_isShallow ? newVal : toRaw(newVal);
+        const useDirectValue = this.__v_isShallow || isShallow(newVal) || isReadonly(newVal);
+        newVal = useDirectValue ? newVal : toRaw(newVal);
         if (shared.hasChanged(newVal, this._rawValue)) {
             this._rawValue = newVal;
-            this._value = this.__v_isShallow ? newVal : toReactive(newVal);
+            this._value = useDirectValue ? newVal : toReactive(newVal);
             triggerRefValue(this);
         }
     }
@@ -1041,11 +1042,13 @@ function toRef(object, key, defaultValue) {
         : new ObjectRefImpl(object, key, defaultValue);
 }
 
+var _a;
 class ComputedRefImpl {
     constructor(getter, _setter, isReadonly, isSSR) {
         this._setter = _setter;
         this.dep = undefined;
         this.__v_isRef = true;
+        this[_a] = false;
         this._dirty = true;
         this.effect = new ReactiveEffect(getter, () => {
             if (!this._dirty) {
@@ -1055,7 +1058,7 @@ class ComputedRefImpl {
         });
         this.effect.computed = this;
         this.effect.active = this._cacheable = !isSSR;
-        this["__v_isReadonly" /* IS_READONLY */] = isReadonly;
+        this["__v_isReadonly" /* ReactiveFlags.IS_READONLY */] = isReadonly;
     }
     get value() {
         // the computed ref may get wrapped by other proxies e.g. readonly() #3376
@@ -1071,6 +1074,7 @@ class ComputedRefImpl {
         this._setter(newValue);
     }
 }
+_a = "__v_isReadonly" /* ReactiveFlags.IS_READONLY */;
 function computed(getterOrOptions, debugOptions, isSSR = false) {
     let getter;
     let setter;
@@ -1087,7 +1091,7 @@ function computed(getterOrOptions, debugOptions, isSSR = false) {
     return cRef;
 }
 
-var _a;
+var _a$1;
 const tick = /*#__PURE__*/ Promise.resolve();
 const queue = [];
 let queued = false;
@@ -1110,7 +1114,7 @@ class DeferredComputedRefImpl {
         this.dep = undefined;
         this._dirty = true;
         this.__v_isRef = true;
-        this[_a] = true;
+        this[_a$1] = true;
         let compareTarget;
         let hasCompareTarget = false;
         let scheduled = false;
@@ -1157,7 +1161,7 @@ class DeferredComputedRefImpl {
         return toRaw(this)._get();
     }
 }
-_a = "__v_isReadonly" /* IS_READONLY */;
+_a$1 = "__v_isReadonly" /* ReactiveFlags.IS_READONLY */;
 function deferredComputed(getter) {
     return new DeferredComputedRefImpl(getter);
 }
