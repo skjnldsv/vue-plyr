@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@skjnldsv/vue-plyr": "file:../..",
-    "vue": "^3.2.31"
+    "vue": "^3.2.38"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.4",
