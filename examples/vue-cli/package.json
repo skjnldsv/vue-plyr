@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@skjnldsv/vue-plyr": "file:../..",
-    "vue": "^3.2.38"
+    "vue": "^3.2.39"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^5.0.8",
