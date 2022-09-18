@@ -1,11 +1,9 @@
 var isCallable = require('../internals/is-callable');
+var $documentAll = require('../internals/document-all');
 
-var documentAll = typeof document == 'object' && document.all;
+var documentAll = $documentAll.all;
 
-// https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot
-var SPECIAL_DOCUMENT_ALL = typeof documentAll == 'undefined' && documentAll !== undefined;
-
-module.exports = SPECIAL_DOCUMENT_ALL ? function (it) {
+module.exports = $documentAll.IS_HTMLDDA ? function (it) {
   return typeof it == 'object' ? it !== null : isCallable(it) || it === documentAll;
 } : function (it) {
   return typeof it == 'object' ? it !== null : isCallable(it);
