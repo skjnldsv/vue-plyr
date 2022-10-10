@@ -13,8 +13,15 @@ A demo of the components (equivalent to the html example include here) can be fo
 [skjnldsv.github.io/vue-plyr](https://skjnldsv.github.io/vue-plyr/).
 
 ## Installation
+
+### NPM
 ```bash
-npm install vue-plyr
+npm install @skjnldsv/vue-plyr
+```
+
+### Yarn
+```bash
+yarn add @skjnldsv/vue-plyr
 ```
 
 ## Examples
