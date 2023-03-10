@@ -5,7 +5,6 @@
 import captions from './captions';
 import controls from './controls';
 import support from './support';
-import browser from './utils/browser';
 import { getElement, toggleClass } from './utils/elements';
 import { ready, triggerEvent } from './utils/events';
 import i18n from './utils/i18n';
@@ -97,9 +96,6 @@ const ui = {
 
     // Check for airplay support
     toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
-
-    // Add iOS class
-    toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos);
 
     // Add touch class
     toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);

@@ -18,8 +18,7 @@ const defaults = {
   // Only allow one media playing at once (vimeo only)
   autopause: true,
 
-  // Allow inline playback on iOS (this effects YouTube/Vimeo - HTML5 requires the attribute present)
-  // TODO: Remove iosNative fullscreen option in favour of this (logic needs work)
+  // Allow inline playback on iOS
   playsinline: true,
 
   // Default time to skip when rewind/fast forward
@@ -61,7 +60,7 @@ const defaults = {
   // Sprite (for icons)
   loadSprite: true,
   iconPrefix: 'plyr',
-  iconUrl: 'https://cdn.plyr.io/3.7.3/plyr.svg',
+  iconUrl: 'https://cdn.plyr.io/3.7.6/plyr.svg',
 
   // Blank video (used to prevent errors on source change)
   blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -353,7 +352,6 @@ const defaults = {
     marker: 'plyr__progress__marker',
     hidden: 'plyr__sr-only',
     hideControls: 'plyr--hide-controls',
-    isIos: 'plyr--is-ios',
     isTouch: 'plyr--is-touch',
     uiSupported: 'plyr--full-ui',
     noTransition: 'plyr--no-transition',
