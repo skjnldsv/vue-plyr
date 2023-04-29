@@ -43,7 +43,7 @@
     "@nextcloud/stylelint-config": "^2.3.0",
     "@rollup/plugin-commonjs": "^24.1.0",
     "@rollup/plugin-node-resolve": "^15.0.2",
-    "@vue/tsconfig": "^0.2.0",
+    "@vue/tsconfig": "^0.3.2",
     "jest": "^29.5.0",
     "jest-environment-jsdom": "^29.5.0",
     "rollup": "^2.78.1",
