@@ -9090,7 +9090,7 @@ Component that was made reactive: `,
     return true;
   }
 
-  const version = "3.3.3";
+  const version = "3.3.4";
   const ssrUtils = null;
   const resolveFilter = null;
   const compatUtils = null;

@@ -10,7 +10,7 @@ function initDev() {
   }
 }
 
-if (process.env.NODE_ENV !== "production") {
+if (!!(process.env.NODE_ENV !== "production")) {
   initDev();
 }
 const compileCache = /* @__PURE__ */ Object.create(null);
@@ -19,7 +19,7 @@ function compileToFunction(template, options) {
     if (template.nodeType) {
       template = template.innerHTML;
     } else {
-      process.env.NODE_ENV !== "production" && warn(`invalid template option: `, template);
+      !!(process.env.NODE_ENV !== "production") && warn(`invalid template option: `, template);
       return NOOP;
     }
   }
@@ -30,7 +30,7 @@ function compileToFunction(template, options) {
   }
   if (template[0] === "#") {
     const el = document.querySelector(template);
-    if (process.env.NODE_ENV !== "production" && !el) {
+    if (!!(process.env.NODE_ENV !== "production") && !el) {
       warn(`Template element not found or is empty: ${template}`);
     }
     template = el ? el.innerHTML : ``;
@@ -38,8 +38,8 @@ function compileToFunction(template, options) {
   const opts = extend(
     {
       hoistStatic: true,
-      onError: process.env.NODE_ENV !== "production" ? onError : void 0,
-      onWarn: process.env.NODE_ENV !== "production" ? (e) => onError(e, true) : NOOP
+      onError: !!(process.env.NODE_ENV !== "production") ? onError : void 0,
+      onWarn: !!(process.env.NODE_ENV !== "production") ? (e) => onError(e, true) : NOOP
     },
     options
   );
