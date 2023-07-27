@@ -1,3 +1,4 @@
+'use strict';
 require('../modules/es.symbol');
 require('../modules/es.symbol.description');
 require('../modules/es.symbol.async-iterator');
