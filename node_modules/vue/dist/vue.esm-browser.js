@@ -2509,6 +2509,61 @@ function updateHOCHostEl({ vnode, parent }, el) {
   }
 }
 
+const COMPONENTS = "components";
+const DIRECTIVES = "directives";
+function resolveComponent(name, maybeSelfReference) {
+  return resolveAsset(COMPONENTS, name, true, maybeSelfReference) || name;
+}
+const NULL_DYNAMIC_COMPONENT = Symbol.for("v-ndc");
+function resolveDynamicComponent(component) {
+  if (isString(component)) {
+    return resolveAsset(COMPONENTS, component, false) || component;
+  } else {
+    return component || NULL_DYNAMIC_COMPONENT;
+  }
+}
+function resolveDirective(name) {
+  return resolveAsset(DIRECTIVES, name);
+}
+function resolveAsset(type, name, warnMissing = true, maybeSelfReference = false) {
+  const instance = currentRenderingInstance || currentInstance;
+  if (instance) {
+    const Component = instance.type;
+    if (type === COMPONENTS) {
+      const selfName = getComponentName(
+        Component,
+        false
+        /* do not include inferred name to avoid breaking existing code */
+      );
+      if (selfName && (selfName === name || selfName === camelize(name) || selfName === capitalize(camelize(name)))) {
+        return Component;
+      }
+    }
+    const res = (
+      // local registration
+      // check instance[type] first which is resolved for options API
+      resolve(instance[type] || Component[type], name) || // global registration
+      resolve(instance.appContext[type], name)
+    );
+    if (!res && maybeSelfReference) {
+      return Component;
+    }
+    if (warnMissing && !res) {
+      const extra = type === COMPONENTS ? `
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement.` : ``;
+      warn(`Failed to resolve ${type.slice(0, -1)}: ${name}${extra}`);
+    }
+    return res;
+  } else {
+    warn(
+      `resolve${capitalize(type.slice(0, -1))} can only be used in render() or setup().`
+    );
+  }
+}
+function resolve(registry, name) {
+  return registry && (registry[name] || registry[camelize(name)] || registry[capitalize(camelize(name))]);
+}
+
 const isSuspense = (type) => type.__isSuspense;
 const SuspenseImpl = {
   name: "Suspense",
@@ -3043,7 +3098,7 @@ function normalizeSuspenseSlot(s) {
   }
   if (isArray(s)) {
     const singleChild = filterSingleRoot(s);
-    if (!singleChild) {
+    if (!singleChild && s.filter((child) => child !== NULL_DYNAMIC_COMPONENT).length > 0) {
       warn(`<Suspense> slots expect a single root node.`);
     }
     s = singleChild;
@@ -4126,61 +4181,6 @@ const onRenderTracked = createHook(
 );
 function onErrorCaptured(hook, target = currentInstance) {
   injectHook("ec", hook, target);
-}
-
-const COMPONENTS = "components";
-const DIRECTIVES = "directives";
-function resolveComponent(name, maybeSelfReference) {
-  return resolveAsset(COMPONENTS, name, true, maybeSelfReference) || name;
-}
-const NULL_DYNAMIC_COMPONENT = Symbol.for("v-ndc");
-function resolveDynamicComponent(component) {
-  if (isString(component)) {
-    return resolveAsset(COMPONENTS, component, false) || component;
-  } else {
-    return component || NULL_DYNAMIC_COMPONENT;
-  }
-}
-function resolveDirective(name) {
-  return resolveAsset(DIRECTIVES, name);
-}
-function resolveAsset(type, name, warnMissing = true, maybeSelfReference = false) {
-  const instance = currentRenderingInstance || currentInstance;
-  if (instance) {
-    const Component = instance.type;
-    if (type === COMPONENTS) {
-      const selfName = getComponentName(
-        Component,
-        false
-        /* do not include inferred name to avoid breaking existing code */
-      );
-      if (selfName && (selfName === name || selfName === camelize(name) || selfName === capitalize(camelize(name)))) {
-        return Component;
-      }
-    }
-    const res = (
-      // local registration
-      // check instance[type] first which is resolved for options API
-      resolve(instance[type] || Component[type], name) || // global registration
-      resolve(instance.appContext[type], name)
-    );
-    if (!res && maybeSelfReference) {
-      return Component;
-    }
-    if (warnMissing && !res) {
-      const extra = type === COMPONENTS ? `
-If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement.` : ``;
-      warn(`Failed to resolve ${type.slice(0, -1)}: ${name}${extra}`);
-    }
-    return res;
-  } else {
-    warn(
-      `resolve${capitalize(type.slice(0, -1))} can only be used in render() or setup().`
-    );
-  }
-}
-function resolve(registry, name) {
-  return registry && (registry[name] || registry[camelize(name)] || registry[capitalize(camelize(name))]);
 }
 
 function renderList(source, renderItem, cache, index) {
@@ -5998,15 +5998,15 @@ function createHydrationFunctions(rendererInternals) {
         }
         break;
       case Comment:
-        if (domType !== 8 /* COMMENT */ || isFragmentStart) {
-          if (node.tagName.toLowerCase() === "template") {
-            const content = vnode.el.content.firstChild;
-            replaceNode(content, node, parentComponent);
-            vnode.el = node = content;
-            nextNode = nextSibling(node);
-          } else {
-            nextNode = onMismatch();
-          }
+        if (isTemplateNode(node)) {
+          nextNode = nextSibling(node);
+          replaceNode(
+            vnode.el = node.content.firstChild,
+            node,
+            parentComponent
+          );
+        } else if (domType !== 8 /* COMMENT */ || isFragmentStart) {
+          nextNode = onMismatch();
         } else {
           nextNode = nextSibling(node);
         }
@@ -6350,8 +6350,7 @@ function createHydrationFunctions(rendererInternals) {
     let parent = parentComponent;
     while (parent) {
       if (parent.vnode.el === oldNode) {
-        parent.vnode.el = newNode;
-        parent.subTree.el = newNode;
+        parent.vnode.el = parent.subTree.el = newNode;
       }
       parent = parent.parent;
     }
@@ -9137,7 +9136,7 @@ function isMemoSame(cached, memo) {
   return true;
 }
 
-const version = "3.3.7";
+const version = "3.3.8";
 const ssrUtils = null;
 const resolveFilter = null;
 const compatUtils = null;
