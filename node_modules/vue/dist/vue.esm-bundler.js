@@ -2,7 +2,7 @@ import * as runtimeDom from '@vue/runtime-dom';
 import { initCustomFormatter, registerRuntimeCompiler, warn } from '@vue/runtime-dom';
 export * from '@vue/runtime-dom';
 import { compile } from '@vue/compiler-dom';
-import { isString, NOOP, extend, generateCodeFrame } from '@vue/shared';
+import { isString, NOOP, extend, generateCodeFrame, EMPTY_OBJ } from '@vue/shared';
 
 function initDev() {
   {
@@ -13,7 +13,15 @@ function initDev() {
 if (!!(process.env.NODE_ENV !== "production")) {
   initDev();
 }
-const compileCache = /* @__PURE__ */ Object.create(null);
+const compileCache = /* @__PURE__ */ new WeakMap();
+function getCache(options) {
+  let c = compileCache.get(options != null ? options : EMPTY_OBJ);
+  if (!c) {
+    c = /* @__PURE__ */ Object.create(null);
+    compileCache.set(options != null ? options : EMPTY_OBJ, c);
+  }
+  return c;
+}
 function compileToFunction(template, options) {
   if (!isString(template)) {
     if (template.nodeType) {
@@ -24,7 +32,8 @@ function compileToFunction(template, options) {
     }
   }
   const key = template;
-  const cached = compileCache[key];
+  const cache = getCache(options);
+  const cached = cache[key];
   if (cached) {
     return cached;
   }
@@ -59,7 +68,7 @@ ${codeFrame}` : message);
   }
   const render = new Function("Vue", code)(runtimeDom);
   render._rc = true;
-  return compileCache[key] = render;
+  return cache[key] = render;
 }
 registerRuntimeCompiler(compileToFunction);
 

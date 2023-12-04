@@ -19,7 +19,15 @@ function _interopNamespaceDefault(e) {
 
 var runtimeDom__namespace = /*#__PURE__*/_interopNamespaceDefault(runtimeDom);
 
-const compileCache = /* @__PURE__ */ Object.create(null);
+const compileCache = /* @__PURE__ */ new WeakMap();
+function getCache(options) {
+  let c = compileCache.get(options != null ? options : shared.EMPTY_OBJ);
+  if (!c) {
+    c = /* @__PURE__ */ Object.create(null);
+    compileCache.set(options != null ? options : shared.EMPTY_OBJ, c);
+  }
+  return c;
+}
 function compileToFunction(template, options) {
   if (!shared.isString(template)) {
     if (template.nodeType) {
@@ -29,7 +37,8 @@ function compileToFunction(template, options) {
     }
   }
   const key = template;
-  const cached = compileCache[key];
+  const cache = getCache(options);
+  const cached = cache[key];
   if (cached) {
     return cached;
   }
@@ -51,7 +60,7 @@ function compileToFunction(template, options) {
   const { code } = compilerDom.compile(template, opts);
   const render = new Function("Vue", code)(runtimeDom__namespace);
   render._rc = true;
-  return compileCache[key] = render;
+  return cache[key] = render;
 }
 runtimeDom.registerRuntimeCompiler(compileToFunction);
 
