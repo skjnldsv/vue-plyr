@@ -1,4 +1,4 @@
-import { ParserOptions, NodeTransform, SourceLocation, CompilerError, DirectiveTransform, CompilerOptions, CodegenResult, RootNode } from '@vue/compiler-core';
+import { ParserOptions, NodeTransform, SourceLocation, CompilerError, DirectiveTransform, RootNode, CompilerOptions, CodegenResult } from '@vue/compiler-core';
 export * from '@vue/compiler-core';
 
 export declare const parserOptions: ParserOptions;
@@ -20,7 +20,7 @@ interface DOMCompilerError extends CompilerError {
     code: DOMErrorCodes;
 }
 export declare function createDOMCompilerError(code: DOMErrorCodes, loc?: SourceLocation): DOMCompilerError;
-export declare const enum DOMErrorCodes {
+export declare enum DOMErrorCodes {
     X_V_HTML_NO_EXPRESSION = 53,
     X_V_HTML_WITH_CHILDREN = 54,
     X_V_TEXT_NO_EXPRESSION = 55,
@@ -34,9 +34,12 @@ export declare const enum DOMErrorCodes {
     X_IGNORED_SIDE_EFFECT_TAG = 63,
     __EXTEND_POINT__ = 64
 }
+export declare const DOMErrorMessages: {
+    [code: number]: string;
+};
 
 export declare const DOMNodeTransforms: NodeTransform[];
 export declare const DOMDirectiveTransforms: Record<string, DirectiveTransform>;
-export declare function compile(template: string, options?: CompilerOptions): CodegenResult;
+export declare function compile(src: string | RootNode, options?: CompilerOptions): CodegenResult;
 export declare function parse(template: string, options?: ParserOptions): RootNode;
 
