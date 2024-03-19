@@ -476,14 +476,18 @@ var generator = new sourceMap.SourceMapGenerator({
 });
 ```
 
-#### SourceMapGenerator.fromSourceMap(sourceMapConsumer)
+#### SourceMapGenerator.fromSourceMap(sourceMapConsumer, sourceMapGeneratorOptions)
 
 Creates a new `SourceMapGenerator` from an existing `SourceMapConsumer` instance.
 
 * `sourceMapConsumer` The SourceMap.
 
+* `sourceMapGeneratorOptions` options that will be passed to the SourceMapGenerator constructor which used under the hood.
+
 ```js
-var generator = sourceMap.SourceMapGenerator.fromSourceMap(consumer);
+var generator = sourceMap.SourceMapGenerator.fromSourceMap(consumer, {
+  ignoreInvalidMapping: true,
+});
 ```
 
 #### SourceMapGenerator.prototype.addMapping(mapping)

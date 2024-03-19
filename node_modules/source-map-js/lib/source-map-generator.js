@@ -40,12 +40,12 @@ SourceMapGenerator.prototype._version = 3;
  * @param aSourceMapConsumer The SourceMap.
  */
 SourceMapGenerator.fromSourceMap =
-  function SourceMapGenerator_fromSourceMap(aSourceMapConsumer) {
+  function SourceMapGenerator_fromSourceMap(aSourceMapConsumer, generatorOps) {
     var sourceRoot = aSourceMapConsumer.sourceRoot;
-    var generator = new SourceMapGenerator({
+    var generator = new SourceMapGenerator(Object.assign(generatorOps || {}, {
       file: aSourceMapConsumer.file,
       sourceRoot: sourceRoot
-    });
+    }));
     aSourceMapConsumer.eachMapping(function (mapping) {
       var newMapping = {
         generated: {
