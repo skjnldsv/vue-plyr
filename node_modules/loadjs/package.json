@@ -1,6 +1,6 @@
 {
   "name": "loadjs",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "license": "MIT",
   "description": "Tiny async loader for modern browsers",
   "keywords": [
@@ -8,14 +8,14 @@
     "loader",
     "dependency manager"
   ],
-  "homepage": "https://github.com/muicss/loadjs",
+  "homepage": "https://github.com/kubetail-org/loadjs",
   "bugs": {
-    "url": "https://github.com/muicss/loadjs/issues",
-    "email": "contact@muicss.com"
+    "url": "https://github.com/kubetail-org/loadjs/issues",
+    "email": "hello@kubetail.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/muicss/loadjs.git"
+    "url": "https://github.com/kubetail-org/loadjs.git"
   },
   "main": "dist/loadjs.umd.js",
   "scripts": {
@@ -30,9 +30,9 @@
     "del": "^5.1.0",
     "gulp": "^4.0.2",
     "gulp-jshint": "^2.1.0",
-    "gulp-rename": "^1.4.0",
+    "gulp-rename": "^2.0.0",
     "gulp-uglify": "^3.0.2",
     "gulp-umd": "^2.0.0",
-    "jshint": "^2.10.2"
+    "jshint": "^2.11.0"
   }
 }
