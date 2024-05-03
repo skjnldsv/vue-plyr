@@ -16,7 +16,7 @@ jobs:
     name: Build and publish to npm
     steps:
       - name: Check actor permission level
-        uses: skjnldsv/check-actor-permission@v2
+        uses: skjnldsv/check-actor-permission@v3
         with:
           require: admin
 
