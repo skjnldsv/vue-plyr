@@ -1,6 +1,7 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve'
+import { resolve } from 'node:path'
 import commonjs from '@rollup/plugin-commonjs'
-import styles from 'rollup-plugin-styles'
+import postcss from 'rollup-plugin-postcss'
 import vue from 'rollup-plugin-vue'
 
 const external = [
@@ -15,8 +16,9 @@ export default {
 		nodeResolve(),
 		vue(),
 		commonjs(),
-		styles({
-			mode: 'extract',
+		postcss({
+			// Or with custom file name
+			extract: resolve('dist/vue-plyr.css'),
 		}),
 	],
 	output: [
