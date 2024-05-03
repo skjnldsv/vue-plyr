@@ -10,6 +10,6 @@
     "serve": "^14.2.3"
   },
   "dependencies": {
-    "@skjnldsv/vue-plyr": "^7.4.0"
+    "@skjnldsv/vue-plyr": "^7.5.0"
   }
 }
