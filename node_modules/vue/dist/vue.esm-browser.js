@@ -1,5 +1,5 @@
 /**
-* vue v3.4.26
+* vue v3.4.27
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -205,8 +205,8 @@ function stringifyStyle(styles) {
   }
   for (const key in styles) {
     const value = styles[key];
-    const normalizedKey = key.startsWith(`--`) ? key : hyphenate(key);
     if (isString(value) || typeof value === "number") {
+      const normalizedKey = key.startsWith(`--`) ? key : hyphenate(key);
       ret += `${normalizedKey}:${value};`;
     }
   }
@@ -6629,7 +6629,7 @@ function propHasMismatch(el, key, clientValue, vnode, instance) {
       mismatchType = mismatchKey = `class`;
     }
   } else if (key === "style") {
-    actual = el.getAttribute("style");
+    actual = el.getAttribute("style") || "";
     expected = isString(clientValue) ? clientValue : stringifyStyle(normalizeStyle(clientValue));
     const actualMap = toStyleMap(actual);
     const expectedMap = toStyleMap(expected);
@@ -9617,7 +9617,7 @@ function isMemoSame(cached, memo) {
   return true;
 }
 
-const version = "3.4.26";
+const version = "3.4.27";
 const warn = warn$1 ;
 const ErrorTypeStrings = ErrorTypeStrings$1 ;
 const devtools = devtools$1 ;
@@ -15819,7 +15819,7 @@ function processSlotOutlet(node, context) {
   };
 }
 
-const fnExpRE = /^\s*([\w$_]+|(async\s*)?\([^)]*?\))\s*(:[^=]+)?=>|^\s*(async\s+)?function(?:\s+[\w$]+)?\s*\(/;
+const fnExpRE = /^\s*(async\s*)?(\([^)]*?\)|[\w$_]+)\s*(:[^=]+)?=>|^\s*(async\s+)?function(?:\s+[\w$]+)?\s*\(/;
 const transformOn$1 = (dir, node, context, augmentor) => {
   const { loc, modifiers, arg } = dir;
   if (!dir.exp && !modifiers.length) {
