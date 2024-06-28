@@ -1,5 +1,5 @@
 /**
-* vue v3.4.30
+* vue v3.4.31
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -330,11 +330,14 @@ var Vue = (function (exports) {
     return arr.findIndex((item) => looseEqual(item, val));
   }
 
+  const isRef$1 = (val) => {
+    return !!(val && val.__v_isRef === true);
+  };
   const toDisplayString = (val) => {
-    return isString(val) ? val : val == null ? "" : isArray(val) || isObject(val) && (val.toString === objectToString || !isFunction(val.toString)) ? JSON.stringify(val, replacer, 2) : String(val);
+    return isString(val) ? val : val == null ? "" : isArray(val) || isObject(val) && (val.toString === objectToString || !isFunction(val.toString)) ? isRef$1(val) ? toDisplayString(val.value) : JSON.stringify(val, replacer, 2) : String(val);
   };
   const replacer = (_key, val) => {
-    if (val && val.__v_isRef) {
+    if (isRef$1(val)) {
       return replacer(_key, val.value);
     } else if (isMap(val)) {
       return {
@@ -481,7 +484,7 @@ var Vue = (function (exports) {
       /**
        * @internal
        */
-      this._dirtyLevel = 5;
+      this._dirtyLevel = 4;
       /**
        * @internal
        */
@@ -501,20 +504,14 @@ var Vue = (function (exports) {
       recordEffectScope(this, scope);
     }
     get dirty() {
-      if (this._dirtyLevel === 2)
-        return false;
-      if (this._dirtyLevel === 3 || this._dirtyLevel === 4) {
+      if (this._dirtyLevel === 2 || this._dirtyLevel === 3) {
         this._dirtyLevel = 1;
         pauseTracking();
         for (let i = 0; i < this._depsLength; i++) {
           const dep = this.deps[i];
           if (dep.computed) {
-            if (dep.computed.effect._dirtyLevel === 2) {
-              resetTracking();
-              return true;
-            }
             triggerComputed(dep.computed);
-            if (this._dirtyLevel >= 5) {
+            if (this._dirtyLevel >= 4) {
               break;
             }
           }
@@ -524,10 +521,10 @@ var Vue = (function (exports) {
         }
         resetTracking();
       }
-      return this._dirtyLevel >= 5;
+      return this._dirtyLevel >= 4;
     }
     set dirty(v) {
-      this._dirtyLevel = v ? 5 : 0;
+      this._dirtyLevel = v ? 4 : 0;
     }
     run() {
       this._dirtyLevel = 0;
@@ -649,17 +646,8 @@ var Vue = (function (exports) {
     pauseScheduling();
     for (const effect2 of dep.keys()) {
       let tracking;
-      if (!dep.computed && effect2.computed) {
-        if (effect2._runnings > 0 && (tracking != null ? tracking : tracking = dep.get(effect2) === effect2._trackId)) {
-          effect2._dirtyLevel = 2;
-          continue;
-        }
-      }
       if (effect2._dirtyLevel < dirtyLevel && (tracking != null ? tracking : tracking = dep.get(effect2) === effect2._trackId)) {
         effect2._shouldSchedule || (effect2._shouldSchedule = effect2._dirtyLevel === 0);
-        if (effect2.computed && effect2._dirtyLevel === 2) {
-          effect2._shouldSchedule = true;
-        }
         effect2._dirtyLevel = dirtyLevel;
       }
       if (effect2._shouldSchedule && (tracking != null ? tracking : tracking = dep.get(effect2) === effect2._trackId)) {
@@ -667,7 +655,7 @@ var Vue = (function (exports) {
           (_a = effect2.onTrigger) == null ? void 0 : _a.call(effect2, extend({ effect: effect2 }, debuggerEventExtraInfo));
         }
         effect2.trigger();
-        if ((!effect2._runnings || effect2.allowRecurse) && effect2._dirtyLevel !== 3) {
+        if ((!effect2._runnings || effect2.allowRecurse) && effect2._dirtyLevel !== 2) {
           effect2._shouldSchedule = false;
           if (effect2.scheduler) {
             queueEffectSchedulers.push(effect2.scheduler);
@@ -759,7 +747,7 @@ var Vue = (function (exports) {
       if (dep) {
         triggerEffects(
           dep,
-          5,
+          4,
           {
             target,
             type,
@@ -1362,7 +1350,7 @@ var Vue = (function (exports) {
         () => getter(this._value),
         () => triggerRefValue(
           this,
-          this.effect._dirtyLevel === 3 ? 3 : 4
+          this.effect._dirtyLevel === 2 ? 2 : 3
         )
       );
       this.effect.computed = this;
@@ -1371,11 +1359,8 @@ var Vue = (function (exports) {
     }
     get value() {
       const self = toRaw(this);
-      const lastDirtyLevel = self.effect._dirtyLevel;
       if ((!self._cacheable || self.effect.dirty) && hasChanged(self._value, self._value = self.effect.run())) {
-        if (lastDirtyLevel !== 3) {
-          triggerRefValue(self, 5);
-        }
+        triggerRefValue(self, 4);
       }
       trackRefValue(self);
       if (self.effect._dirtyLevel >= 2) {
@@ -1384,7 +1369,7 @@ var Vue = (function (exports) {
 
 getter: `, this.getter);
         }
-        triggerRefValue(self, 3);
+        triggerRefValue(self, 2);
       }
       return self._value;
     }
@@ -1439,7 +1424,7 @@ getter: `, this.getter);
       );
     }
   }
-  function triggerRefValue(ref2, dirtyLevel = 5, newVal, oldVal) {
+  function triggerRefValue(ref2, dirtyLevel = 4, newVal, oldVal) {
     ref2 = toRaw(ref2);
     const dep = ref2.dep;
     if (dep) {
@@ -1490,12 +1475,12 @@ getter: `, this.getter);
         const oldVal = this._rawValue;
         this._rawValue = newVal;
         this._value = useDirectValue ? newVal : toReactive(newVal);
-        triggerRefValue(this, 5, newVal, oldVal);
+        triggerRefValue(this, 4, newVal, oldVal);
       }
     }
   }
   function triggerRef(ref2) {
-    triggerRefValue(ref2, 5, ref2.value );
+    triggerRefValue(ref2, 4, ref2.value );
   }
   function unref(ref2) {
     return isRef(ref2) ? ref2.value : ref2;
@@ -9647,7 +9632,7 @@ Component that was made reactive: `,
     return true;
   }
 
-  const version = "3.4.30";
+  const version = "3.4.31";
   const warn = warn$1 ;
   const ErrorTypeStrings = ErrorTypeStrings$1 ;
   const devtools = devtools$1 ;
