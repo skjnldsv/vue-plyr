@@ -1,18 +1,18 @@
 'use strict';
-var global = require('../internals/global');
+var globalThis = require('../internals/global-this');
 var uncurryThis = require('../internals/function-uncurry-this-clause');
 var fails = require('../internals/fails');
 var aCallable = require('../internals/a-callable');
 var internalSort = require('../internals/array-sort');
 var ArrayBufferViewCore = require('../internals/array-buffer-view-core');
-var FF = require('../internals/engine-ff-version');
-var IE_OR_EDGE = require('../internals/engine-is-ie-or-edge');
-var V8 = require('../internals/engine-v8-version');
-var WEBKIT = require('../internals/engine-webkit-version');
+var FF = require('../internals/environment-ff-version');
+var IE_OR_EDGE = require('../internals/environment-is-ie-or-edge');
+var V8 = require('../internals/environment-v8-version');
+var WEBKIT = require('../internals/environment-webkit-version');
 
 var aTypedArray = ArrayBufferViewCore.aTypedArray;
 var exportTypedArrayMethod = ArrayBufferViewCore.exportTypedArrayMethod;
-var Uint16Array = global.Uint16Array;
+var Uint16Array = globalThis.Uint16Array;
 var nativeSort = Uint16Array && uncurryThis(Uint16Array.prototype.sort);
 
 // WebKit

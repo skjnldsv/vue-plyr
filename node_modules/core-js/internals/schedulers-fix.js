@@ -1,16 +1,16 @@
 'use strict';
-var global = require('../internals/global');
+var globalThis = require('../internals/global-this');
 var apply = require('../internals/function-apply');
 var isCallable = require('../internals/is-callable');
-var ENGINE_IS_BUN = require('../internals/engine-is-bun');
-var USER_AGENT = require('../internals/engine-user-agent');
+var ENVIRONMENT = require('../internals/environment');
+var USER_AGENT = require('../internals/environment-user-agent');
 var arraySlice = require('../internals/array-slice');
 var validateArgumentsLength = require('../internals/validate-arguments-length');
 
-var Function = global.Function;
+var Function = globalThis.Function;
 // dirty IE9- and Bun 0.3.0- checks
-var WRAP = /MSIE .\./.test(USER_AGENT) || ENGINE_IS_BUN && (function () {
-  var version = global.Bun.version.split('.');
+var WRAP = /MSIE .\./.test(USER_AGENT) || ENVIRONMENT === 'BUN' && (function () {
+  var version = globalThis.Bun.version.split('.');
   return version.length < 3 || version[0] === '0' && (version[1] < 3 || version[1] === '3' && version[2] === '0');
 })();
 

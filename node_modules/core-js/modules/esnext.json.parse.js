@@ -1,7 +1,7 @@
 'use strict';
 var $ = require('../internals/export');
 var DESCRIPTORS = require('../internals/descriptors');
-var global = require('../internals/global');
+var globalThis = require('../internals/global-this');
 var getBuiltIn = require('../internals/get-built-in');
 var uncurryThis = require('../internals/function-uncurry-this');
 var call = require('../internals/function-call');
@@ -16,9 +16,9 @@ var fails = require('../internals/fails');
 var parseJSONString = require('../internals/parse-json-string');
 var NATIVE_SYMBOL = require('../internals/symbol-constructor-detection');
 
-var JSON = global.JSON;
-var Number = global.Number;
-var SyntaxError = global.SyntaxError;
+var JSON = globalThis.JSON;
+var Number = globalThis.Number;
+var SyntaxError = globalThis.SyntaxError;
 var nativeParse = JSON && JSON.parse;
 var enumerableOwnProperties = getBuiltIn('Object', 'keys');
 // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
@@ -30,7 +30,7 @@ var push = uncurryThis([].push);
 
 var IS_DIGIT = /^\d$/;
 var IS_NON_ZERO_DIGIT = /^[1-9]$/;
-var IS_NUMBER_START = /^(?:-|\d)$/;
+var IS_NUMBER_START = /^[\d-]$/;
 var IS_WHITESPACE = /^[\t\n\r ]$/;
 
 var PRIMITIVE = 0;
@@ -195,9 +195,9 @@ Context.prototype = {
     var i = startIndex;
     if (at(source, i) === '-') i++;
     if (at(source, i) === '0') i++;
-    else if (exec(IS_NON_ZERO_DIGIT, at(source, i))) i = this.skip(IS_DIGIT, ++i);
+    else if (exec(IS_NON_ZERO_DIGIT, at(source, i))) i = this.skip(IS_DIGIT, i + 1);
     else throw new SyntaxError('Failed to parse number at: ' + i);
-    if (at(source, i) === '.') i = this.skip(IS_DIGIT, ++i);
+    if (at(source, i) === '.') i = this.skip(IS_DIGIT, i + 1);
     if (at(source, i) === 'e' || at(source, i) === 'E') {
       i++;
       if (at(source, i) === '+' || at(source, i) === '-') i++;

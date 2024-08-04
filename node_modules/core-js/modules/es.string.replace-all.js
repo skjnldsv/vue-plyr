@@ -25,8 +25,7 @@ var max = Math.max;
 $({ target: 'String', proto: true }, {
   replaceAll: function replaceAll(searchValue, replaceValue) {
     var O = requireObjectCoercible(this);
-    var IS_REG_EXP, flags, replacer, string, searchString, functionalReplace, searchLength, advanceBy, replacement;
-    var position = 0;
+    var IS_REG_EXP, flags, replacer, string, searchString, functionalReplace, searchLength, advanceBy, position, replacement;
     var endOfLastMatch = 0;
     var result = '';
     if (!isNullOrUndefined(searchValue)) {
@@ -36,11 +35,8 @@ $({ target: 'String', proto: true }, {
         if (!~indexOf(flags, 'g')) throw new $TypeError('`.replaceAll` does not allow non-global regexes');
       }
       replacer = getMethod(searchValue, REPLACE);
-      if (replacer) {
-        return call(replacer, searchValue, O, replaceValue);
-      } else if (IS_PURE && IS_REG_EXP) {
-        return replace(toString(O), searchValue, replaceValue);
-      }
+      if (replacer) return call(replacer, searchValue, O, replaceValue);
+      if (IS_PURE && IS_REG_EXP) return replace(toString(O), searchValue, replaceValue);
     }
     string = toString(O);
     searchString = toString(searchValue);

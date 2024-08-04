@@ -1,19 +1,18 @@
 'use strict';
-var global = require('../internals/global');
+var globalThis = require('../internals/global-this');
 var NativePromiseConstructor = require('../internals/promise-native-constructor');
 var isCallable = require('../internals/is-callable');
 var isForced = require('../internals/is-forced');
 var inspectSource = require('../internals/inspect-source');
 var wellKnownSymbol = require('../internals/well-known-symbol');
-var IS_BROWSER = require('../internals/engine-is-browser');
-var IS_DENO = require('../internals/engine-is-deno');
+var ENVIRONMENT = require('../internals/environment');
 var IS_PURE = require('../internals/is-pure');
-var V8_VERSION = require('../internals/engine-v8-version');
+var V8_VERSION = require('../internals/environment-v8-version');
 
 var NativePromisePrototype = NativePromiseConstructor && NativePromiseConstructor.prototype;
 var SPECIES = wellKnownSymbol('species');
 var SUBCLASSING = false;
-var NATIVE_PROMISE_REJECTION_EVENT = isCallable(global.PromiseRejectionEvent);
+var NATIVE_PROMISE_REJECTION_EVENT = isCallable(globalThis.PromiseRejectionEvent);
 
 var FORCED_PROMISE_CONSTRUCTOR = isForced('Promise', function () {
   var PROMISE_CONSTRUCTOR_SOURCE = inspectSource(NativePromiseConstructor);
@@ -38,7 +37,7 @@ var FORCED_PROMISE_CONSTRUCTOR = isForced('Promise', function () {
     SUBCLASSING = promise.then(function () { /* empty */ }) instanceof FakePromise;
     if (!SUBCLASSING) return true;
   // Unhandled rejections tracking support, NodeJS Promise without it fails @@species test
-  } return !GLOBAL_CORE_JS_PROMISE && (IS_BROWSER || IS_DENO) && !NATIVE_PROMISE_REJECTION_EVENT;
+  } return !GLOBAL_CORE_JS_PROMISE && (ENVIRONMENT === 'BROWSER' || ENVIRONMENT === 'DENO') && !NATIVE_PROMISE_REJECTION_EVENT;
 });
 
 module.exports = {

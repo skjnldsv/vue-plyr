@@ -4,7 +4,7 @@ require('../modules/es.string.iterator');
 var $ = require('../internals/export');
 var DESCRIPTORS = require('../internals/descriptors');
 var USE_NATIVE_URL = require('../internals/url-constructor-detection');
-var global = require('../internals/global');
+var globalThis = require('../internals/global-this');
 var bind = require('../internals/function-bind-context');
 var uncurryThis = require('../internals/function-uncurry-this');
 var defineBuiltIn = require('../internals/define-built-in');
@@ -27,9 +27,9 @@ var getInternalURLState = InternalStateModule.getterFor('URL');
 var URLSearchParams = URLSearchParamsModule.URLSearchParams;
 var getInternalSearchParamsState = URLSearchParamsModule.getState;
 
-var NativeURL = global.URL;
-var TypeError = global.TypeError;
-var parseInt = global.parseInt;
+var NativeURL = globalThis.URL;
+var TypeError = globalThis.TypeError;
+var parseInt = globalThis.parseInt;
 var floor = Math.floor;
 var pow = Math.pow;
 var charAt = uncurryThis(''.charAt);
@@ -203,25 +203,25 @@ var findLongestZeroSequence = function (ipv6) {
       ++currLength;
     }
   }
-  if (currLength > maxLength) {
-    maxIndex = currStart;
-    maxLength = currLength;
-  }
-  return maxIndex;
+  return currLength > maxLength ? currStart : maxIndex;
 };
 
 // https://url.spec.whatwg.org/#host-serializing
 var serializeHost = function (host) {
   var result, index, compress, ignore0;
+
   // ipv4
   if (typeof host == 'number') {
     result = [];
     for (index = 0; index < 4; index++) {
       unshift(result, host % 256);
       host = floor(host / 256);
-    } return join(result, '.');
+    }
+    return join(result, '.');
+  }
+
   // ipv6
-  } else if (typeof host == 'object') {
+  if (typeof host == 'object') {
     result = '';
     compress = findLongestZeroSequence(host);
     for (index = 0; index < 8; index++) {
@@ -236,7 +236,9 @@ var serializeHost = function (host) {
       }
     }
     return '[' + result + ']';
-  } return host;
+  }
+
+  return host;
 };
 
 var C0ControlPercentEncodeSet = {};
