@@ -2,7 +2,7 @@ import { RawSourceMap, SourceMapGenerator } from 'source-map-js'
 
 import AtRule, { AtRuleProps } from './at-rule.js'
 import Comment, { CommentProps } from './comment.js'
-import Container, { ContainerProps } from './container.js'
+import Container, { ContainerProps, NewChild } from './container.js'
 import CssSyntaxError from './css-syntax-error.js'
 import Declaration, { DeclarationProps } from './declaration.js'
 import Document, { DocumentProps } from './document.js'
@@ -170,6 +170,7 @@ declare namespace postcss {
     LazyResult,
     list,
     Message,
+    NewChild,
     Node,
     NodeErrorOptions,
     NodeProps,
@@ -444,7 +445,9 @@ declare namespace postcss {
  * @param plugins PostCSS plugins.
  * @return Processor to process multiple CSS.
  */
-declare function postcss(plugins?: postcss.AcceptedPlugin[]): Processor
+declare function postcss(
+  plugins?: readonly postcss.AcceptedPlugin[]
+): Processor
 declare function postcss(...plugins: postcss.AcceptedPlugin[]): Processor
 
 export = postcss
