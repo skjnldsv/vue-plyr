@@ -1,5 +1,5 @@
 /**
-* vue v3.5.9
+* vue v3.5.10
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -647,12 +647,17 @@ function endBatch() {
     let e = batchedSub;
     let next;
     while (e) {
-      e.flags &= ~8;
+      if (!(e.flags & 1)) {
+        e.flags &= ~8;
+      }
       e = e.next;
     }
     e = batchedSub;
     batchedSub = void 0;
     while (e) {
+      next = e.next;
+      e.next = void 0;
+      e.flags &= ~8;
       if (e.flags & 1) {
         try {
           ;
@@ -661,8 +666,6 @@ function endBatch() {
           if (!error) error = err;
         }
       }
-      next = e.next;
-      e.next = void 0;
       e = next;
     }
   }
@@ -1996,6 +1999,10 @@ class ComputedRefImpl {
      * @internal
      */
     this.globalVersion = globalVersion - 1;
+    /**
+     * @internal
+     */
+    this.next = void 0;
     // for backwards compat
     this.effect = this;
     this["__v_isReadonly"] = !setter;
@@ -10518,7 +10525,7 @@ function isMemoSame(cached, memo) {
   return true;
 }
 
-const version = "3.5.9";
+const version = "3.5.10";
 const warn = warn$1 ;
 const ErrorTypeStrings = ErrorTypeStrings$1 ;
 const devtools = devtools$1 ;
@@ -11305,6 +11312,11 @@ const patchProp = (el, key, prevValue, nextValue, namespace, parentComponent) =>
     if (!el.tagName.includes("-") && (key === "value" || key === "checked" || key === "selected")) {
       patchAttr(el, key, nextValue, isSVG, parentComponent, key !== "value");
     }
+  } else if (
+    // #11081 force set props for possible async custom element
+    el._isVueCE && (/[A-Z]/.test(key) || !isString(nextValue))
+  ) {
+    patchDOMProp(el, camelize(key), nextValue);
   } else {
     if (key === "true-value") {
       el._trueValue = nextValue;
@@ -11345,13 +11357,7 @@ function shouldSetAsProp(el, key, value, isSVG) {
   if (isNativeOn(key) && isString(value)) {
     return false;
   }
-  if (key in el) {
-    return true;
-  }
-  if (el._isVueCE && (/[A-Z]/.test(key) || !isString(value))) {
-    return true;
-  }
-  return false;
+  return key in el;
 }
 
 const REMOVAL = {};
