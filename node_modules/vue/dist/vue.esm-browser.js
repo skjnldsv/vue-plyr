@@ -1,5 +1,5 @@
 /**
-* vue v3.5.10
+* vue v3.5.11
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -630,8 +630,14 @@ class ReactiveEffect {
 }
 let batchDepth = 0;
 let batchedSub;
-function batch(sub) {
+let batchedComputed;
+function batch(sub, isComputed = false) {
   sub.flags |= 8;
+  if (isComputed) {
+    sub.next = batchedComputed;
+    batchedComputed = sub;
+    return;
+  }
   sub.next = batchedSub;
   batchedSub = sub;
 }
@@ -642,20 +648,22 @@ function endBatch() {
   if (--batchDepth > 0) {
     return;
   }
+  if (batchedComputed) {
+    let e = batchedComputed;
+    batchedComputed = void 0;
+    while (e) {
+      const next = e.next;
+      e.next = void 0;
+      e.flags &= ~8;
+      e = next;
+    }
+  }
   let error;
   while (batchedSub) {
     let e = batchedSub;
-    let next;
-    while (e) {
-      if (!(e.flags & 1)) {
-        e.flags &= ~8;
-      }
-      e = e.next;
-    }
-    e = batchedSub;
     batchedSub = void 0;
     while (e) {
-      next = e.next;
+      const next = e.next;
       e.next = void 0;
       e.flags &= ~8;
       if (e.flags & 1) {
@@ -851,7 +859,6 @@ class Dep {
     /**
      * For object property deps cleanup
      */
-    this.target = void 0;
     this.map = void 0;
     this.key = void 0;
     /**
@@ -979,7 +986,6 @@ function track(target, type, key) {
     let dep = depsMap.get(key);
     if (!dep) {
       depsMap.set(key, dep = new Dep());
-      dep.target = target;
       dep.map = depsMap;
       dep.key = key;
     }
@@ -2015,7 +2021,7 @@ class ComputedRefImpl {
     this.flags |= 16;
     if (!(this.flags & 8) && // avoid infinite self recursion
     activeSub !== this) {
-      batch(this);
+      batch(this, true);
       return true;
     }
   }
@@ -2537,10 +2543,8 @@ function logError(err, type, contextVNode, throwInDev = true, throwInProd = fals
   }
 }
 
-let isFlushing = false;
-let isFlushPending = false;
 const queue = [];
-let flushIndex = 0;
+let flushIndex = -1;
 const pendingPostFlushCbs = [];
 let activePostFlushCbs = null;
 let postFlushIndex = 0;
@@ -2552,7 +2556,7 @@ function nextTick(fn) {
   return fn ? p.then(this ? fn.bind(this) : fn) : p;
 }
 function findInsertionIndex(id) {
-  let start = isFlushing ? flushIndex + 1 : 0;
+  let start = flushIndex + 1;
   let end = queue.length;
   while (start < end) {
     const middle = start + end >>> 1;
@@ -2581,8 +2585,7 @@ function queueJob(job) {
   }
 }
 function queueFlush() {
-  if (!isFlushing && !isFlushPending) {
-    isFlushPending = true;
+  if (!currentFlushPromise) {
     currentFlushPromise = resolvedPromise.then(flushJobs);
   }
 }
@@ -2599,7 +2602,7 @@ function queuePostFlushCb(cb) {
   }
   queueFlush();
 }
-function flushPreFlushCbs(instance, seen, i = isFlushing ? flushIndex + 1 : 0) {
+function flushPreFlushCbs(instance, seen, i = flushIndex + 1) {
   {
     seen = seen || /* @__PURE__ */ new Map();
   }
@@ -2655,8 +2658,6 @@ function flushPostFlushCbs(seen) {
 }
 const getId = (job) => job.id == null ? job.flags & 2 ? -1 : Infinity : job.id;
 function flushJobs(seen) {
-  isFlushPending = false;
-  isFlushing = true;
   {
     seen = seen || /* @__PURE__ */ new Map();
   }
@@ -2688,10 +2689,9 @@ function flushJobs(seen) {
         job.flags &= ~1;
       }
     }
-    flushIndex = 0;
+    flushIndex = -1;
     queue.length = 0;
     flushPostFlushCbs(seen);
-    isFlushing = false;
     currentFlushPromise = null;
     if (queue.length || pendingPostFlushCbs.length) {
       flushJobs(seen);
@@ -10525,7 +10525,7 @@ function isMemoSame(cached, memo) {
   return true;
 }
 
-const version = "3.5.10";
+const version = "3.5.11";
 const warn = warn$1 ;
 const ErrorTypeStrings = ErrorTypeStrings$1 ;
 const devtools = devtools$1 ;
