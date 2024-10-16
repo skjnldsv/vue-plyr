@@ -2,7 +2,7 @@ export type Formatter = (input: string | number | null | undefined) => string
 
 export interface Colors {
 	isColorSupported: boolean
-	
+
 	reset: Formatter
 	bold: Formatter
 	dim: Formatter
@@ -11,7 +11,7 @@ export interface Colors {
 	inverse: Formatter
 	hidden: Formatter
 	strikethrough: Formatter
-	
+
 	black: Formatter
 	red: Formatter
 	green: Formatter
@@ -21,7 +21,7 @@ export interface Colors {
 	cyan: Formatter
 	white: Formatter
 	gray: Formatter
-	
+
 	bgBlack: Formatter
 	bgRed: Formatter
 	bgGreen: Formatter
@@ -32,21 +32,20 @@ export interface Colors {
 	bgWhite: Formatter
 
 	blackBright: Formatter
-  redBright: Formatter
-  greenBright: Formatter
-  yellowBright: Formatter
-  blueBright: Formatter
-  magentaBright: Formatter
-  cyanBright: Formatter
-  whiteBright: Formatter
+	redBright: Formatter
+	greenBright: Formatter
+	yellowBright: Formatter
+	blueBright: Formatter
+	magentaBright: Formatter
+	cyanBright: Formatter
+	whiteBright: Formatter
 
 	bgBlackBright: Formatter
-  bgRedBright: Formatter
-  bgGreenBright: Formatter
-  bgYellowBright: Formatter
-  bgBlueBright: Formatter
-  bgMagentaBright: Formatter
-  bgCyanBright: Formatter
-  bgWhiteBright: Formatter
-
+	bgRedBright: Formatter
+	bgGreenBright: Formatter
+	bgYellowBright: Formatter
+	bgBlueBright: Formatter
+	bgMagentaBright: Formatter
+	bgCyanBright: Formatter
+	bgWhiteBright: Formatter
 }
