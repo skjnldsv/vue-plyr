@@ -18,6 +18,7 @@ type Plugin =
   | "deferredImportEvaluation"
   | "decoratorAutoAccessors"
   | "destructuringPrivate"
+  | "deprecatedImportAssert"
   | "doExpressions"
   | IF_BABEL_7<"dynamicImport">
   | "explicitResourceManagement"
@@ -53,7 +54,7 @@ type Plugin =
 type ParserPluginWithOptions =
   | ["decorators", DecoratorsPluginOptions]
   | ["estree", { classFeatures?: boolean }]
-  | ["importAttributes", { deprecatedAssertSyntax: boolean }]
+  | IF_BABEL_7<["importAttributes", { deprecatedAssertSyntax: boolean }]>
   | IF_BABEL_7<["moduleAttributes", { version: "may-2020" }]>
   | ["optionalChainingAssign", { version: "2023-07" }]
   | ["pipelineOperator", PipelineOperatorPluginOptions]
@@ -187,6 +188,13 @@ interface ParserOptions {
    * Useful when generating code and source maps from the ASTs of multiple input files.
    */
   sourceFilename?: string;
+
+  /**
+   * By default, all source indexes start from 0.
+   * You can provide a start index to alternatively start with.
+   * Useful for integration with other source tools.
+   */
+  startIndex?: number;
 
   /**
    * By default, the first line of code parsed is treated as line 1.
