@@ -1,5 +1,5 @@
 /**
-* vue v3.5.12
+* vue v3.5.13
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -144,10 +144,9 @@ var Vue = (function (exports) {
     return ret;
   }
   function stringifyStyle(styles) {
+    if (!styles) return "";
+    if (isString(styles)) return styles;
     let ret = "";
-    if (!styles || isString(styles)) {
-      return ret;
-    }
     for (const key in styles) {
       const value = styles[key];
       if (isString(value) || typeof value === "number") {
@@ -408,17 +407,21 @@ var Vue = (function (exports) {
     }
     stop(fromParent) {
       if (this._active) {
+        this._active = false;
         let i, l;
         for (i = 0, l = this.effects.length; i < l; i++) {
           this.effects[i].stop();
         }
+        this.effects.length = 0;
         for (i = 0, l = this.cleanups.length; i < l; i++) {
           this.cleanups[i]();
         }
+        this.cleanups.length = 0;
         if (this.scopes) {
           for (i = 0, l = this.scopes.length; i < l; i++) {
             this.scopes[i].stop(true);
           }
+          this.scopes.length = 0;
         }
         if (!this.detached && this.parent && !fromParent) {
           const last = this.parent.scopes.pop();
@@ -428,7 +431,6 @@ var Vue = (function (exports) {
           }
         }
         this.parent = void 0;
-        this._active = false;
       }
     }
   }
@@ -1194,6 +1196,7 @@ var Vue = (function (exports) {
       this._isShallow = _isShallow;
     }
     get(target, key, receiver) {
+      if (key === "__v_skip") return target["__v_skip"];
       const isReadonly2 = this._isReadonly, isShallow2 = this._isShallow;
       if (key === "__v_isReactive") {
         return !isReadonly2;
@@ -2030,7 +2033,7 @@ var Vue = (function (exports) {
     const scope = getCurrentScope();
     const watchHandle = () => {
       effect.stop();
-      if (scope) {
+      if (scope && scope.active) {
         remove(scope.effects, effect);
       }
     };
@@ -2990,11 +2993,32 @@ var Vue = (function (exports) {
           updateCssVars(n2, true);
         }
         if (isTeleportDeferred(n2.props)) {
-          queuePostRenderEffect(mountToTarget, parentSuspense);
+          queuePostRenderEffect(() => {
+            mountToTarget();
+            n2.el.__isMounted = true;
+          }, parentSuspense);
         } else {
           mountToTarget();
         }
       } else {
+        if (isTeleportDeferred(n2.props) && !n1.el.__isMounted) {
+          queuePostRenderEffect(() => {
+            TeleportImpl.process(
+              n1,
+              n2,
+              container,
+              anchor,
+              parentComponent,
+              parentSuspense,
+              namespace,
+              slotScopeIds,
+              optimized,
+              internals
+            );
+            delete n1.el.__isMounted;
+          }, parentSuspense);
+          return;
+        }
         n2.el = n1.el;
         n2.targetStart = n1.targetStart;
         const mainAnchor = n2.anchor = n1.anchor;
@@ -3300,10 +3324,9 @@ var Vue = (function (exports) {
         if (innerChild.type !== Comment) {
           setTransitionHooks(innerChild, enterHooks);
         }
-        const oldChild = instance.subTree;
-        const oldInnerChild = oldChild && getInnerChild$1(oldChild);
+        let oldInnerChild = instance.subTree && getInnerChild$1(instance.subTree);
         if (oldInnerChild && oldInnerChild.type !== Comment && !isSameVNodeType(innerChild, oldInnerChild) && recursiveGetSubtree(instance).type !== Comment) {
-          const leavingHooks = resolveTransitionHooks(
+          let leavingHooks = resolveTransitionHooks(
             oldInnerChild,
             rawProps,
             state,
@@ -3318,6 +3341,7 @@ var Vue = (function (exports) {
                 instance.update();
               }
               delete leavingHooks.afterLeave;
+              oldInnerChild = void 0;
             };
             return emptyPlaceholder(child);
           } else if (mode === "in-out" && innerChild.type !== Comment) {
@@ -3331,10 +3355,19 @@ var Vue = (function (exports) {
                 earlyRemove();
                 el[leaveCbKey] = void 0;
                 delete enterHooks.delayedLeave;
+                oldInnerChild = void 0;
               };
-              enterHooks.delayedLeave = delayedLeave;
+              enterHooks.delayedLeave = () => {
+                delayedLeave();
+                delete enterHooks.delayedLeave;
+                oldInnerChild = void 0;
+              };
             };
+          } else {
+            oldInnerChild = void 0;
           }
+        } else if (oldInnerChild) {
+          oldInnerChild = void 0;
         }
         return child;
       };
@@ -3639,6 +3672,9 @@ var Vue = (function (exports) {
       return;
     }
     if (isAsyncWrapper(vnode) && !isUnmount) {
+      if (vnode.shapeFlag & 512 && vnode.type.__asyncResolved && vnode.component.subTree.component) {
+        setRef(rawRef, oldRawRef, parentSuspense, vnode.component.subTree);
+      }
       return;
     }
     const refValue = vnode.shapeFlag & 4 ? getComponentPublicInstance(vnode.component) : vnode.el;
@@ -3903,7 +3939,7 @@ var Vue = (function (exports) {
               getContainerType(container),
               optimized
             );
-            if (isAsyncWrapper(vnode)) {
+            if (isAsyncWrapper(vnode) && !vnode.type.__asyncResolved) {
               let subTree;
               if (isFragmentStart) {
                 subTree = createVNode(Fragment);
@@ -4172,6 +4208,10 @@ Server rendered element contains fewer child nodes than client vdom.`
         getContainerType(container),
         slotScopeIds
       );
+      if (parentComponent) {
+        parentComponent.vnode.el = vnode.el;
+        updateHOCHostEl(parentComponent, vnode.el);
+      }
       return next;
     };
     const locateClosingAnchor = (node, open = "[", close = "]") => {
@@ -8574,7 +8614,7 @@ If you want to remount the same app, move your app creation logic into a factory
           }
           if (extraAttrs.length) {
             warn$1(
-              `Extraneous non-props attributes (${extraAttrs.join(", ")}) were passed to component but could not be automatically inherited because component renders fragment or text root nodes.`
+              `Extraneous non-props attributes (${extraAttrs.join(", ")}) were passed to component but could not be automatically inherited because component renders fragment or text or teleport root nodes.`
             );
           }
           if (eventAttrs.length) {
@@ -9357,9 +9397,9 @@ If you want to remount the same app, move your app creation logic into a factory
     currentBlock = blockStack[blockStack.length - 1] || null;
   }
   let isBlockTreeEnabled = 1;
-  function setBlockTracking(value) {
+  function setBlockTracking(value, inVOnce = false) {
     isBlockTreeEnabled += value;
-    if (value < 0 && currentBlock) {
+    if (value < 0 && currentBlock && inVOnce) {
       currentBlock.hasOnce = true;
     }
   }
@@ -10369,7 +10409,7 @@ Component that was made reactive: `,
     return true;
   }
 
-  const version = "3.5.12";
+  const version = "3.5.13";
   const warn = warn$1 ;
   const ErrorTypeStrings = ErrorTypeStrings$1 ;
   const devtools = devtools$1 ;
@@ -10541,7 +10581,8 @@ Component that was made reactive: `,
       onAppear = onEnter,
       onAppearCancelled = onEnterCancelled
     } = baseProps;
-    const finishEnter = (el, isAppear, done) => {
+    const finishEnter = (el, isAppear, done, isCancelled) => {
+      el._enterCancelled = isCancelled;
       removeTransitionClass(el, isAppear ? appearToClass : enterToClass);
       removeTransitionClass(el, isAppear ? appearActiveClass : enterActiveClass);
       done && done();
@@ -10584,8 +10625,13 @@ Component that was made reactive: `,
         el._isLeaving = true;
         const resolve = () => finishLeave(el, done);
         addTransitionClass(el, leaveFromClass);
-        addTransitionClass(el, leaveActiveClass);
-        forceReflow();
+        if (!el._enterCancelled) {
+          forceReflow();
+          addTransitionClass(el, leaveActiveClass);
+        } else {
+          addTransitionClass(el, leaveActiveClass);
+          forceReflow();
+        }
         nextFrame(() => {
           if (!el._isLeaving) {
             return;
@@ -10599,11 +10645,11 @@ Component that was made reactive: `,
         callHook(onLeave, [el, resolve]);
       },
       onEnterCancelled(el) {
-        finishEnter(el, false);
+        finishEnter(el, false, void 0, true);
         callHook(onEnterCancelled, [el]);
       },
       onAppearCancelled(el) {
-        finishEnter(el, true);
+        finishEnter(el, true, void 0, true);
         callHook(onAppearCancelled, [el]);
       },
       onLeaveCancelled(el) {
@@ -10816,10 +10862,11 @@ Component that was made reactive: `,
       }
       updateTeleports(vars);
     };
-    onBeforeMount(() => {
-      watchPostEffect(setVars);
+    onBeforeUpdate(() => {
+      queuePostFlushCb(setVars);
     });
     onMounted(() => {
+      watch(setVars, NOOP, { flush: "post" });
       const ob = new MutationObserver(setVars);
       ob.observe(instance.subTree.el.parentNode, { childList: true });
       onUnmounted(() => ob.disconnect());
@@ -11426,6 +11473,8 @@ Expected function or array of functions, received type ${typeof value}.`
           this._update();
         }
         if (shouldReflect) {
+          const ob = this._ob;
+          ob && ob.disconnect();
           if (val === true) {
             this.setAttribute(hyphenate(key), "");
           } else if (typeof val === "string" || typeof val === "number") {
@@ -11433,6 +11482,7 @@ Expected function or array of functions, received type ${typeof value}.`
           } else if (!val) {
             this.removeAttribute(hyphenate(key));
           }
+          ob && ob.observe(this, { attributes: true });
         }
       }
     }
