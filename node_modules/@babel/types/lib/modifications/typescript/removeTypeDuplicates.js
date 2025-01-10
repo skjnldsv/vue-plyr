@@ -34,17 +34,18 @@ function removeTypeDuplicates(nodesIn) {
       }
       continue;
     }
-    if ((0, _index.isTSTypeReference)(node) && node.typeParameters) {
+    const typeArgumentsKey = "typeParameters";
+    if ((0, _index.isTSTypeReference)(node) && node[typeArgumentsKey]) {
+      const typeArguments = node[typeArgumentsKey];
       const name = getQualifiedName(node.typeName);
       if (generics.has(name)) {
         let existing = generics.get(name);
-        if (existing.typeParameters) {
-          if (node.typeParameters) {
-            existing.typeParameters.params.push(...node.typeParameters.params);
-            existing.typeParameters.params = removeTypeDuplicates(existing.typeParameters.params);
-          }
+        const existingTypeArguments = existing[typeArgumentsKey];
+        if (existingTypeArguments) {
+          existingTypeArguments.params.push(...typeArguments.params);
+          existingTypeArguments.params = removeTypeDuplicates(existingTypeArguments.params);
         } else {
-          existing = node.typeParameters;
+          existing = typeArguments;
         }
       } else {
         generics.set(name, node);
