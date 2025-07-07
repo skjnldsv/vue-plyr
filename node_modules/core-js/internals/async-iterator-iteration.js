@@ -1,5 +1,5 @@
 'use strict';
-// https://github.com/tc39/proposal-iterator-helpers
+// https://github.com/tc39/proposal-async-iterator-helpers
 // https://github.com/tc39/proposal-array-from-async
 var call = require('../internals/function-call');
 var aCallable = require('../internals/a-callable');
@@ -82,9 +82,14 @@ var createMethod = function (TYPE) {
 };
 
 module.exports = {
+  // `AsyncIterator.prototype.toArray` / `Array.fromAsync` methods
   toArray: createMethod(0),
+  // `AsyncIterator.prototype.forEach` method
   forEach: createMethod(1),
+  // `AsyncIterator.prototype.every` method
   every: createMethod(2),
+  // `AsyncIterator.prototype.some` method
   some: createMethod(3),
+  // `AsyncIterator.prototype.find` method
   find: createMethod(4)
 };
