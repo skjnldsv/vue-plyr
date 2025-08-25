@@ -1,5 +1,5 @@
 /**
-* vue v3.5.19
+* vue v3.5.20
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -1167,7 +1167,7 @@ var Vue = (function (exports) {
     join(separator) {
       return reactiveReadArray(this).join(separator);
     },
-    // keys() iterator only reads `length`, no optimisation required
+    // keys() iterator only reads `length`, no optimization required
     lastIndexOf(...args) {
       return searchProxy(this, "lastIndexOf", args);
     },
@@ -1519,7 +1519,7 @@ var Vue = (function (exports) {
       get size() {
         const target = this["__v_raw"];
         !readonly && track(toRaw(target), "iterate", ITERATE_KEY);
-        return Reflect.get(target, "size", target);
+        return target.size;
       },
       has(key) {
         const target = this["__v_raw"];
@@ -10584,7 +10584,7 @@ Component that was made reactive: `,
     return true;
   }
 
-  const version = "3.5.19";
+  const version = "3.5.20";
   const warn = warn$1 ;
   const ErrorTypeStrings = ErrorTypeStrings$1 ;
   const devtools = devtools$1 ;
@@ -10972,6 +10972,8 @@ Component that was made reactive: `,
   const vShowOriginalDisplay = Symbol("_vod");
   const vShowHidden = Symbol("_vsh");
   const vShow = {
+    // used for prop mismatch check during hydration
+    name: "show",
     beforeMount(el, { value }, { transition }) {
       el[vShowOriginalDisplay] = el.style.display === "none" ? "" : el.style.display;
       if (transition && value) {
@@ -11005,9 +11007,6 @@ Component that was made reactive: `,
       setDisplay(el, value);
     }
   };
-  {
-    vShow.name = "show";
-  }
   function setDisplay(el, value) {
     el.style.display = value ? el[vShowOriginalDisplay] : "none";
     el[vShowHidden] = !value;
