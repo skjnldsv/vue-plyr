@@ -1,41 +1,49 @@
-/* eslint-disable import/no-extraneous-dependencies */
-// ==========================================================================
-// Publish a version to CDN and demo
-// ==========================================================================
-/* eslint no-console: "off" */
+import { readFileSync } from 'node:fs';
+import path, { join } from 'node:path';
+import process from 'node:process';
+import { fileURLToPath } from 'node:url';
+import { S3Client } from '@aws-sdk/client-s3';
+import aws from 'aws-sdk';
+import { bold, cyan, green } from 'colorette';
+import log from 'fancy-log';
+import gitbranch from 'git-branch';
+import gulp from 'gulp';
+import open from 'gulp-open';
+import rename from 'gulp-rename';
+import replace from 'gulp-replace';
+import size from 'gulp-size';
 
-const path = require('path');
-const gulp = require('gulp');
-// Utils
-const gitbranch = require('git-branch');
-const rename = require('gulp-rename');
-const replace = require('gulp-replace');
-const { green, cyan, bold } = require('colorette');
-const log = require('fancy-log');
-const open = require('gulp-open');
-const size = require('gulp-size');
-// Deployment
-const aws = require('aws-sdk');
-const publish = require('gulp-awspublish');
-// Configs
-const pkg = require('../package.json');
-const deploy = require('../deploy.json');
+import { publish } from './utils/publish.js';
+import 'dotenv/config';
+
+// Convert `import.meta.url` to `__filename` and `__dirname`
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const pkg = JSON.parse(readFileSync(join(path.resolve(), 'package.json'), 'utf-8'));
+const config = JSON.parse(readFileSync(join(path.resolve(), 'deploy.json'), 'utf-8'));
+
 // Info from package
 const { version } = pkg;
 const minSuffix = '.min';
 
 // Get AWS config
-Object.values(deploy).forEach((target) => {
-  Object.assign(target, {
-    publisher: publish.create({
-      region: target.region,
-      params: {
-        Bucket: target.bucket,
+const jobs = Object.fromEntries(Object.entries(config).map(([name, options]) => [name, {
+  ...options,
+  client: options.type === 'r2'
+    ? new S3Client({
+      region: 'auto',
+      credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
       },
+      endpoint: `https://${process.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    })
+    : new S3Client({
+      region: options.region,
       credentials: new aws.SharedIniFileCredentials({ profile: 'plyr' }),
     }),
-  });
-});
+}]));
 
 // Paths
 const root = path.join(__dirname, '..');
@@ -55,7 +63,8 @@ const paths = {
 const currentBranch = (() => {
   try {
     return gitbranch.sync();
-  } catch (_) {
+  }
+  catch {
     return null;
   }
 })();
@@ -79,49 +88,39 @@ const options = {
       'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
     },
   },
-  symlinks(ver, filename) {
-    return {
-      headers: {
-        // http://stackoverflow.com/questions/2272835/amazon-s3-object-redirect
-        'x-amz-website-redirect-location': `/${ver}/${filename}`,
-        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-      },
-    };
-  },
 };
 
 // Size plugin
 const sizeOptions = { showFiles: true, gzip: true };
 
-const regex =
-  '(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*).(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?';
+const regex = '(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-[\\da-z\\-]+(?:\\.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:\\.[\\da-z\\-]+)*)?';
 const semver = new RegExp(`v${regex}`, 'gi');
-const localPath = new RegExp('(../)?dist/', 'gi');
-const versionPath = `https://${deploy.cdn.domain}/${version}/`;
-const cdnpath = new RegExp(`${deploy.cdn.domain}/${regex}/`, 'gi');
+const localPath = /(..\/)?dist\//gi;
+const versionPath = `https://${jobs.cdn.domain}/${version}/`;
+const cdnPath = new RegExp(`${jobs.cdn.domain}/${regex}/`, 'gi');
 
 const renameFile = rename((p) => {
-  p.basename = p.basename.replace(minSuffix, ''); // eslint-disable-line
-  p.dirname = p.dirname.replace('.', version); // eslint-disable-line
+  p.basename = p.basename.replace(minSuffix, '');
+  p.dirname = p.dirname.replace('.', version);
 });
 
 // Check we're on the correct branch to deploy
-const canDeploy = () => {
+function canDeploy() {
   if (![branch.isMaster, branch.isBeta].some(Boolean)) {
     console.error(`Must be on an allowed branch to publish! (current: ${branch.current})`);
     return false;
   }
 
   return true;
-};
+}
 
-gulp.task('version', (done) => {
+export function prepare(done) {
   if (!canDeploy()) {
     done();
     return null;
   }
 
-  const { domain } = deploy.cdn;
+  const { domain } = jobs.cdn;
 
   log(`Updating version in files to ${green(bold(version))}...`);
 
@@ -130,72 +129,55 @@ gulp.task('version', (done) => {
 
   return gulp
     .src(
-      files.map((file) => path.join(root, `src/js/${file}`)),
+      files.map(file => path.join(root, `src/js/${file}`)),
       { base: '.' },
     )
     .pipe(replace(semver, `v${version}`))
-    .pipe(replace(cdnpath, `${domain}/${version}/`))
+    .pipe(replace(cdnPath, `${domain}/${version}/`))
     .pipe(gulp.dest('./'));
-});
+}
 
-// Publish version to CDN bucket
-gulp.task('cdn', (done) => {
+function cdn(done) {
   if (!canDeploy()) {
     done();
     return null;
   }
 
-  const { domain, publisher } = deploy.cdn;
-
-  if (!publisher) {
-    throw new Error('No publisher instance. Check AWS configuration.');
-  }
+  const { domain, client, bucket } = jobs.cdn;
 
   log(`Uploading ${green(bold(pkg.version))} to ${cyan(domain)}...`);
 
   // Upload to CDN
-  return (
-    gulp
-      .src(paths.upload)
-      .pipe(renameFile)
-      // Remove min suffix from source map URL
-      .pipe(
-        replace(
-          /sourceMappingURL=([\w-?.]+)/,
-          (match, filename) => `sourceMappingURL=${filename.replace(minSuffix, '')}`,
-        ),
-      )
-      .pipe(size(sizeOptions))
-      .pipe(replace(localPath, versionPath))
-      .pipe(publisher.publish(options.cdn.headers))
-      .pipe(publish.reporter())
-  );
-});
+  return gulp
+    .src(paths.upload)
+    .pipe(renameFile)
+    .pipe(
+      replace(
+        /sourceMappingURL=([\w\-?.]+)/,
+        (_, filename) => `sourceMappingURL=${filename.replace(minSuffix, '')}`,
+      ),
+    )
+    .pipe(size(sizeOptions))
+    .pipe(replace(localPath, versionPath))
+    .pipe(publish(client, bucket, options.cdn.headers));
+}
 
-// Publish to demo bucket
-gulp.task('demo', (done) => {
+function demo(done) {
   if (!canDeploy()) {
     done();
     return null;
   }
 
-  const { publisher } = deploy.demo;
-  const { domain } = deploy.cdn;
-
-  if (!publisher) {
-    throw new Error('No publisher instance. Check AWS configuration.');
-  }
-
+  const { client, bucket, domain } = jobs.demo;
   log(`Uploading ${green(bold(pkg.version))} to ${cyan(domain)}...`);
 
   // Replace versioned files in README.md
   gulp
     .src([`${root}/README.md`])
-    .pipe(replace(cdnpath, `${domain}/${version}/`))
+    .pipe(replace(cdnPath, `${jobs.cdn.domain}/${version}/`))
     .pipe(gulp.dest(root));
 
   // Replace local file paths with remote paths in demo HTML
-  // e.g. "../dist/plyr.js" to "https://cdn.plyr.io/x.x.x/plyr.js"
   const index = `${paths.demo}index.html`;
   const error = `${paths.demo}error.html`;
   const pages = [index];
@@ -210,25 +192,21 @@ gulp.task('demo', (done) => {
     .pipe(
       rename((p) => {
         if (options.demo.uploadPath) {
-          // eslint-disable-next-line no-param-reassign
           p.dirname += options.demo.uploadPath;
         }
       }),
     )
-    .pipe(publisher.publish(options.demo.headers))
-    .pipe(publish.reporter());
-});
+    .pipe(publish(client, bucket, options.demo.headers));
+}
 
-// Open the demo site to check it's ok
-gulp.task('open', () => {
-  const { domain } = deploy.demo;
+function preview() {
+  const { domain } = jobs.demo;
 
   return gulp.src(__filename).pipe(
     open({
       uri: `https://${domain}/${branch.isBeta ? 'beta' : ''}`,
     }),
   );
-});
+}
 
-// Do everything
-gulp.task('deploy', gulp.series('cdn', 'demo', 'open'));
+export const deploy = gulp.series(cdn, demo, preview);

@@ -1,5 +1,26 @@
 # Changelog
 
+### v3.8.2
+
+- Add missing types export in package.json.
+
+### v3.8.1
+
+- Fix exports-related regression in 3.8.0. Sorry!
+
+### v3.8.0
+
+- Add @babel/plugin-transform-nullish-coalescing-operator and @rollup/plugin-babel (#2783)
+- Fix #2799 -- drop recommendation of polyfill.io
+- Add Mux as an example in the demo (#2859)
+- Fixed captions when storage has been disabled (#2813)
+- CORS support for preview thumbnails (#2777)
+- fix:progress offset (#2750)
+- docs: fix Koel's tagline and URL (#2857)
+- fix: Set PIP support based on the Picture in Picture API (#2849)
+- docs: update the default value of iconUrl (#2734)
+- housekeeping: update dev deps for build etc.
+
 ### v3.7.8
 
 - Feat: Minor demo style tweaks

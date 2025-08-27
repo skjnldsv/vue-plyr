@@ -2,7 +2,7 @@
 // Gulp build script
 // ==========================================================================
 
-const gulp = require('gulp');
-const HubRegistry = require('gulp-hub');
+export { default } from './tasks/build.js';
 
-gulp.registry(new HubRegistry(['tasks/*.js']));
+export * from './tasks/build.js';
+export * from './tasks/deploy.js';

@@ -24,8 +24,10 @@ function parseId(url) {
     return url;
   }
 
+  // eslint-disable-next-line regexp/optimal-quantifier-concatenation
   const regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
-  return url.match(regex) ? RegExp.$2 : url;
+  const match = url.match(regex);
+  return match ? match[2] : url;
 }
 
 // Try to extract a hash for private videos from the URL
@@ -37,7 +39,7 @@ function parseHash(url) {
    *  - video/{id}/{hash}
    * If matched, the hash is available in capture group 4
    */
-  const regex = /^.*(vimeo.com\/|video\/)(\d+)(\?.*&*h=|\/)+([\d,a-f]+)/;
+  const regex = /^.*(vimeo.com\/|video\/)(\d+)(\?.*h=|\/)+([\d,a-f]+)/;
   const found = url.match(regex);
 
   return found && found.length === 5 ? found[4] : null;
@@ -64,7 +66,7 @@ const vimeo = {
     // Set speed options from config
     player.options.speed = player.config.speed.options;
 
-    // Set intial ratio
+    // Set initial ratio
     setAspectRatio.call(player);
 
     // Load the SDK if not already
@@ -76,7 +78,8 @@ const vimeo = {
         .catch((error) => {
           player.debug.warn('Vimeo SDK (player.js) failed to load', error);
         });
-    } else {
+    }
+    else {
       vimeo.ready.call(player);
     }
   },
@@ -94,7 +97,8 @@ const vimeo = {
       source = player.media.getAttribute(player.config.attributes.embed.id);
       // hash can also be set as attribute on the <div>
       hash = player.media.getAttribute(player.config.attributes.embed.hash);
-    } else {
+    }
+    else {
       hash = parseHash(source);
     }
     const hashParam = hash ? { h: hash } : {};
@@ -139,9 +143,10 @@ const vimeo = {
     if (premium || !config.customControls) {
       iframe.setAttribute('data-poster', player.poster);
       player.media = replaceElement(iframe, player.media);
-    } else {
+    }
+    else {
       const wrapper = createElement('div', {
-        class: player.config.classNames.embedContainer,
+        'class': player.config.classNames.embedContainer,
         'data-poster': player.poster,
       });
       wrapper.appendChild(iframe);
@@ -349,7 +354,7 @@ const vimeo = {
     });
 
     player.embed.on('cuechange', ({ cues = [] }) => {
-      const strippedCues = cues.map((cue) => stripHTML(cue.text));
+      const strippedCues = cues.map(cue => stripHTML(cue.text));
       captions.updateCues.call(player, strippedCues);
     });
 
@@ -399,7 +404,7 @@ const vimeo = {
       triggerEvent.call(player, player.media, 'progress');
 
       // Check all loaded
-      if (parseInt(data.percent, 10) === 1) {
+      if (Number.parseInt(data.percent, 10) === 1) {
         triggerEvent.call(player, player.media, 'canplaythrough');
       }
 
