@@ -1,12 +1,11 @@
 /**
-* vue v3.5.20
+* vue v3.5.21
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
 var Vue = (function (exports) {
   'use strict';
 
-  /*! #__NO_SIDE_EFFECTS__ */
   // @__NO_SIDE_EFFECTS__
   function makeMap(str) {
     const map = /* @__PURE__ */ Object.create(null);
@@ -64,10 +63,10 @@ var Vue = (function (exports) {
       return hit || (cache[str] = fn(str));
     });
   };
-  const camelizeRE = /-(\w)/g;
+  const camelizeRE = /-\w/g;
   const camelize = cacheStringFunction(
     (str) => {
-      return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : "");
+      return str.replace(camelizeRE, (c) => c.slice(1).toUpperCase());
     }
   );
   const hyphenateRE = /\B([A-Z])/g;
@@ -2230,11 +2229,11 @@ var Vue = (function (exports) {
     if (depth <= 0 || !isObject(value) || value["__v_skip"]) {
       return value;
     }
-    seen = seen || /* @__PURE__ */ new Set();
-    if (seen.has(value)) {
+    seen = seen || /* @__PURE__ */ new Map();
+    if ((seen.get(value) || 0) >= depth) {
       return value;
     }
-    seen.add(value);
+    seen.set(value, depth);
     depth--;
     if (isRef(value)) {
       traverse(value.value, depth, seen);
@@ -2696,11 +2695,14 @@ var Vue = (function (exports) {
   let isHmrUpdating = false;
   const hmrDirtyComponents = /* @__PURE__ */ new Map();
   {
-    getGlobalThis().__VUE_HMR_RUNTIME__ = {
-      createRecord: tryWrap(createRecord),
-      rerender: tryWrap(rerender),
-      reload: tryWrap(reload)
-    };
+    const g = getGlobalThis();
+    if (!g.__VUE_HMR_RUNTIME__) {
+      g.__VUE_HMR_RUNTIME__ = {
+        createRecord: tryWrap(createRecord),
+        rerender: tryWrap(rerender),
+        reload: tryWrap(reload)
+      };
+    }
   }
   const map = /* @__PURE__ */ new Map();
   function registerHMR(instance) {
@@ -2773,10 +2775,12 @@ var Vue = (function (exports) {
         dirtyInstances.delete(instance);
       } else if (instance.parent) {
         queueJob(() => {
-          isHmrUpdating = true;
-          instance.parent.update();
-          isHmrUpdating = false;
-          dirtyInstances.delete(instance);
+          if (!(instance.job.flags & 8)) {
+            isHmrUpdating = true;
+            instance.parent.update();
+            isHmrUpdating = false;
+            dirtyInstances.delete(instance);
+          }
         });
       } else if (instance.appContext.reload) {
         instance.appContext.reload();
@@ -2880,7 +2884,6 @@ var Vue = (function (exports) {
       _devtoolsComponentRemoved(component);
     }
   };
-  /*! #__NO_SIDE_EFFECTS__ */
   // @__NO_SIDE_EFFECTS__
   function createDevtoolsComponentHook(hook) {
     return (component) => {
@@ -3278,26 +3281,34 @@ var Vue = (function (exports) {
   function hydrateTeleport(node, vnode, parentComponent, parentSuspense, slotScopeIds, optimized, {
     o: { nextSibling, parentNode, querySelector, insert, createText }
   }, hydrateChildren) {
+    function hydrateDisabledTeleport(node2, vnode2, targetStart, targetAnchor) {
+      vnode2.anchor = hydrateChildren(
+        nextSibling(node2),
+        vnode2,
+        parentNode(node2),
+        parentComponent,
+        parentSuspense,
+        slotScopeIds,
+        optimized
+      );
+      vnode2.targetStart = targetStart;
+      vnode2.targetAnchor = targetAnchor;
+    }
     const target = vnode.target = resolveTarget(
       vnode.props,
       querySelector
     );
+    const disabled = isTeleportDisabled(vnode.props);
     if (target) {
-      const disabled = isTeleportDisabled(vnode.props);
       const targetNode = target._lpa || target.firstChild;
       if (vnode.shapeFlag & 16) {
         if (disabled) {
-          vnode.anchor = hydrateChildren(
-            nextSibling(node),
+          hydrateDisabledTeleport(
+            node,
             vnode,
-            parentNode(node),
-            parentComponent,
-            parentSuspense,
-            slotScopeIds,
-            optimized
+            targetNode,
+            targetNode && nextSibling(targetNode)
           );
-          vnode.targetStart = targetNode;
-          vnode.targetAnchor = targetNode && nextSibling(targetNode);
         } else {
           vnode.anchor = nextSibling(node);
           let targetAnchor = targetNode;
@@ -3328,6 +3339,10 @@ var Vue = (function (exports) {
         }
       }
       updateCssVars(vnode, disabled);
+    } else if (disabled) {
+      if (vnode.shapeFlag & 16) {
+        hydrateDisabledTeleport(node, vnode, node, nextSibling(node));
+      }
     }
     return vnode.anchor && nextSibling(vnode.anchor);
   }
@@ -3439,7 +3454,7 @@ var Vue = (function (exports) {
           setTransitionHooks(innerChild, enterHooks);
         }
         let oldInnerChild = instance.subTree && getInnerChild$1(instance.subTree);
-        if (oldInnerChild && oldInnerChild.type !== Comment && !isSameVNodeType(innerChild, oldInnerChild) && recursiveGetSubtree(instance).type !== Comment) {
+        if (oldInnerChild && oldInnerChild.type !== Comment && !isSameVNodeType(oldInnerChild, innerChild) && recursiveGetSubtree(instance).type !== Comment) {
           let leavingHooks = resolveTransitionHooks(
             oldInnerChild,
             rawProps,
@@ -3719,7 +3734,6 @@ var Vue = (function (exports) {
     return ret;
   }
 
-  /*! #__NO_SIDE_EFFECTS__ */
   // @__NO_SIDE_EFFECTS__
   function defineComponent(options, extraOptions) {
     return isFunction(options) ? (
@@ -3772,6 +3786,7 @@ var Vue = (function (exports) {
     return ret;
   }
 
+  const pendingSetRefMap = /* @__PURE__ */ new WeakMap();
   function setRef(rawRef, oldRawRef, parentSuspense, vnode, isUnmount = false) {
     if (isArray(rawRef)) {
       rawRef.forEach(
@@ -3821,6 +3836,7 @@ var Vue = (function (exports) {
       return !knownTemplateRefs.has(ref2);
     };
     if (oldRef != null && oldRef !== ref) {
+      invalidatePendingSetRef(oldRawRef);
       if (isString(oldRef)) {
         refs[oldRef] = null;
         if (canSetSetupRef(oldRef)) {
@@ -3878,14 +3894,27 @@ var Vue = (function (exports) {
           }
         };
         if (value) {
-          doSet.id = -1;
-          queuePostRenderEffect(doSet, parentSuspense);
+          const job = () => {
+            doSet();
+            pendingSetRefMap.delete(rawRef);
+          };
+          job.id = -1;
+          pendingSetRefMap.set(rawRef, job);
+          queuePostRenderEffect(job, parentSuspense);
         } else {
+          invalidatePendingSetRef(rawRef);
           doSet();
         }
       } else {
         warn$1("Invalid template ref type:", ref, `(${typeof ref})`);
       }
+    }
+  }
+  function invalidatePendingSetRef(rawRef) {
+    const pendingSetRef = pendingSetRefMap.get(rawRef);
+    if (pendingSetRef) {
+      pendingSetRef.flags |= 8;
+      pendingSetRefMap.delete(rawRef);
     }
   }
 
@@ -4620,7 +4649,6 @@ Server rendered element contains fewer child nodes than client vdom.`
   }
 
   const isAsyncWrapper = (i) => !!i.type.__asyncLoader;
-  /*! #__NO_SIDE_EFFECTS__ */
   // @__NO_SIDE_EFFECTS__
   function defineAsyncComponent(source) {
     if (isFunction(source)) {
@@ -8621,8 +8649,9 @@ If you want to remount the same app, move your app creation logic into a factory
       );
     }
   }
+  const mixinEmitsCache = /* @__PURE__ */ new WeakMap();
   function normalizeEmitsOptions(comp, appContext, asMixin = false) {
-    const cache = appContext.emitsCache;
+    const cache = asMixin ? mixinEmitsCache : appContext.emitsCache;
     const cached = cache.get(comp);
     if (cached !== void 0) {
       return cached;
@@ -9070,7 +9099,7 @@ If you want to remount the same app, move your app creation logic into a factory
     const { activeBranch, pendingBranch, isInFallback, isHydrating } = suspense;
     if (pendingBranch) {
       suspense.pendingBranch = newBranch;
-      if (isSameVNodeType(newBranch, pendingBranch)) {
+      if (isSameVNodeType(pendingBranch, newBranch)) {
         patch(
           pendingBranch,
           newBranch,
@@ -9141,7 +9170,7 @@ If you want to remount the same app, move your app creation logic into a factory
             );
             setActiveBranch(suspense, newFallback);
           }
-        } else if (activeBranch && isSameVNodeType(newBranch, activeBranch)) {
+        } else if (activeBranch && isSameVNodeType(activeBranch, newBranch)) {
           patch(
             activeBranch,
             newBranch,
@@ -9172,7 +9201,7 @@ If you want to remount the same app, move your app creation logic into a factory
         }
       }
     } else {
-      if (activeBranch && isSameVNodeType(newBranch, activeBranch)) {
+      if (activeBranch && isSameVNodeType(activeBranch, newBranch)) {
         patch(
           activeBranch,
           newBranch,
@@ -10315,7 +10344,7 @@ Component that was made reactive: `,
       return instance.proxy;
     }
   }
-  const classifyRE = /(?:^|[-_])(\w)/g;
+  const classifyRE = /(?:^|[-_])\w/g;
   const classify = (str) => str.replace(classifyRE, (c) => c.toUpperCase()).replace(/[-_]/g, "");
   function getComponentName(Component, includeInferred = true) {
     return isFunction(Component) ? Component.displayName || Component.name : Component.name || includeInferred && Component.__name;
@@ -10358,15 +10387,23 @@ Component that was made reactive: `,
   };
 
   function h(type, propsOrChildren, children) {
+    const doCreateVNode = (type2, props, children2) => {
+      setBlockTracking(-1);
+      try {
+        return createVNode(type2, props, children2);
+      } finally {
+        setBlockTracking(1);
+      }
+    };
     const l = arguments.length;
     if (l === 2) {
       if (isObject(propsOrChildren) && !isArray(propsOrChildren)) {
         if (isVNode(propsOrChildren)) {
-          return createVNode(type, null, [propsOrChildren]);
+          return doCreateVNode(type, null, [propsOrChildren]);
         }
-        return createVNode(type, propsOrChildren);
+        return doCreateVNode(type, propsOrChildren);
       } else {
-        return createVNode(type, null, propsOrChildren);
+        return doCreateVNode(type, null, propsOrChildren);
       }
     } else {
       if (l > 3) {
@@ -10374,7 +10411,7 @@ Component that was made reactive: `,
       } else if (l === 3 && isVNode(children)) {
         children = [children];
       }
-      return createVNode(type, propsOrChildren, children);
+      return doCreateVNode(type, propsOrChildren, children);
     }
   }
 
@@ -10584,7 +10621,7 @@ Component that was made reactive: `,
     return true;
   }
 
-  const version = "3.5.20";
+  const version = "3.5.21";
   const warn = warn$1 ;
   const ErrorTypeStrings = ErrorTypeStrings$1 ;
   const devtools = devtools$1 ;
@@ -10931,7 +10968,7 @@ Component that was made reactive: `,
       type = timeout > 0 ? transitionTimeout > animationTimeout ? TRANSITION$1 : ANIMATION : null;
       propCount = type ? type === TRANSITION$1 ? transitionDurations.length : animationDurations.length : 0;
     }
-    const hasTransform = type === TRANSITION$1 && /\b(transform|all)(,|$)/.test(
+    const hasTransform = type === TRANSITION$1 && /\b(?:transform|all)(?:,|$)/.test(
       getStyleProperties(`${TRANSITION$1}Property`).toString()
     );
     return {
@@ -11085,7 +11122,7 @@ Component that was made reactive: `,
     }
   }
 
-  const displayRE = /(^|;)\s*display\s*:/;
+  const displayRE = /(?:^|;)\s*display\s*:/;
   function patchStyle(el, prev, next) {
     const style = el.style;
     const isCssString = isString(next);
@@ -11408,11 +11445,10 @@ Expected function or array of functions, received type ${typeof value}.`
   }
 
   const REMOVAL = {};
-  /*! #__NO_SIDE_EFFECTS__ */
   // @__NO_SIDE_EFFECTS__
   function defineCustomElement(options, extraOptions, _createApp) {
-    const Comp = defineComponent(options, extraOptions);
-    if (isPlainObject(Comp)) extend(Comp, extraOptions);
+    let Comp = defineComponent(options, extraOptions);
+    if (isPlainObject(Comp)) Comp = extend({}, Comp, extraOptions);
     class VueCustomElement extends VueElement {
       constructor(initialProps) {
         super(Comp, initialProps, _createApp);
@@ -11421,7 +11457,6 @@ Expected function or array of functions, received type ${typeof value}.`
     VueCustomElement.def = Comp;
     return VueCustomElement;
   }
-
   const defineSSRCustomElement = (/* @__NO_SIDE_EFFECTS__ */ (options, extraOptions) => {
     return /* @__PURE__ */ defineCustomElement(options, extraOptions, createSSRApp);
   });
@@ -11882,7 +11917,7 @@ Expected function or array of functions, received type ${typeof value}.`
             if (e && e.target !== el) {
               return;
             }
-            if (!e || /transform$/.test(e.propertyName)) {
+            if (!e || e.propertyName.endsWith("transform")) {
               el.removeEventListener("transitionend", cb);
               el[moveCbKey] = null;
               removeTransitionClass(el, moveClass);
@@ -13638,7 +13673,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
     return !currentOpenBracketCount && !currentOpenParensCount;
   };
   const isMemberExpression = isMemberExpressionBrowser ;
-  const fnExpRE = /^\s*(async\s*)?(\([^)]*?\)|[\w$_]+)\s*(:[^=]+)?=>|^\s*(async\s+)?function(?:\s+[\w$]+)?\s*\(/;
+  const fnExpRE = /^\s*(?:async\s*)?(?:\([^)]*?\)|[\w$_]+)\s*(?::[^=]+)?=>|^\s*(?:async\s+)?function(?:\s+[\w$]+)?\s*\(/;
   const isFnExpressionBrowser = (exp) => fnExpRE.test(getExpSource(exp));
   const isFnExpression = isFnExpressionBrowser ;
   function assert(condition, msg) {
@@ -15680,7 +15715,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
   }
 
   const transformIf = createStructuralDirectiveTransform(
-    /^(if|else|else-if)$/,
+    /^(?:if|else|else-if)$/,
     (node, dir, context) => {
       return processIf(node, dir, context, (ifNode, branch, isRoot) => {
         const siblings = context.parent.children;
@@ -16267,7 +16302,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
         );
       } else if (vElse = findDir(
         slotElement,
-        /^else(-if)?$/,
+        /^else(?:-if)?$/,
         true
         /* allowEmpty */
       )) {
@@ -16279,7 +16314,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
             break;
           }
         }
-        if (prev && isTemplateNode(prev) && findDir(prev, /^(else-)?if$/)) {
+        if (prev && isTemplateNode(prev) && findDir(prev, /^(?:else-)?if$/)) {
           let conditional = dynamicSlots[dynamicSlots.length - 1];
           while (conditional.alternate.type === 19) {
             conditional = conditional.alternate;
