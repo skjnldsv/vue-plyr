@@ -9,7 +9,7 @@
     "generate": "nuxi generate"
   },
   "devDependencies": {
-    "nuxt": "^3.17.5"
+    "nuxt": "^3.20.1"
   },
   "dependencies": {
     "@skjnldsv/vue-plyr": "file:../.."
