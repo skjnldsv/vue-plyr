@@ -20,7 +20,7 @@ jobs:
     name: examples-build
     steps:
       - name: Checkout
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.1.5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v4.1.5
 
       - name: Set up node ${{ matrix.node-version }}
         uses: actions/setup-node@c2ac33f2c62f978d6c944d9648125a294e56dc0b # v3
