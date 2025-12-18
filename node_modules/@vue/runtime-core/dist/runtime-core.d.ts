@@ -196,7 +196,7 @@ export declare function defineProps<TypeProps>(): DefineProps<LooseRequired<Type
 export type DefineProps<T, BKeys extends keyof T> = Readonly<T> & {
     readonly [K in BKeys]-?: boolean;
 };
-type BooleanKey<T, K extends keyof T = keyof T> = K extends any ? [T[K]] extends [boolean | undefined] ? K : never : never;
+type BooleanKey<T, K extends keyof T = keyof T> = K extends any ? T[K] extends boolean | undefined ? T[K] extends never | undefined ? never : K : never : never;
 /**
  * Vue `<script setup>` compiler macro for declaring a component's emitted
  * events. The expected argument is the same as the component `emits` option.
@@ -420,7 +420,7 @@ export interface ObjectDirective<HostElement = any, Value = any, Modifiers exten
 }
 export type FunctionDirective<HostElement = any, V = any, Modifiers extends string = string, Arg = any> = DirectiveHook<HostElement, any, V, Modifiers, Arg>;
 export type Directive<HostElement = any, Value = any, Modifiers extends string = string, Arg = any> = ObjectDirective<HostElement, Value, Modifiers, Arg> | FunctionDirective<HostElement, Value, Modifiers, Arg>;
-type DirectiveModifiers<K extends string = string> = Partial<Record<K, boolean>>;
+export type DirectiveModifiers<K extends string = string> = Partial<Record<K, boolean>>;
 export type DirectiveArguments = Array<[Directive | undefined] | [Directive | undefined, any] | [Directive | undefined, any, any] | [Directive | undefined, any, any, DirectiveModifiers]>;
 /**
  * Adds directives to a VNode.
