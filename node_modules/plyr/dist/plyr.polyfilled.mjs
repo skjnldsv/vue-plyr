@@ -3258,7 +3258,9 @@ const captions = {
 
       // Handle Vimeo captions
       if (this.isVimeo) {
-        this.embed.enableTextTrack(language);
+        // Enable text track but don't render captions within the player
+        // Since we handle that ourselves
+        this.embed.enableTextTrack(language, null, false);
       }
 
       // Trigger event
@@ -3419,7 +3421,7 @@ const defaults = {
   // Sprite (for icons)
   loadSprite: true,
   iconPrefix: 'plyr',
-  iconUrl: 'https://cdn.plyr.io/3.8.3/plyr.svg',
+  iconUrl: 'https://cdn.plyr.io/3.8.4/plyr.svg',
   // Blank video (used to prevent errors on source change)
   blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
   // Quality default
@@ -9277,7 +9279,7 @@ requireUrlPolyfill();
 
 // ==========================================================================
 // Plyr Polyfilled Build
-// plyr.js v3.8.3
+// plyr.js v3.8.4
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
