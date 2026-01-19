@@ -1,5 +1,5 @@
 /**
-* vue v3.5.26
+* vue v3.5.27
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -1491,20 +1491,20 @@ function createIterableMethod(method, isReadonly2, isShallow2) {
       "iterate",
       isKeyOnly ? MAP_KEY_ITERATE_KEY : ITERATE_KEY
     );
-    return {
-      // iterator protocol
-      next() {
-        const { value, done } = innerIterator.next();
-        return done ? { value, done } : {
-          value: isPair ? [wrap(value[0]), wrap(value[1])] : wrap(value),
-          done
-        };
-      },
-      // iterable protocol
-      [Symbol.iterator]() {
-        return this;
+    return extend(
+      // inheriting all iterator properties
+      Object.create(innerIterator),
+      {
+        // iterator protocol
+        next() {
+          const { value, done } = innerIterator.next();
+          return done ? { value, done } : {
+            value: isPair ? [wrap(value[0]), wrap(value[1])] : wrap(value),
+            done
+          };
+        }
       }
-    };
+    );
   };
 }
 function createReadonlyMethod(type) {
@@ -1718,8 +1718,9 @@ function targetTypeMap(rawType) {
 function getTargetType(value) {
   return value["__v_skip"] || !Object.isExtensible(value) ? 0 /* INVALID */ : targetTypeMap(toRawType(value));
 }
+// @__NO_SIDE_EFFECTS__
 function reactive(target) {
-  if (isReadonly(target)) {
+  if (/* @__PURE__ */ isReadonly(target)) {
     return target;
   }
   return createReactiveObject(
@@ -1730,6 +1731,7 @@ function reactive(target) {
     reactiveMap
   );
 }
+// @__NO_SIDE_EFFECTS__
 function shallowReactive(target) {
   return createReactiveObject(
     target,
@@ -1739,6 +1741,7 @@ function shallowReactive(target) {
     shallowReactiveMap
   );
 }
+// @__NO_SIDE_EFFECTS__
 function readonly(target) {
   return createReactiveObject(
     target,
@@ -1748,6 +1751,7 @@ function readonly(target) {
     readonlyMap
   );
 }
+// @__NO_SIDE_EFFECTS__
 function shallowReadonly(target) {
   return createReactiveObject(
     target,
@@ -1786,24 +1790,29 @@ function createReactiveObject(target, isReadonly2, baseHandlers, collectionHandl
   proxyMap.set(target, proxy);
   return proxy;
 }
+// @__NO_SIDE_EFFECTS__
 function isReactive(value) {
-  if (isReadonly(value)) {
-    return isReactive(value["__v_raw"]);
+  if (/* @__PURE__ */ isReadonly(value)) {
+    return /* @__PURE__ */ isReactive(value["__v_raw"]);
   }
   return !!(value && value["__v_isReactive"]);
 }
+// @__NO_SIDE_EFFECTS__
 function isReadonly(value) {
   return !!(value && value["__v_isReadonly"]);
 }
+// @__NO_SIDE_EFFECTS__
 function isShallow(value) {
   return !!(value && value["__v_isShallow"]);
 }
+// @__NO_SIDE_EFFECTS__
 function isProxy(value) {
   return value ? !!value["__v_raw"] : false;
 }
+// @__NO_SIDE_EFFECTS__
 function toRaw(observed) {
   const raw = observed && observed["__v_raw"];
-  return raw ? toRaw(raw) : observed;
+  return raw ? /* @__PURE__ */ toRaw(raw) : observed;
 }
 function markRaw(value) {
   if (!hasOwn(value, "__v_skip") && Object.isExtensible(value)) {
@@ -1811,20 +1820,23 @@ function markRaw(value) {
   }
   return value;
 }
-const toReactive = (value) => isObject(value) ? reactive(value) : value;
-const toReadonly = (value) => isObject(value) ? readonly(value) : value;
+const toReactive = (value) => isObject(value) ? /* @__PURE__ */ reactive(value) : value;
+const toReadonly = (value) => isObject(value) ? /* @__PURE__ */ readonly(value) : value;
 
+// @__NO_SIDE_EFFECTS__
 function isRef(r) {
   return r ? r["__v_isRef"] === true : false;
 }
+// @__NO_SIDE_EFFECTS__
 function ref(value) {
   return createRef(value, false);
 }
+// @__NO_SIDE_EFFECTS__
 function shallowRef(value) {
   return createRef(value, true);
 }
 function createRef(rawValue, shallow) {
-  if (isRef(rawValue)) {
+  if (/* @__PURE__ */ isRef(rawValue)) {
     return rawValue;
   }
   return new RefImpl(rawValue, shallow);
@@ -1880,7 +1892,7 @@ function triggerRef(ref2) {
   }
 }
 function unref(ref2) {
-  return isRef(ref2) ? ref2.value : ref2;
+  return /* @__PURE__ */ isRef(ref2) ? ref2.value : ref2;
 }
 function toValue(source) {
   return isFunction(source) ? source() : unref(source);
@@ -1889,7 +1901,7 @@ const shallowUnwrapHandlers = {
   get: (target, key, receiver) => key === "__v_raw" ? target : unref(Reflect.get(target, key, receiver)),
   set: (target, key, value, receiver) => {
     const oldValue = target[key];
-    if (isRef(oldValue) && !isRef(value)) {
+    if (/* @__PURE__ */ isRef(oldValue) && !/* @__PURE__ */ isRef(value)) {
       oldValue.value = value;
       return true;
     } else {
@@ -1919,6 +1931,7 @@ class CustomRefImpl {
 function customRef(factory) {
   return new CustomRefImpl(factory);
 }
+// @__NO_SIDE_EFFECTS__
 function toRefs(object) {
   if (!isProxy(object)) {
     warn$2(`toRefs() expects a reactive object but received a plain one.`);
@@ -1954,9 +1967,9 @@ class ObjectRefImpl {
     return this._value = val === void 0 ? this._defaultValue : val;
   }
   set value(newVal) {
-    if (this._shallow && isRef(this._raw[this._key])) {
+    if (this._shallow && /* @__PURE__ */ isRef(this._raw[this._key])) {
       const nestedRef = this._object[this._key];
-      if (isRef(nestedRef)) {
+      if (/* @__PURE__ */ isRef(nestedRef)) {
         nestedRef.value = newVal;
         return;
       }
@@ -1978,15 +1991,16 @@ class GetterRefImpl {
     return this._value = this._getter();
   }
 }
+// @__NO_SIDE_EFFECTS__
 function toRef(source, key, defaultValue) {
-  if (isRef(source)) {
+  if (/* @__PURE__ */ isRef(source)) {
     return source;
   } else if (isFunction(source)) {
     return new GetterRefImpl(source);
   } else if (isObject(source) && arguments.length > 1) {
     return propertyToRef(source, key, defaultValue);
   } else {
-    return ref(source);
+    return /* @__PURE__ */ ref(source);
   }
 }
 function propertyToRef(source, key, defaultValue) {
@@ -2067,6 +2081,7 @@ class ComputedRefImpl {
     }
   }
 }
+// @__NO_SIDE_EFFECTS__
 function computed$1(getterOrOptions, debugOptions, isSSR = false) {
   let getter;
   let setter;
@@ -4439,7 +4454,7 @@ Server rendered element contains more child nodes than client vdom.`
               logMismatchError();
             }
             if (forcePatch && (key.endsWith("value") || key === "indeterminate") || isOn(key) && !isReservedProp(key) || // force hydrate v-bind with .prop modifiers
-            key[0] === "." || isCustomElement) {
+            key[0] === "." || isCustomElement && !isReservedProp(key)) {
               patchProp(el, key, null, props[key], void 0, parentComponent);
             }
           }
@@ -10755,7 +10770,7 @@ function isMemoSame(cached, memo) {
   return true;
 }
 
-const version = "3.5.26";
+const version = "3.5.27";
 const warn = warn$1 ;
 const ErrorTypeStrings = ErrorTypeStrings$1 ;
 const devtools = devtools$1 ;
