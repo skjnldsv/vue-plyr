@@ -1,5 +1,5 @@
 /**
-* vue v3.5.27
+* vue v3.5.28
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -410,6 +410,7 @@ var Vue = (function (exports) {
 
   let activeEffectScope;
   class EffectScope {
+    // TODO isolatedDeclarations "__v_skip"
     constructor(detached = false) {
       this.detached = detached;
       /**
@@ -429,6 +430,7 @@ var Vue = (function (exports) {
        */
       this.cleanups = [];
       this._isPaused = false;
+      this.__v_skip = true;
       this.parent = activeEffectScope;
       if (!detached && activeEffectScope) {
         this.index = (activeEffectScope.scopes || (activeEffectScope.scopes = [])).push(
@@ -3485,7 +3487,22 @@ var Vue = (function (exports) {
   function hydrateTeleport(node, vnode, parentComponent, parentSuspense, slotScopeIds, optimized, {
     o: { nextSibling, parentNode, querySelector, insert, createText }
   }, hydrateChildren) {
-    function hydrateDisabledTeleport(node2, vnode2, targetStart, targetAnchor) {
+    function hydrateAnchor(target2, targetNode) {
+      let targetAnchor = targetNode;
+      while (targetAnchor) {
+        if (targetAnchor && targetAnchor.nodeType === 8) {
+          if (targetAnchor.data === "teleport start anchor") {
+            vnode.targetStart = targetAnchor;
+          } else if (targetAnchor.data === "teleport anchor") {
+            vnode.targetAnchor = targetAnchor;
+            target2._lpa = vnode.targetAnchor && nextSibling(vnode.targetAnchor);
+            break;
+          }
+        }
+        targetAnchor = nextSibling(targetAnchor);
+      }
+    }
+    function hydrateDisabledTeleport(node2, vnode2) {
       vnode2.anchor = hydrateChildren(
         nextSibling(node2),
         vnode2,
@@ -3495,8 +3512,6 @@ var Vue = (function (exports) {
         slotScopeIds,
         optimized
       );
-      vnode2.targetStart = targetStart;
-      vnode2.targetAnchor = targetAnchor;
     }
     const target = vnode.target = resolveTarget(
       vnode.props,
@@ -3507,27 +3522,22 @@ var Vue = (function (exports) {
       const targetNode = target._lpa || target.firstChild;
       if (vnode.shapeFlag & 16) {
         if (disabled) {
-          hydrateDisabledTeleport(
-            node,
-            vnode,
-            targetNode,
-            targetNode && nextSibling(targetNode)
-          );
+          hydrateDisabledTeleport(node, vnode);
+          hydrateAnchor(target, targetNode);
+          if (!vnode.targetAnchor) {
+            prepareAnchor(
+              target,
+              vnode,
+              createText,
+              insert,
+              // if target is the same as the main view, insert anchors before current node
+              // to avoid hydrating mismatch
+              parentNode(node) === target ? node : null
+            );
+          }
         } else {
           vnode.anchor = nextSibling(node);
-          let targetAnchor = targetNode;
-          while (targetAnchor) {
-            if (targetAnchor && targetAnchor.nodeType === 8) {
-              if (targetAnchor.data === "teleport start anchor") {
-                vnode.targetStart = targetAnchor;
-              } else if (targetAnchor.data === "teleport anchor") {
-                vnode.targetAnchor = targetAnchor;
-                target._lpa = vnode.targetAnchor && nextSibling(vnode.targetAnchor);
-                break;
-              }
-            }
-            targetAnchor = nextSibling(targetAnchor);
-          }
+          hydrateAnchor(target, targetNode);
           if (!vnode.targetAnchor) {
             prepareAnchor(target, vnode, createText, insert);
           }
@@ -3545,7 +3555,9 @@ var Vue = (function (exports) {
       updateCssVars(vnode, disabled);
     } else if (disabled) {
       if (vnode.shapeFlag & 16) {
-        hydrateDisabledTeleport(node, vnode, node, nextSibling(node));
+        hydrateDisabledTeleport(node, vnode);
+        vnode.targetStart = node;
+        vnode.targetAnchor = nextSibling(node);
       }
     }
     return vnode.anchor && nextSibling(vnode.anchor);
@@ -3569,13 +3581,13 @@ var Vue = (function (exports) {
       ctx.ut();
     }
   }
-  function prepareAnchor(target, vnode, createText, insert) {
+  function prepareAnchor(target, vnode, createText, insert, anchor = null) {
     const targetStart = vnode.targetStart = createText("");
     const targetAnchor = vnode.targetAnchor = createText("");
     targetStart[TeleportEndKey] = targetAnchor;
     if (target) {
-      insert(targetStart, target);
-      insert(targetAnchor, target);
+      insert(targetStart, target, anchor);
+      insert(targetAnchor, target, anchor);
     }
     return targetAnchor;
   }
@@ -3810,7 +3822,7 @@ var Vue = (function (exports) {
           }
         }
         let called = false;
-        const done = el[enterCbKey$1] = (cancelled) => {
+        el[enterCbKey$1] = (cancelled) => {
           if (called) return;
           called = true;
           if (cancelled) {
@@ -3823,6 +3835,7 @@ var Vue = (function (exports) {
           }
           el[enterCbKey$1] = void 0;
         };
+        const done = el[enterCbKey$1].bind(null, false);
         if (hook) {
           callAsyncHook(hook, [el, done]);
         } else {
@@ -3842,7 +3855,7 @@ var Vue = (function (exports) {
         }
         callHook(onBeforeLeave, [el]);
         let called = false;
-        const done = el[leaveCbKey] = (cancelled) => {
+        el[leaveCbKey] = (cancelled) => {
           if (called) return;
           called = true;
           remove();
@@ -3856,6 +3869,7 @@ var Vue = (function (exports) {
             delete leavingVNodesCache[key2];
           }
         };
+        const done = el[leaveCbKey].bind(null, false);
         leavingVNodesCache[key2] = vnode;
         if (onLeave) {
           callAsyncHook(onLeave, [el, done]);
@@ -3968,8 +3982,7 @@ var Vue = (function (exports) {
     const r = shallowRef(null);
     if (i) {
       const refs = i.refs === EMPTY_OBJ ? i.refs = {} : i.refs;
-      let desc;
-      if ((desc = Object.getOwnPropertyDescriptor(refs, key)) && !desc.configurable) {
+      if (isTemplateRefKey(refs, key)) {
         warn$1(`useTemplateRef('${key}') already exists.`);
       } else {
         Object.defineProperty(refs, key, {
@@ -3988,6 +4001,10 @@ var Vue = (function (exports) {
       knownTemplateRefs.add(ret);
     }
     return ret;
+  }
+  function isTemplateRefKey(refs, key) {
+    let desc;
+    return !!((desc = Object.getOwnPropertyDescriptor(refs, key)) && !desc.configurable);
   }
 
   const pendingSetRefMap = /* @__PURE__ */ new WeakMap();
@@ -4034,10 +4051,19 @@ var Vue = (function (exports) {
           return false;
         }
       }
+      if (isTemplateRefKey(refs, key)) {
+        return false;
+      }
       return hasOwn(rawSetupState, key);
     };
-    const canSetRef = (ref2) => {
-      return !knownTemplateRefs.has(ref2);
+    const canSetRef = (ref2, key) => {
+      if (knownTemplateRefs.has(ref2)) {
+        return false;
+      }
+      if (key && isTemplateRefKey(refs, key)) {
+        return false;
+      }
+      return true;
     };
     if (oldRef != null && oldRef !== ref) {
       invalidatePendingSetRef(oldRawRef);
@@ -4047,10 +4073,10 @@ var Vue = (function (exports) {
           setupState[oldRef] = null;
         }
       } else if (isRef(oldRef)) {
-        if (canSetRef(oldRef)) {
+        const oldRawRefAtom = oldRawRef;
+        if (canSetRef(oldRef, oldRawRefAtom.k)) {
           oldRef.value = null;
         }
-        const oldRawRefAtom = oldRawRef;
         if (oldRawRefAtom.k) refs[oldRawRefAtom.k] = null;
       }
     }
@@ -4074,7 +4100,7 @@ var Vue = (function (exports) {
                   }
                 } else {
                   const newVal = [refValue];
-                  if (canSetRef(ref)) {
+                  if (canSetRef(ref, rawRef.k)) {
                     ref.value = newVal;
                   }
                   if (rawRef.k) refs[rawRef.k] = newVal;
@@ -4089,7 +4115,7 @@ var Vue = (function (exports) {
               setupState[ref] = value;
             }
           } else if (_isRef) {
-            if (canSetRef(ref)) {
+            if (canSetRef(ref, rawRef.k)) {
               ref.value = value;
             }
             if (rawRef.k) refs[rawRef.k] = value;
@@ -6944,7 +6970,7 @@ If you want to remount the same app, move your app creation logic into a factory
         const dynamicProps = nextVNode.dynamicProps;
         for (let i = 0; i < dynamicProps.length; i++) {
           const key = dynamicProps[i];
-          if (nextProps[key] !== prevProps[key] && !isEmitListener(emits, key)) {
+          if (hasPropValueChanged(nextProps, prevProps, key) && !isEmitListener(emits, key)) {
             return true;
           }
         }
@@ -6975,11 +7001,19 @@ If you want to remount the same app, move your app creation logic into a factory
     }
     for (let i = 0; i < nextKeys.length; i++) {
       const key = nextKeys[i];
-      if (nextProps[key] !== prevProps[key] && !isEmitListener(emitsOptions, key)) {
+      if (hasPropValueChanged(nextProps, prevProps, key) && !isEmitListener(emitsOptions, key)) {
         return true;
       }
     }
     return false;
+  }
+  function hasPropValueChanged(nextProps, prevProps, key) {
+    const nextProp = nextProps[key];
+    const prevProp = prevProps[key];
+    if (key === "style" && isObject(nextProp) && isObject(prevProp)) {
+      return !looseEqual(nextProp, prevProp);
+    }
+    return nextProp !== prevProp;
   }
   function updateHOCHostEl({ vnode, parent }, el) {
     while (parent) {
@@ -7684,15 +7718,7 @@ If you want to remount the same app, move your app creation logic into a factory
       } else {
         const el = n2.el = n1.el;
         if (n2.children !== n1.children) {
-          if (isHmrUpdating && n2.patchFlag === -1 && "__elIndex" in n1) {
-            const childNodes = container.childNodes;
-            const newChild = hostCreateText(n2.children);
-            const oldChild = childNodes[n2.__elIndex = n1.__elIndex];
-            hostInsert(newChild, container, oldChild);
-            hostRemove(oldChild);
-          } else {
-            hostSetText(el, n2.children);
-          }
+          hostSetText(el, n2.children);
         }
       }
     };
@@ -7768,7 +7794,7 @@ If you want to remount the same app, move your app creation logic into a factory
           optimized
         );
       } else {
-        const customElement = !!(n1.el && n1.el._isVueCE) ? n1.el : null;
+        const customElement = n1.el && n1.el._isVueCE ? n1.el : null;
         try {
           if (customElement) {
             customElement._beginPatch();
@@ -8250,8 +8276,7 @@ If you want to remount the same app, move your app creation logic into a factory
               hydrateSubTree();
             }
           } else {
-            if (root.ce && // @ts-expect-error _def is private
-            root.ce._def.shadowRoot !== false) {
+            if (root.ce && root.ce._hasShadowRoot()) {
               root.ce._injectChildStyle(type);
             }
             {
@@ -8306,9 +8331,9 @@ If you want to remount the same app, move your app creation logic into a factory
                 updateComponentPreRender(instance, next, optimized);
               }
               nonHydratedAsyncRoot.asyncDep.then(() => {
-                if (!instance.isUnmounted) {
-                  componentUpdateFn();
-                }
+                queuePostRenderEffect(() => {
+                  if (!instance.isUnmounted) update();
+                }, parentSuspense);
               });
               return;
             }
@@ -9005,12 +9030,10 @@ If you want to remount the same app, move your app creation logic into a factory
             traverseStaticChildren(c1, c2);
         }
         if (c2.type === Text) {
-          if (c2.patchFlag !== -1) {
-            c2.el = c1.el;
-          } else {
-            c2.__elIndex = i + // take fragment start anchor into account
-            (n1.type === Fragment ? 1 : 0);
+          if (c2.patchFlag === -1) {
+            c2 = ch2[i] = cloneIfMounted(c2);
           }
+          c2.el = c1.el;
         }
         if (c2.type === Comment && !c2.el) {
           c2.el = c1.el;
@@ -10722,7 +10745,7 @@ Component that was made reactive: `,
     return true;
   }
 
-  const version = "3.5.27";
+  const version = "3.5.28";
   const warn = warn$1 ;
   const ErrorTypeStrings = ErrorTypeStrings$1 ;
   const devtools = devtools$1 ;
@@ -11980,6 +12003,12 @@ Expected function or array of functions, received type ${typeof value}.`
     /**
      * @internal
      */
+    _hasShadowRoot() {
+      return this._def.shadowRoot !== false;
+    }
+    /**
+     * @internal
+     */
     _removeChildStyle(comp) {
       {
         this._styleChildren.delete(comp);
@@ -12099,10 +12128,7 @@ Expected function or array of functions, received type ${typeof value}.`
                   instance
                 )
               );
-              positionMap.set(child, {
-                left: child.el.offsetLeft,
-                top: child.el.offsetTop
-              });
+              positionMap.set(child, getPosition(child.el));
             }
           }
         }
@@ -12133,10 +12159,7 @@ Expected function or array of functions, received type ${typeof value}.`
     }
   }
   function recordPosition(c) {
-    newPositionMap.set(c, {
-      left: c.el.offsetLeft,
-      top: c.el.offsetTop
-    });
+    newPositionMap.set(c, getPosition(c.el));
   }
   function applyTranslation(c) {
     const oldPos = positionMap.get(c);
@@ -12144,11 +12167,28 @@ Expected function or array of functions, received type ${typeof value}.`
     const dx = oldPos.left - newPos.left;
     const dy = oldPos.top - newPos.top;
     if (dx || dy) {
-      const s = c.el.style;
-      s.transform = s.webkitTransform = `translate(${dx}px,${dy}px)`;
+      const el = c.el;
+      const s = el.style;
+      const rect = el.getBoundingClientRect();
+      let scaleX = 1;
+      let scaleY = 1;
+      if (el.offsetWidth) scaleX = rect.width / el.offsetWidth;
+      if (el.offsetHeight) scaleY = rect.height / el.offsetHeight;
+      if (!Number.isFinite(scaleX) || scaleX === 0) scaleX = 1;
+      if (!Number.isFinite(scaleY) || scaleY === 0) scaleY = 1;
+      if (Math.abs(scaleX - 1) < 0.01) scaleX = 1;
+      if (Math.abs(scaleY - 1) < 0.01) scaleY = 1;
+      s.transform = s.webkitTransform = `translate(${dx / scaleX}px,${dy / scaleY}px)`;
       s.transitionDuration = "0s";
       return c;
     }
+  }
+  function getPosition(el) {
+    const rect = el.getBoundingClientRect();
+    return {
+      left: rect.left,
+      top: rect.top
+    };
   }
   function hasCSSTransform(el, root, moveClass) {
     const clone = el.cloneNode();
@@ -12426,6 +12466,7 @@ Expected function or array of functions, received type ${typeof value}.`
     exact: (e, modifiers) => systemModifiers.some((m) => e[`${m}Key`] && !modifiers.includes(m))
   };
   const withModifiers = (fn, modifiers) => {
+    if (!fn) return fn;
     const cache = fn._withMods || (fn._withMods = {});
     const cacheKey = modifiers.join(".");
     return cache[cacheKey] || (cache[cacheKey] = ((event, ...args) => {
