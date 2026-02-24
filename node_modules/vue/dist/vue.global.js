@@ -1,5 +1,5 @@
 /**
-* vue v3.5.28
+* vue v3.5.29
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -3809,6 +3809,7 @@ var Vue = (function (exports) {
         callHook(hook, [el]);
       },
       enter(el) {
+        if (leavingVNodesCache[key] === vnode) return;
         let hook = onEnter;
         let afterHook = onAfterEnter;
         let cancelHook = onEnterCancelled;
@@ -5902,13 +5903,24 @@ If this is a native custom element, make sure to exclude it from component resol
     }
     let awaitable = getAwaitable();
     unsetCurrentInstance();
+    const cleanup = () => {
+      if (getCurrentInstance() !== ctx) ctx.scope.off();
+      unsetCurrentInstance();
+    };
     if (isPromise(awaitable)) {
       awaitable = awaitable.catch((e) => {
         setCurrentInstance(ctx);
+        Promise.resolve().then(() => Promise.resolve().then(cleanup));
         throw e;
       });
     }
-    return [awaitable, () => setCurrentInstance(ctx)];
+    return [
+      awaitable,
+      () => {
+        setCurrentInstance(ctx);
+        Promise.resolve().then(cleanup);
+      }
+    ];
   }
 
   function createDuplicateChecker() {
@@ -10745,7 +10757,7 @@ Component that was made reactive: `,
     return true;
   }
 
-  const version = "3.5.28";
+  const version = "3.5.29";
   const warn = warn$1 ;
   const ErrorTypeStrings = ErrorTypeStrings$1 ;
   const devtools = devtools$1 ;
