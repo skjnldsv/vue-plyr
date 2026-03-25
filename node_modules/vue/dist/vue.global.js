@@ -1,5 +1,5 @@
 /**
-* vue v3.5.30
+* vue v3.5.31
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -1955,16 +1955,16 @@ var Vue = (function (exports) {
     return ret;
   }
   class ObjectRefImpl {
-    constructor(_object, _key, _defaultValue) {
+    constructor(_object, key, _defaultValue) {
       this._object = _object;
-      this._key = _key;
       this._defaultValue = _defaultValue;
       this["__v_isRef"] = true;
       this._value = void 0;
+      this._key = isSymbol(key) ? key : String(key);
       this._raw = toRaw(_object);
       let shallow = true;
       let obj = _object;
-      if (!isArray(_object) || !isIntegerKey(String(_key))) {
+      if (!isArray(_object) || isSymbol(this._key) || !isIntegerKey(this._key)) {
         do {
           shallow = !isProxy(obj) || isShallow(obj);
         } while (shallow && (obj = obj["__v_raw"]));
@@ -2764,6 +2764,13 @@ var Vue = (function (exports) {
   }
 
   let isHmrUpdating = false;
+  const setHmrUpdating = (v) => {
+    try {
+      return isHmrUpdating;
+    } finally {
+      isHmrUpdating = v;
+    }
+  };
   const hmrDirtyComponents = /* @__PURE__ */ new Map();
   {
     getGlobalThis().__VUE_HMR_RUNTIME__ = {
@@ -3322,9 +3329,10 @@ var Vue = (function (exports) {
           mount(container, mainAnchor);
           updateCssVars(n2, true);
         }
-        if (isTeleportDeferred(n2.props)) {
+        if (isTeleportDeferred(n2.props) || parentSuspense && parentSuspense.pendingBranch) {
           n2.el.__isMounted = false;
           queuePostRenderEffect(() => {
+            if (n2.el.__isMounted !== false) return;
             mountToTarget();
             delete n2.el.__isMounted;
           }, parentSuspense);
@@ -3332,7 +3340,12 @@ var Vue = (function (exports) {
           mountToTarget();
         }
       } else {
-        if (isTeleportDeferred(n2.props) && n1.el.__isMounted === false) {
+        n2.el = n1.el;
+        n2.targetStart = n1.targetStart;
+        const mainAnchor = n2.anchor = n1.anchor;
+        const target = n2.target = n1.target;
+        const targetAnchor = n2.targetAnchor = n1.targetAnchor;
+        if (n1.el.__isMounted === false) {
           queuePostRenderEffect(() => {
             TeleportImpl.process(
               n1,
@@ -3349,11 +3362,6 @@ var Vue = (function (exports) {
           }, parentSuspense);
           return;
         }
-        n2.el = n1.el;
-        n2.targetStart = n1.targetStart;
-        const mainAnchor = n2.anchor = n1.anchor;
-        const target = n2.target = n1.target;
-        const targetAnchor = n2.targetAnchor = n1.targetAnchor;
         const wasDisabled = isTeleportDisabled(n1.props);
         const currentContainer = wasDisabled ? container : target;
         const currentAnchor = wasDisabled ? mainAnchor : targetAnchor;
@@ -3816,7 +3824,7 @@ var Vue = (function (exports) {
         callHook(hook, [el]);
       },
       enter(el) {
-        if (leavingVNodesCache[key] === vnode) return;
+        if (!isHmrUpdating && leavingVNodesCache[key] === vnode) return;
         let hook = onEnter;
         let afterHook = onAfterEnter;
         let cancelHook = onEnterCancelled;
@@ -7051,11 +7059,12 @@ If you want to remount the same app, move your app creation logic into a factory
     }
     return nextProp !== prevProp;
   }
-  function updateHOCHostEl({ vnode, parent }, el) {
+  function updateHOCHostEl({ vnode, parent, suspense }, el) {
     while (parent) {
       const root = parent.subTree;
       if (root.suspense && root.suspense.activeBranch === vnode) {
-        root.el = vnode.el;
+        root.suspense.vnode.el = root.el = el;
+        vnode = root;
       }
       if (root === vnode) {
         (vnode = parent.vnode).el = el;
@@ -7063,6 +7072,9 @@ If you want to remount the same app, move your app creation logic into a factory
       } else {
         break;
       }
+    }
+    if (suspense && suspense.activeBranch === vnode) {
+      suspense.vnode.el = el;
     }
   }
 
@@ -7905,10 +7917,17 @@ If you want to remount the same app, move your app creation logic into a factory
       }
       hostInsert(el, container, anchor);
       if ((vnodeHook = props && props.onVnodeMounted) || needCallTransitionHooks || dirs) {
+        const isHmr = isHmrUpdating;
         queuePostRenderEffect(() => {
-          vnodeHook && invokeVNodeHook(vnodeHook, parentComponent, vnode);
-          needCallTransitionHooks && transition.enter(el);
-          dirs && invokeDirectiveHook(vnode, null, parentComponent, "mounted");
+          let prev;
+          prev = setHmrUpdating(isHmr);
+          try {
+            vnodeHook && invokeVNodeHook(vnodeHook, parentComponent, vnode);
+            needCallTransitionHooks && transition.enter(el);
+            dirs && invokeDirectiveHook(vnode, null, parentComponent, "mounted");
+          } finally {
+            setHmrUpdating(prev);
+          }
         }, parentSuspense);
       }
     };
@@ -8829,7 +8848,8 @@ If you want to remount the same app, move your app creation logic into a factory
         shapeFlag,
         patchFlag,
         dirs,
-        cacheIndex
+        cacheIndex,
+        memo
       } = vnode;
       if (patchFlag === -2) {
         optimized = false;
@@ -8891,10 +8911,14 @@ If you want to remount the same app, move your app creation logic into a factory
           remove(vnode);
         }
       }
-      if (shouldInvokeVnodeHook && (vnodeHook = props && props.onVnodeUnmounted) || shouldInvokeDirs) {
+      const shouldInvalidateMemo = memo != null && cacheIndex == null;
+      if (shouldInvokeVnodeHook && (vnodeHook = props && props.onVnodeUnmounted) || shouldInvokeDirs || shouldInvalidateMemo) {
         queuePostRenderEffect(() => {
           vnodeHook && invokeVNodeHook(vnodeHook, parentComponent, vnode);
           shouldInvokeDirs && invokeDirectiveHook(vnode, null, parentComponent, "unmounted");
+          if (shouldInvalidateMemo) {
+            vnode.el = null;
+          }
         }, parentSuspense);
       }
     };
@@ -9448,6 +9472,7 @@ If you want to remount the same app, move your app creation logic into a factory
       pendingId: suspenseId++,
       timeout: typeof timeout === "number" ? timeout : -1,
       activeBranch: null,
+      isFallbackMountPending: false,
       pendingBranch: null,
       isInFallback: !isHydrating,
       isHydrating,
@@ -9497,7 +9522,7 @@ If you want to remount the same app, move your app creation logic into a factory
               }
             };
           }
-          if (activeBranch) {
+          if (activeBranch && !suspense.isFallbackMountPending) {
             if (parentNode(activeBranch.el) === container2) {
               anchor = next(activeBranch);
             }
@@ -9510,6 +9535,7 @@ If you want to remount the same app, move your app creation logic into a factory
             move(pendingBranch, container2, anchor, 0);
           }
         }
+        suspense.isFallbackMountPending = false;
         setActiveBranch(suspense, pendingBranch);
         suspense.pendingBranch = null;
         suspense.isInFallback = false;
@@ -9545,6 +9571,7 @@ If you want to remount the same app, move your app creation logic into a factory
         triggerEvent(vnode2, "onFallback");
         const anchor2 = next(activeBranch);
         const mountFallback = () => {
+          suspense.isFallbackMountPending = false;
           if (!suspense.isInFallback) {
             return;
           }
@@ -9564,6 +9591,7 @@ If you want to remount the same app, move your app creation logic into a factory
         };
         const delayEnter = fallbackVNode.transition && fallbackVNode.transition.mode === "out-in";
         if (delayEnter) {
+          suspense.isFallbackMountPending = true;
           activeBranch.transition.afterLeave = mountFallback;
         }
         suspense.isInFallback = true;
@@ -10114,6 +10142,10 @@ Component that was made reactive: `,
           const incoming = toMerge[key];
           if (incoming && existing !== incoming && !(isArray(existing) && existing.includes(incoming))) {
             ret[key] = existing ? [].concat(existing, incoming) : incoming;
+          } else if (incoming == null && existing == null && // mergeProps({ 'onUpdate:modelValue': undefined }) should not retain
+          // the model listener.
+          !isModelListener(key)) {
+            ret[key] = incoming;
           }
         } else if (key !== "") {
           ret[key] = toMerge[key];
@@ -10784,7 +10816,7 @@ Component that was made reactive: `,
     return true;
   }
 
-  const version = "3.5.30";
+  const version = "3.5.31";
   const warn = warn$1 ;
   const ErrorTypeStrings = ErrorTypeStrings$1 ;
   const devtools = devtools$1 ;
@@ -12344,7 +12376,8 @@ Expected function or array of functions, received type ${typeof value}.`
       if (elValue === newValue) {
         return;
       }
-      if (document.activeElement === el && el.type !== "range") {
+      const rootNode = el.getRootNode();
+      if ((rootNode instanceof Document || rootNode instanceof ShadowRoot) && rootNode.activeElement === el && el.type !== "range") {
         if (lazy && value === oldValue) {
           return;
         }
@@ -16335,7 +16368,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
             loop.body = createBlockStatement([
               createCompoundExpression([`const _memo = (`, memo.exp, `)`]),
               createCompoundExpression([
-                `if (_cached`,
+                `if (_cached && _cached.el`,
                 ...keyExp ? [` && _cached.key === `, keyExp] : [],
                 ` && ${context.helperString(
                 IS_MEMO_SAME
