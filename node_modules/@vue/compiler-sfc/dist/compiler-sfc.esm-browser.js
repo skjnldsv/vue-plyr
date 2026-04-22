@@ -1,5 +1,5 @@
 /**
-* @vue/compiler-sfc v3.5.32
+* @vue/compiler-sfc v3.5.33
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -34270,6 +34270,18 @@ function requireStringifier () {
 	if (hasRequiredStringifier) return stringifier;
 	hasRequiredStringifier = 1;
 
+	// Escapes sequences that could break out of an HTML <style> context.
+	// Uses CSS unicode escaping (\3c = '<') which is valid CSS and parsed
+	// correctly by all compliant CSS consumers.
+	const STYLE_TAG = /(<)(\/?style\b)/gi;
+	const COMMENT_OPEN = /(<)(!--)/g;
+
+	function escapeHTMLInCSS(str) {
+	  if (typeof str !== 'string') return str
+	  if (!str.includes('<')) return str
+	  return str.replace(STYLE_TAG, '\\3c $2').replace(COMMENT_OPEN, '\\3c $2')
+	}
+
 	const DEFAULT_RAW = {
 	  after: '\n',
 	  beforeClose: '\n',
@@ -34308,7 +34320,7 @@ function requireStringifier () {
 	      this.block(node, name + params);
 	    } else {
 	      let end = (node.raws.between || '') + (semicolon ? ';' : '');
-	      this.builder(name + params + end, node);
+	      this.builder(escapeHTMLInCSS(name + params + end), node);
 	    }
 	  }
 
@@ -34343,7 +34355,7 @@ function requireStringifier () {
 
 	  block(node, start) {
 	    let between = this.raw(node, 'between', 'beforeOpen');
-	    this.builder(start + between + '{', node, 'start');
+	    this.builder(escapeHTMLInCSS(start + between) + '{', node, 'start');
 
 	    let after;
 	    if (node.nodes && node.nodes.length) {
@@ -34353,7 +34365,7 @@ function requireStringifier () {
 	      after = this.raw(node, 'after', 'emptyBody');
 	    }
 
-	    if (after) this.builder(after);
+	    if (after) this.builder(escapeHTMLInCSS(after));
 	    this.builder('}', node, 'end');
 	  }
 
@@ -34365,10 +34377,11 @@ function requireStringifier () {
 	    }
 
 	    let semicolon = this.raw(node, 'semicolon');
+	    let isDocument = node.type === 'document';
 	    for (let i = 0; i < node.nodes.length; i++) {
 	      let child = node.nodes[i];
 	      let before = this.raw(child, 'before');
-	      if (before) this.builder(before);
+	      if (before) this.builder(isDocument ? before : escapeHTMLInCSS(before));
 	      this.stringify(child, last !== i || semicolon);
 	    }
 	  }
@@ -34376,7 +34389,7 @@ function requireStringifier () {
 	  comment(node) {
 	    let left = this.raw(node, 'left', 'commentLeft');
 	    let right = this.raw(node, 'right', 'commentRight');
-	    this.builder('/*' + left + node.text + right + '*/', node);
+	    this.builder(escapeHTMLInCSS('/*' + left + node.text + right + '*/'), node);
 	  }
 
 	  decl(node, semicolon) {
@@ -34388,7 +34401,7 @@ function requireStringifier () {
 	    }
 
 	    if (semicolon) string += ';';
-	    this.builder(string, node);
+	    this.builder(escapeHTMLInCSS(string), node);
 	  }
 
 	  document(node) {
@@ -34594,13 +34607,17 @@ function requireStringifier () {
 
 	  root(node) {
 	    this.body(node);
-	    if (node.raws.after) this.builder(node.raws.after);
+	    if (node.raws.after) {
+	      let after = node.raws.after;
+	      let isDocument = node.parent && node.parent.type === 'document';
+	      this.builder(isDocument ? after : escapeHTMLInCSS(after));
+	    }
 	  }
 
 	  rule(node) {
 	    this.block(node, this.rawValue(node, 'selector'));
 	    if (node.raws.ownSemicolon) {
-	      this.builder(node.raws.ownSemicolon, node, 'end');
+	      this.builder(escapeHTMLInCSS(node.raws.ownSemicolon), node, 'end');
 	    }
 	  }
 
@@ -35799,7 +35816,8 @@ function requirePreviousMap () {
 	      return fromBase64(text.substr(baseUriMatch[0].length))
 	    }
 
-	    let encoding = text.match(/data:application\/json;([^,]+),/)[1];
+	    let encoding = text.slice('data:application/json;'.length);
+	    encoding = encoding.slice(0, encoding.indexOf(','));
 	    throw new Error('Unsupported source map encoding ' + encoding)
 	  }
 
@@ -36042,7 +36060,15 @@ function requireInput () {
 	      );
 	    }
 
-	    result.input = { column, endColumn, endLine, endOffset, line, offset, source: this.css };
+	    result.input = {
+	      column,
+	      endColumn,
+	      endLine,
+	      endOffset,
+	      line,
+	      offset,
+	      source: this.css
+	    };
 	    if (this.file) {
 	      if (pathToFileURL) {
 	        result.input.url = pathToFileURL(this.file).toString();
@@ -38135,7 +38161,7 @@ function requireNoWorkResult () {
 
 	let MapGenerator = /*@__PURE__*/ requireMapGenerator();
 	let parse = /*@__PURE__*/ requireParse();
-	const Result = /*@__PURE__*/ requireResult();
+	let Result = /*@__PURE__*/ requireResult();
 	let stringify = /*@__PURE__*/ requireStringify();
 	let warnOnce = /*@__PURE__*/ requireWarnOnce();
 
@@ -38285,7 +38311,7 @@ function requireProcessor$1 () {
 
 	class Processor {
 	  constructor(plugins = []) {
-	    this.version = '8.5.8';
+	    this.version = '8.5.10';
 	    this.plugins = this.normalize(plugins);
 	  }
 
@@ -42186,6 +42212,8 @@ function processRule(id, rule) {
 function rewriteSelector(id, rule, selector, selectorRoot, deep, slotted = false) {
   let node = null;
   let shouldInject = !deep;
+  let hasNestedDeep = false;
+  let splitForNestedDeep = false;
   selector.each((n) => {
     if (n.type === "combinator" && (n.value === ">>>" || n.value === "/deep/")) {
       n.value = " ";
@@ -42197,6 +42225,49 @@ function rewriteSelector(id, rule, selector, selectorRoot, deep, slotted = false
     }
     if (n.type === "pseudo") {
       const { value } = n;
+      if (isDeepContainerPseudo(n)) {
+        const hasDeepSelectors = n.nodes.some(
+          (selector2) => selector2.some(isDeepSelector)
+        );
+        if (hasDeepSelectors) {
+          const hasScopeAnchor = !!node;
+          const hasMixedSelectors = n.nodes.some(
+            (selector2) => !selector2.some(isDeepSelector)
+          );
+          const hasTrailingNodes = selector.index(n) < selector.length - 1;
+          if (canSplitDeepContainerPseudo(n) && !deep && !hasScopeAnchor && hasMixedSelectors && hasTrailingNodes) {
+            splitSelectorForNestedDeep(
+              id,
+              rule,
+              selector,
+              selectorRoot,
+              n,
+              deep,
+              slotted
+            );
+            splitForNestedDeep = true;
+            return false;
+          }
+          if (value === ":not" && !deep && !hasScopeAnchor && hasMixedSelectors && hasTrailingNodes) {
+            return;
+          }
+          n.nodes.forEach(
+            (selector2) => rewriteSelector(
+              id,
+              rule,
+              selector2,
+              selectorRoot,
+              deep || hasScopeAnchor,
+              slotted
+            )
+          );
+          if (!hasScopeAnchor) {
+            node = n;
+            shouldInject = false;
+          }
+          hasNestedDeep = true;
+        }
+      }
       if (value === ":deep" || value === "::v-deep") {
         rule.__deep = true;
         if (n.nodes.length) {
@@ -42271,10 +42342,13 @@ function rewriteSelector(id, rule, selector, selectorRoot, deep, slotted = false
       }
       if (node) return;
     }
-    if (n.type !== "pseudo" && n.type !== "combinator" || n.type === "pseudo" && (n.value === ":is" || n.value === ":where") && !node) {
+    if (!hasNestedDeep && (n.type !== "pseudo" && n.type !== "combinator" || n.type === "pseudo" && (n.value === ":is" || n.value === ":where") && !node)) {
       node = n;
     }
   });
+  if (splitForNestedDeep) {
+    return;
+  }
   if (rule.nodes.some((node2) => node2.type === "rule")) {
     const deep2 = rule.__deep;
     if (!deep2) {
@@ -42286,7 +42360,7 @@ function rewriteSelector(id, rule, selector, selectorRoot, deep, slotted = false
     }
     shouldInject = deep2;
   }
-  if (node) {
+  if (node && !hasNestedDeep) {
     const { type, value } = node;
     if (type === "pseudo" && (value === ":is" || value === ":where")) {
       node.nodes.forEach(
@@ -42317,6 +42391,38 @@ function rewriteSelector(id, rule, selector, selectorRoot, deep, slotted = false
 }
 function isSpaceCombinator(node) {
   return node.type === "combinator" && /^\s+$/.test(node.value);
+}
+function isDeepSelector(node) {
+  var _a;
+  if (node.type === "pseudo" && (node.value === ":deep" || node.value === "::v-deep")) {
+    return true;
+  }
+  return !!((_a = node.nodes) == null ? void 0 : _a.some((child) => isDeepSelector(child)));
+}
+function isDeepContainerPseudo(node) {
+  return node.type === "pseudo" && (node.value === ":is" || node.value === ":where" || node.value === ":has" || node.value === ":not");
+}
+function canSplitDeepContainerPseudo(node) {
+  return node.value === ":is" || node.value === ":where" || node.value === ":has";
+}
+function splitSelectorForNestedDeep(id, rule, selector, selectorRoot, pseudo, deep, slotted) {
+  const pseudoIndex = selector.index(pseudo);
+  const selectors = pseudo.nodes.map((branch, index) => {
+    const branchSelector = selector.clone();
+    if (branchSelector.first) {
+      branchSelector.first.spaces.before = index === 0 ? selector.first.spaces.before : " ";
+    }
+    const branchPseudo = branchSelector.at(pseudoIndex);
+    const branchClone = branch.clone();
+    if (branchClone.first) {
+      branchClone.first.spaces.before = "";
+    }
+    branchPseudo.removeAll();
+    branchPseudo.append(branchClone);
+    rewriteSelector(id, rule, branchSelector, selectorRoot, deep, slotted);
+    return branchSelector;
+  });
+  selector.replaceWith(...selectors);
 }
 function extractAndWrapNodes(parentNode) {
   if (!parentNode.nodes) return;
@@ -50823,7 +50929,7 @@ var __spreadValues = (a, b) => {
     }
   return a;
 };
-const version = "3.5.32";
+const version = "3.5.33";
 const parseCache = parseCache$1;
 const errorMessages = __spreadValues(__spreadValues({}, errorMessages$1), DOMErrorMessages);
 const walk = walk$2;
