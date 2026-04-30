@@ -379,7 +379,10 @@ class LazyResult {
     if (str.stringify) str = str.stringify
 
     let rootSource = this.result.root.source
-    if (opts.map === undefined && !(rootSource && rootSource.input && rootSource.input.map)) {
+    if (
+      opts.map === undefined &&
+      !(rootSource && rootSource.input && rootSource.input.map)
+    ) {
       let result = ''
       str(this.result.root, i => {
         result += i
