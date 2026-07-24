@@ -86,18 +86,12 @@ class PreviousMap {
 
   loadFile(path, cssFile, trusted) {
     if (!trusted && !this.unsafeMap) {
-      if (!/\.map$/i.test(path)) {
+      if (!/\.map$/i.test(path)) return undefined
+      if (!cssFile) return undefined
+
+      let rel = relative(dirname(cssFile), path)
+      if (rel === '..' || rel.startsWith('..' + sep) || isAbsolute(rel)) {
         return undefined
-      }
-      if (cssFile) {
-        let relativePath = relative(dirname(cssFile), path)
-        if (
-          relativePath === '..' ||
-          relativePath.startsWith('..' + sep) ||
-          isAbsolute(relativePath)
-        ) {
-          return undefined
-        }
       }
     }
     this.root = dirname(path)
