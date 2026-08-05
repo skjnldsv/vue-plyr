@@ -1,5 +1,5 @@
 /**
-* vue v3.5.40
+* vue v3.5.41
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
@@ -270,7 +270,7 @@ var Vue = (function (exports) {
   const specialBooleanAttrs = `itemscope,allowfullscreen,formnovalidate,ismap,nomodule,novalidate,readonly`;
   const isSpecialBooleanAttr = /* @__PURE__ */ makeMap(specialBooleanAttrs);
   const isBooleanAttr = /* @__PURE__ */ makeMap(
-    specialBooleanAttrs + `,async,autofocus,autoplay,controls,default,defer,disabled,hidden,inert,loop,open,required,reversed,scoped,seamless,checked,muted,multiple,selected`
+    specialBooleanAttrs + `,async,autofocus,autoplay,controls,default,defer,disabled,inert,loop,open,required,reversed,scoped,seamless,checked,muted,multiple,selected`
   );
   function includeBooleanAttr(value) {
     return !!value || value === "";
@@ -2673,7 +2673,9 @@ var Vue = (function (exports) {
         cb.flags |= 1;
       }
     } else {
-      pendingPostFlushCbs.push(...cb);
+      for (let i = 0; i < cb.length; i++) {
+        pendingPostFlushCbs.push(cb[i]);
+      }
     }
     queueFlush();
   }
@@ -2709,7 +2711,9 @@ var Vue = (function (exports) {
       );
       pendingPostFlushCbs.length = 0;
       if (activePostFlushCbs) {
-        activePostFlushCbs.push(...deduped);
+        for (let i = 0; i < deduped.length; i++) {
+          activePostFlushCbs.push(deduped[i]);
+        }
         return;
       }
       activePostFlushCbs = deduped;
@@ -3970,7 +3974,11 @@ var Vue = (function (exports) {
   function setTransitionHooks(vnode, hooks) {
     if (vnode.shapeFlag & 6 && vnode.component) {
       vnode.transition = hooks;
-      setTransitionHooks(vnode.component.subTree, hooks);
+      const subTree = vnode.component.subTree;
+      setTransitionHooks(
+        isTeleport(subTree.type) ? getInnerChild$1(subTree) || subTree : subTree,
+        hooks
+      );
     } else if (vnode.shapeFlag & 128) {
       vnode.ssContent.transition = hooks.clone(vnode.ssContent);
       vnode.ssFallback.transition = hooks.clone(vnode.ssFallback);
@@ -4510,6 +4518,9 @@ Server rendered element contains more child nodes than client vdom.`
               }
               if (forcePatch && (key.endsWith("value") || key === "indeterminate") || isOn(key) && !isReservedProp(key) || // force hydrate v-bind with .prop modifiers
               key[0] === "." || isCustomElement && !isReservedProp(key) || dynamicProps && dynamicProps.includes(key)) {
+                if (isUnchangedResourceProp(el, key, props[key])) {
+                  continue;
+                }
                 patchProp(el, key, null, props[key], namespace, parentComponent);
               }
             }
@@ -4692,6 +4703,13 @@ Server rendered element contains fewer child nodes than client vdom.`
     };
     return [hydrate, hydrateNode];
   }
+  const resourceProps = /* @__PURE__ */ new Set(["src", "srcset", "href", "poster"]);
+  function isUnchangedResourceProp(el, key, clientValue) {
+    if (!resourceProps.has(key)) {
+      return false;
+    }
+    return el.getAttribute(key) === (clientValue == null ? null : `${clientValue}`);
+  }
   function propHasMismatch(el, key, clientValue, vnode, instance) {
     let mismatchType;
     let mismatchKey;
@@ -4729,7 +4747,10 @@ Server rendered element contains fewer child nodes than client vdom.`
         mismatchKey = "style";
       }
     } else if (el instanceof SVGElement && isKnownSvgAttr(key) || el instanceof HTMLElement && (isBooleanAttr(key) || isKnownHtmlAttr(key))) {
-      if (isBooleanAttr(key)) {
+      if (key === "hidden") {
+        actual = normalizeHiddenValue(el.getAttribute(key));
+        expected = normalizeHiddenValue(clientValue);
+      } else if (isBooleanAttr(key)) {
         actual = el.hasAttribute(key);
         expected = includeBooleanAttr(clientValue);
       } else if (clientValue == null) {
@@ -4764,6 +4785,15 @@ Server rendered element contains fewer child nodes than client vdom.`
       return true;
     }
     return false;
+  }
+  function normalizeHiddenValue(value) {
+    if (!isRenderableAttrValue(value)) {
+      return false;
+    }
+    if (isString(value)) {
+      return value.toLowerCase() === "until-found" ? "until-found" : "";
+    }
+    return includeBooleanAttr(value) ? "" : false;
   }
   function toClassSet(str) {
     return new Set(str.trim().split(/\s+/));
@@ -5578,7 +5608,8 @@ If this is a native custom element, make sure to exclude it from component resol
     return slots;
   }
 
-  function renderSlot(slots, name, props = {}, fallback, noSlotted, branchKey) {
+  function renderSlot(slots, name, props, fallback, noSlotted, branchKey) {
+    if (props == null) props = {};
     if (currentRenderingInstance.ce || currentRenderingInstance.parent && isAsyncWrapper(currentRenderingInstance.parent) && currentRenderingInstance.parent.ce) {
       const slotProps = branchKey != null && props.key == null ? extend({}, props, { key: branchKey }) : props;
       const hasProps = Object.keys(slotProps).length > 0;
@@ -6999,12 +7030,13 @@ If you want to remount the same app, move your app creation logic into a factory
       root.dirs = root.dirs ? root.dirs.concat(vnode.dirs) : vnode.dirs;
     }
     if (vnode.transition) {
-      if (!isElementRoot(root)) {
+      const child = isTeleport(root.type) ? getInnerChild$1(root) || root : root;
+      if (!isElementRoot(child)) {
         warn$1(
           `Component inside <Transition> renders non-element root node that cannot be animated.`
         );
       }
-      setTransitionHooks(root, vnode.transition);
+      setTransitionHooks(child, vnode.transition);
     }
     if (setRoot) {
       setRoot(root);
@@ -9652,7 +9684,9 @@ If you want to remount the same app, move your app creation logic into a factory
         let hasUnresolvedAncestor = false;
         while (parent) {
           if (parent.pendingBranch) {
-            parent.effects.push(...effects);
+            for (let i = 0; i < effects.length; i++) {
+              parent.effects.push(effects[i]);
+            }
             hasUnresolvedAncestor = true;
             break;
           }
@@ -10017,6 +10051,14 @@ If you want to remount the same app, move your app creation logic into a factory
     if (vnode.key !== vnode.key) {
       warn$1(`VNode created with invalid key (NaN). VNode type:`, vnode.type);
     }
+    if (props && vnode.shapeFlag & 1) {
+      const overwritingProp = props.innerHTML != null ? "innerHTML" : props.textContent != null ? "textContent" : null;
+      if (overwritingProp && hasContentChildren(vnode.children)) {
+        warn$1(
+          `The \`${overwritingProp}\` prop on <${vnode.type}> will override its children. Remove either the \`${overwritingProp}\` prop or the children.`
+        );
+      }
+    }
     if (isBlockTreeEnabled > 0 && // avoid a block node from tracking itself
     !isBlockNode && // has current parent block
     currentBlock && // presence of a patch flag indicates this node needs patching on updates.
@@ -10029,6 +10071,11 @@ If you want to remount the same app, move your app creation logic into a factory
       currentBlock.push(vnode);
     }
     return vnode;
+  }
+  function hasContentChildren(children) {
+    if (isString(children)) return children !== "";
+    if (isArray(children)) return children.length > 0;
+    return false;
   }
   const createVNode = createVNodeWithArgsTransform ;
   function _createVNode(type, props = null, children = null, patchFlag = 0, dynamicProps = null, isBlockNode = false) {
@@ -10466,7 +10513,12 @@ Component that was made reactive: `,
         setupResult.then(unsetCurrentInstance, unsetCurrentInstance);
         if (isSSR) {
           return setupResult.then((resolvedResult) => {
-            handleSetupResult(instance, resolvedResult, isSSR);
+            setInSSRSetupState(true);
+            try {
+              handleSetupResult(instance, resolvedResult, isSSR);
+            } finally {
+              setInSSRSetupState(false);
+            }
           }).catch((e) => {
             handleError(e, instance, 0);
           });
@@ -10930,7 +10982,7 @@ Component that was made reactive: `,
     return true;
   }
 
-  const version = "3.5.40";
+  const version = "3.5.41";
   const warn = warn$1 ;
   const ErrorTypeStrings = ErrorTypeStrings$1 ;
   const devtools = devtools$1 ;
@@ -11881,7 +11933,9 @@ Expected function or array of functions, received type ${typeof value}.`
           if (parent && parent._pendingResolve) {
             this._pendingResolve = parent._pendingResolve.then(() => {
               this._pendingResolve = void 0;
-              this._resolveDef();
+              if (this.isConnected) {
+                return this._resolveDef();
+              }
             });
           } else {
             this._resolveDef();
@@ -11931,7 +11985,7 @@ Expected function or array of functions, received type ${typeof value}.`
      */
     _resolveDef() {
       if (this._pendingResolve) {
-        return;
+        return this._pendingResolve;
       }
       for (let i = 0; i < this.attributes.length; i++) {
         this._setAttr(this.attributes[i].name);
@@ -11971,6 +12025,7 @@ Expected function or array of functions, received type ${typeof value}.`
           def.configureApp = this._def.configureApp;
           resolve(this._def = def, true);
         });
+        return this._pendingResolve;
       } else {
         resolve(this._def);
       }
@@ -12008,6 +12063,11 @@ Expected function or array of functions, received type ${typeof value}.`
         }
       }
       for (const key of declaredPropKeys.map(camelize)) {
+        if (key in Object.getPrototypeOf(this)) {
+          warn(
+            `Custom element prop "${key}" conflicts with an existing property on the element and will overwrite it.`
+          );
+        }
         Object.defineProperty(this, key, {
           get() {
             return this._getProp(key);
@@ -12480,6 +12540,7 @@ Expected function or array of functions, received type ${typeof value}.`
     }
   }
   const assignKey = /* @__PURE__ */ Symbol("_assign");
+  const initialValueKey = /* @__PURE__ */ Symbol("_initialValue");
   function castValue(value, trim, number) {
     if (trim) value = value.trim();
     if (number) value = looseToNumber(value);
@@ -12487,6 +12548,13 @@ Expected function or array of functions, received type ${typeof value}.`
   }
   const vModelText = {
     created(el, { modifiers: { lazy, trim, number } }, vnode) {
+      if (el.parentNode) {
+        if (el.type === "text") {
+          el[initialValueKey] = el.defaultValue.replace(/[\r\n]/g, "");
+        } else if (el.type === "textarea") {
+          el[initialValueKey] = el.defaultValue.replace(/\r\n?/g, "\n");
+        }
+      }
       el[assignKey] = getModelAssigner(vnode);
       const castToNumber = number || vnode.props && vnode.props.type === "number";
       addEventListener(el, lazy ? "change" : "input", (e) => {
@@ -12505,8 +12573,15 @@ Expected function or array of functions, received type ${typeof value}.`
       }
     },
     // set value on mounted so it's after min/max for type="range"
-    mounted(el, { value }) {
-      el.value = value == null ? "" : value;
+    mounted(el, { value, modifiers: { trim, number } }) {
+      const newValue = value == null ? "" : value;
+      const initialValue = el[initialValueKey];
+      delete el[initialValueKey];
+      if (initialValue !== void 0 && (el.type === "text" || el.type === "textarea") && el.value !== initialValue) {
+        el[assignKey](castValue(el.value, trim, number));
+      } else {
+        el.value = newValue;
+      }
     },
     beforeUpdate(el, { value, oldValue, modifiers: { lazy, trim, number } }, vnode) {
       el[assignKey] = getModelAssigner(vnode);
@@ -16459,6 +16534,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
           node.loc
         );
         return () => {
+          var _a;
           let childBlock;
           const { children } = forNode;
           if (isTemplate) {
@@ -16502,7 +16578,8 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
             if (isTemplate && keyProperty) {
               injectProp(childBlock, keyProperty, context);
             }
-            if (childBlock.isBlock !== !isStableFragment) {
+            const shouldUseBlock = !isStableFragment || childBlock.isBlockRequired === true;
+            if (childBlock.isBlock !== shouldUseBlock) {
               if (childBlock.isBlock) {
                 removeHelper(OPEN_BLOCK);
                 removeHelper(
@@ -16514,12 +16591,15 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
                 );
               }
             }
-            childBlock.isBlock = !isStableFragment;
+            childBlock.isBlock = shouldUseBlock;
             if (childBlock.isBlock) {
               helper(OPEN_BLOCK);
               helper(getVNodeBlockHelper(context.inSSR, childBlock.isComponent));
             } else {
               helper(getVNodeHelper(context.inSSR, childBlock.isComponent));
+              if (childBlock.needsPatch) {
+                childBlock.patchFlag = ((_a = childBlock.patchFlag) != null ? _a : 0) | 512;
+              }
             }
           }
           if (memo) {
@@ -16895,6 +16975,8 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
       let vnodeDynamicProps;
       let dynamicPropNames;
       let vnodeDirectives;
+      let needsPatch = false;
+      let isBlockRequired = false;
       let shouldUseBlock = (
         // dynamic component may resolve to plain elements
         isDynamicComponent || vnodeTag === TELEPORT || vnodeTag === SUSPENSE || !isComponent && // <svg> and <foreignObject> must be forced into blocks so that block
@@ -16914,6 +16996,8 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
         vnodeProps = propsBuildResult.props;
         patchFlag = propsBuildResult.patchFlag;
         dynamicPropNames = propsBuildResult.dynamicPropNames;
+        needsPatch = propsBuildResult.needsPatch;
+        isBlockRequired = propsBuildResult.isBlockRequired;
         const directives = propsBuildResult.directives;
         vnodeDirectives = directives && directives.length ? createArrayExpression(
           directives.map((dir) => buildDirectiveArgs(dir, context))
@@ -16964,7 +17048,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
       if (dynamicPropNames && dynamicPropNames.length) {
         vnodeDynamicProps = stringifyDynamicPropNames(dynamicPropNames);
       }
-      node.codegenNode = createVNodeCall(
+      const vnodeCall = node.codegenNode = createVNodeCall(
         context,
         vnodeTag,
         vnodeProps,
@@ -16977,6 +17061,13 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
         isComponent,
         node.loc
       );
+      needsPatch = needsPatch && (patchFlag === 0 || patchFlag === 32);
+      if (needsPatch) {
+        vnodeCall.needsPatch = true;
+      }
+      if (isBlockRequired) {
+        vnodeCall.isBlockRequired = true;
+      }
     };
   };
   function resolveComponentType(node, context, ssr = false) {
@@ -17025,6 +17116,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
     const runtimeDirectives = [];
     const hasChildren = children.length > 0;
     let shouldUseBlock = false;
+    let isBlockRequired = false;
     let patchFlag = 0;
     let hasRef = false;
     let hasClassBinding = false;
@@ -17066,19 +17158,20 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
         if (isEventHandler && isReservedProp(name)) {
           hasVnodeHook = true;
         }
+        if (name === "ref") {
+          hasRef = true;
+        }
         if (isEventHandler && value.type === 14) {
           value = value.arguments[0];
         }
         if (value.type === 20 || (value.type === 4 || value.type === 8) && getConstantType(value, context) > 0) {
           return;
         }
-        if (name === "ref") {
-          hasRef = true;
-        } else if (name === "class") {
+        if (name === "class") {
           hasClassBinding = true;
         } else if (name === "style") {
           hasStyleBinding = true;
-        } else if (name !== "key" && !dynamicPropNames.includes(name)) {
+        } else if (name !== "ref" && name !== "key" && !dynamicPropNames.includes(name)) {
           dynamicPropNames.push(name);
         }
         if (isComponent && (name === "class" || name === "style") && !dynamicPropNames.includes(name)) {
@@ -17131,13 +17224,12 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
         if (isVOn && ssr) {
           continue;
         }
-        if (
-          // #938: elements with dynamic keys should be forced into blocks
-          isVBind && isStaticArgOf(arg, "key") || // inline before-update hooks need to force block so that it is invoked
-          // before children
-          isVOn && hasChildren && isStaticArgOf(arg, "vue:before-update")
-        ) {
+        if (isVBind && isStaticArgOf(arg, "key")) {
           shouldUseBlock = true;
+        }
+        if (isVOn && hasChildren && arg && isStaticExp(arg) && camelize(arg.content) === "vue:beforeUpdate") {
+          shouldUseBlock = true;
+          isBlockRequired = true;
         }
         if (isVBind && isStaticArgOf(arg, "ref")) {
           pushRefVForMarker();
@@ -17189,6 +17281,7 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
           runtimeDirectives.push(prop);
           if (hasChildren) {
             shouldUseBlock = true;
+            isBlockRequired = true;
           }
         }
       }
@@ -17227,7 +17320,8 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
         patchFlag |= 32;
       }
     }
-    if (!shouldUseBlock && (patchFlag === 0 || patchFlag === 32) && (hasRef || hasVnodeHook || runtimeDirectives.length > 0)) {
+    const needsPatch = (patchFlag === 0 || patchFlag === 32) && (hasRef || hasVnodeHook || runtimeDirectives.length > 0);
+    if (!shouldUseBlock && needsPatch) {
       patchFlag |= 512;
     }
     if (!context.inSSR && propsExpression) {
@@ -17293,7 +17387,9 @@ Use a v-bind binding combined with a v-on listener that emits update:x event ins
       directives: runtimeDirectives,
       patchFlag,
       dynamicPropNames,
-      shouldUseBlock
+      shouldUseBlock,
+      needsPatch,
+      isBlockRequired
     };
   }
   function dedupeProperties(properties) {
