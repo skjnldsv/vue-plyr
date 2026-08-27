@@ -84,7 +84,7 @@ declare const initialValueKey: unique symbol;
 type ModelDirective<T, Modifiers extends string = string> = ObjectDirective<T & {
     [assignKey]: AssignerFn;
     [initialValueKey]?: string;
-    _assigning?: boolean;
+    _pendingValue?: [multiple: boolean, value: any];
 }, any, Modifiers>;
 export declare const vModelText: ModelDirective<HTMLInputElement | HTMLTextAreaElement, 'trim' | 'number' | 'lazy'>;
 export declare const vModelCheckbox: ModelDirective<HTMLInputElement>;
